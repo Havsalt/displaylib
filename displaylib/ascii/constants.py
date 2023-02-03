@@ -1,0 +1,7 @@
+
+ANSI_UP = "\u001b[A"
+ANSI_DOWN = "\u001b[B"
+ANSI_RIGHT = "\u001b[C"
+ANSI_LEFT = "\u001b[D"
+
+__all__ = ["ANSI_UP", "ANSI_DOWN", "ANSI_RIGHT", "ANSI_LEFT"]
