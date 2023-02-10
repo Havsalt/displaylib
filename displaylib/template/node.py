@@ -11,6 +11,7 @@ class Node:
     root = None # set from a Engine subclass
     nodes = {} # all nodes that are alive
     _request_sort = False # requests Engine to sort
+    _queued_nodes = [] # uses <Node>.queue_free() to ask Engine to delete them
 
     def __new__(cls: type[Self], *args, **kwargs) -> Self:
         instance = super().__new__(cls)
@@ -22,8 +23,8 @@ class Node:
         self.position = Vec2(x, y)
         self._z_index = z_index
         self.visible = True
-        if z_index != 0:
-            Node._request_sort = True
+        # if z_index != 0: # NOTE: changing the `z_index` is required to request sort on creation
+        # Node._request_sort = True # request sort every frame a new node is created
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.position.x}, {self.position.y})"
@@ -59,5 +60,5 @@ class Node:
     def _update(self, delta: float) -> None:
         return
     
-    def free(self) -> None:
-        del self.nodes[id(self)]
+    def queue_free(self) -> None:
+        Node._queued_nodes.append(self)

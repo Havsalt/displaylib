@@ -1,5 +1,7 @@
 from typing_extensions import Self
+from ..math import Vec2
 from ..template import Node
+from .types import ASCIISurface
 
 
 class ASCIINode(Node):
@@ -8,7 +10,14 @@ class ASCIINode(Node):
     # per instance
     visible: bool = False
 
-    def __init__(self, owner: Self | None = None, x: int = 0, y: int = 0, z_index: int = 0) -> None:
+    def __init__(self, owner: Self | None = None, x: int = 0, y: int = 0, z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(owner, x, y, z_index)
-        self.visible = True
+        if force_sort:
+            Node._request_sort = True # requests the Engine to sort every frame a new node is created
         self.content = [] # 2D array
+    
+    def _render(self, surface: ASCIISurface) -> None:
+        return
+    
+    def _resize(self, size: Vec2) -> None:
+        return

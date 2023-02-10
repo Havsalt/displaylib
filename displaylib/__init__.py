@@ -6,7 +6,7 @@ Submodules:
 - pygame
 """
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __author__ = "FloatingInt"
 __all__ = [
     "Vec2",
@@ -14,8 +14,12 @@ __all__ = [
     "OverloadUnmatched",
     "ASCIINode",
     "ASCIIEngine",
+    "ASCIICamera",
     "ASCIISurface",
-    "ASCIIClient"
+    "ASCIIScreen",
+    "ASCIIImage",
+    "ASCIIClient",
+    "Clock"
 ]
 
 # utility
@@ -25,6 +29,10 @@ from .math import Vec2
 from .ascii import (
     Node as ASCIINode,
     Engine as ASCIIEngine,
+    Camera as ASCIICamera,
     Surface as ASCIISurface,
-    Client as ASCIIClient
+    Screen as ASCIIScreen,
+    Image as ASCIIImage,
+    Client as ASCIIClient,
+    Clock as Clock
 )

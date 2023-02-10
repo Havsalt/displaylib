@@ -41,6 +41,9 @@ class Vec2:
         elif isinstance(other, (int, float)):
             return Vec2(self.x / other, self.y / other)
     
+    def __mod__(self, other: int | float) -> Self:
+        return Vec2(self.x % other, self.y % other)
+    
     def __eq__(self, other: Self) -> bool:
         return (self.x == other.x) and (self.y == other.y)
     

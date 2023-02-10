@@ -4,12 +4,12 @@ from .node import Node
 
 class Engine:
     """Engine base class
-    NOTE: only one Engine should exist per script instance
+    NOTE: only one Engine instance should exist per script instance
     """
     tps: int = 4
     is_running = False
 
-    def __new__(cls: type[Self]) -> Self:
+    def __new__(cls: type[Self], *args, **kwargs) -> Self:
         instance = object.__new__(cls)
         Node.root = instance
         return instance
