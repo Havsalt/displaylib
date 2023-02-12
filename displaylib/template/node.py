@@ -1,5 +1,6 @@
 from typing_extensions import Self
 from ..math import Vec2
+from .types import Engine
 
 
 class Node:
@@ -8,23 +9,23 @@ class Node:
     Automatically keeps track of alive Node(s) by reference.
     An Engine subclass may access it's nodes through the `nodes` class attribute
     """
-    root = None # set from a Engine subclass
+    root: Engine = None # set from a Engine subclass
     nodes = {} # all nodes that are alive
     _request_sort = False # requests Engine to sort
-    _queued_nodes = [] # uses <Node>.queue_free() to ask Engine to delete them
+    _queued_nodes = set() # uses <Node>.queue_free() to ask Engine to delete them
 
     def __new__(cls: type[Self], *args, **kwargs) -> Self:
         instance = super().__new__(cls)
         Node.nodes[id(instance)] = instance
         return instance
 
-    def __init__(self, owner: Self | None = None, x: int = 0, y: int = 0, z_index: int = 0) -> None:
+    def __init__(self, owner: Self | None = None, x: int = 0, y: int = 0, z_index: int = 0, force_sort: bool = True) -> None:
         self.owner = owner
         self.position = Vec2(x, y)
         self._z_index = z_index
         self.visible = True
-        # if z_index != 0: # NOTE: changing the `z_index` is required to request sort on creation
-        # Node._request_sort = True # request sort every frame a new node is created
+        if force_sort: # if True, requests sort every frame a new node is created
+            Node._request_sort = True # otherwise, depent on a `z_index` change
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.position.x}, {self.position.y})"
@@ -61,4 +62,4 @@ class Node:
         return
     
     def queue_free(self) -> None:
-        Node._queued_nodes.append(self)
+        Node._queued_nodes.add(self)

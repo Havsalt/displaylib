@@ -24,7 +24,7 @@ class ASCIIEngine(Engine):
         def sort_fn(element):
             return element[1].z_index
 
-        nodes = Node.nodes.values()
+        nodes = tuple(Node.nodes.values())
         clock = Clock(self.tps)
         while self.is_running:
             delta = 1.0 / self.tps
@@ -40,7 +40,7 @@ class ASCIIEngine(Engine):
             
             if Node._request_sort: # only sort once per frame if needed
                 Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
-            nodes = Node.nodes.values()
+            nodes = tuple(Node.nodes.values())
 
             # render content of visible nodes onto a surface
             self.display = ASCIISurface(Node.nodes.values(), self.screen.width, self.screen.height) # create a Surface from all the Nodes

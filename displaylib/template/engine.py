@@ -7,7 +7,7 @@ class Engine:
     NOTE: only one Engine instance should exist per script instance
     """
     tps: int = 4
-    is_running = False
+    is_running: bool = False
 
     def __new__(cls: type[Self], *args, **kwargs) -> Self:
         instance = object.__new__(cls)

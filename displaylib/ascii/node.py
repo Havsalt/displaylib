@@ -5,7 +5,7 @@ from .types import ASCIISurface
 
 
 class ASCIINode(Node):
-    cell_transparant = 0 # type used to indicate that a cell is transparent in `content`
+    cell_transparant = " " # type used to indicate that a cell is transparent in `content`
     cell_default = " " # the default look of an empty cell
     # per instance
     visible: bool = False
