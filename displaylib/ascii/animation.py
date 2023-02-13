@@ -23,9 +23,10 @@ class Frame:
 
 class Animation:
     __slots__ = ("frames")
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, reverse: bool = False) -> None:
         fnames = os.listdir(path)
-        self.frames = [Frame(os.path.join(path, fname)) for fname in fnames]
+        step = 1 if not reverse else -1
+        self.frames = [Frame(os.path.join(path, fname)) for fname in fnames][::step]
 
 
 class EmptyAnimation(Animation):
