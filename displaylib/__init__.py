@@ -6,7 +6,7 @@ Submodules:
 - pygame
 """
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __author__ = "FloatingInt"
 __all__ = [
     "Vec2",
@@ -34,5 +34,9 @@ from .ascii import (
     Screen as ASCIIScreen,
     Image as ASCIIImage,
     Client as ASCIIClient,
+    Frame as Frame,
+    Animation as Animation,
+    EmptyAnimation as EmptyAnimation,
+    AnimationPlayer as AnimationPlayer,
     Clock as Clock
 )
