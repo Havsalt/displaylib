@@ -12,6 +12,10 @@ __all__ = [
     "Surface",
     "Image",
     "Client",
+    "Frame",
+    "Animation",
+    "EmptyAnimation",
+    "AnimationPlayer",
     "Clock"
 ]
 
@@ -24,6 +28,7 @@ from .surface import ASCIISurface as Surface
 from .screen import ASCIIScreen as Screen
 from .image import ASCIIImage as Image
 from .client import ASCIIClient as Client
+from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .clock import Clock
 # from .constants import * # TODO: find out whether to include this
 
