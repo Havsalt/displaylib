@@ -17,6 +17,8 @@ class Clock:
         self._delta = 1.0 / self._tps
     
     def tick(self):
+        time.sleep(self._delta) # QUICKFIX
+        return
         now = time.perf_counter()
         diff = now - self._last_tick
         self._last_tick = now
