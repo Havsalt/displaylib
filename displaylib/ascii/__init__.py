@@ -2,9 +2,13 @@
 """
 
 __all__ = [
+    # -- standard
     "Vec2",
     "overload",
     "OverloadUnmatched",
+    # -- util
+    "grapheme",
+    # -- core ascii
     "Node",
     "Engine",
     "Camera",
@@ -21,10 +25,12 @@ __all__ = [
     "Label"
 ]
 
-# -- standard imports
+# -- standard
 from ..math import Vec2
 from ..overload import overload, OverloadUnmatched
-# -- ascii imports
+# -- util
+from . import grapheme
+# -- core ascii
 from .node import ASCIINode as Node
 from .engine import ASCIIEngine as Engine
 from .camera import ASCIICamera as Camera
@@ -34,7 +40,7 @@ from .image import ASCIIImage as Image
 from .client import ASCIIClient as Client
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .clock import Clock
-# -- prefab imports
+# -- prefab
 from .prefab.label import ASCIILabel as Label
 
 
