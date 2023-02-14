@@ -1,9 +1,9 @@
 from typing_extensions import Self
-from ..node import Node
+from ..node import ASCIINode
 
 
-class ASCIILabel(Node):
-    """Prefrabricated `Label` node
+class ASCIILabel(ASCIINode):
+    """Prefabricated `Label` node
 
     A new line is created for each `\\n`
     """
