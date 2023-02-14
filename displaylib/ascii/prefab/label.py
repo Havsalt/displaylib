@@ -27,4 +27,4 @@ class ASCIILabel(ASCIINode):
         Args:
             text (str): string to be converted to content
         """
-        self.content = [list(line) for line in text]
+        self.content = [list(line) for line in text.split("\n")]
