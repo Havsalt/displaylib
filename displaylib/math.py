@@ -6,7 +6,9 @@ __all__ = ["Vec2"]
 
 
 class Vec2:
-    """2-dimensional Vector class
+    """Vector2 data structure
+
+    Components: `x`, `y`
 
     Usefull for storing position or direction
     """
