@@ -16,11 +16,15 @@ __all__ = [
     "Animation",
     "EmptyAnimation",
     "AnimationPlayer",
-    "Clock"
+    "Clock",
+    # -- prefab
+    "Label"
 ]
 
+# -- standard imports
 from ..math import Vec2
 from ..overload import overload, OverloadUnmatched
+# -- ascii imports
 from .node import ASCIINode as Node
 from .engine import ASCIIEngine as Engine
 from .camera import ASCIICamera as Camera
@@ -30,9 +34,11 @@ from .image import ASCIIImage as Image
 from .client import ASCIIClient as Client
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .clock import Clock
-# from .constants import * # TODO: find out whether to include this
+# -- prefab imports
+from .prefab.label import ASCIILabel as Label
 
-# activate ANSI escape codes
+
+# -- activate ANSI escape codes
 import os as _os
 _os.system("")
 # _os.system("cls") # used when developing

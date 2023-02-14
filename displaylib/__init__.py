@@ -6,7 +6,7 @@ Submodules:
 - pygame
 """
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 __author__ = "FloatingInt"
 __all__ = [
     "Vec2",
@@ -19,7 +19,8 @@ __all__ = [
     "ASCIIScreen",
     "ASCIIImage",
     "ASCIIClient",
-    "Clock"
+    "Clock",
+    ""
 ]
 
 # utility
@@ -38,5 +39,7 @@ from .ascii import (
     Animation as Animation,
     EmptyAnimation as EmptyAnimation,
     AnimationPlayer as AnimationPlayer,
-    Clock as Clock
+    Clock as Clock,
+    # -- prefab
+    Label as ASCIILabel
 )
