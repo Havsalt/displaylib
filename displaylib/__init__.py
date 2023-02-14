@@ -6,12 +6,13 @@ Submodules:
 - pygame
 """
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __author__ = "FloatingInt"
-__all__ = [
+__all__ = [ # when using default mode
     "Vec2",
     "overload",
     "OverloadUnmatched",
+    "graphme",
     "ASCIINode",
     "ASCIIEngine",
     "ASCIICamera",
@@ -23,11 +24,14 @@ __all__ = [
     ""
 ]
 
-# utility
+# -- util
 from .overload import overload, OverloadUnmatched
 from .math import Vec2
-# default module
+# -- imports
 from .ascii import (
+    # -- util
+    grapheme as graphme,
+    # -- core
     Node as ASCIINode,
     Engine as ASCIIEngine,
     Camera as ASCIICamera,
