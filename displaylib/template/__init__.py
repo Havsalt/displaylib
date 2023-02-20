@@ -6,12 +6,13 @@ __all__ = [
     "overload",
     "OverloadUnmatched",
     "Node",
+    "Node2D",
     "Engine",
     "Client"
 ]
 
 from ..math import Vec2
 from ..overload import overload, OverloadUnmatched
-from .node import Node
+from .node import Node, Node2D
 from .engine import Engine
 from .client import Client
