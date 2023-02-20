@@ -6,10 +6,11 @@ __all__ = [
     "Vec2",
     "overload",
     "OverloadUnmatched",
+    "Node",
     # -- util
     "grapheme",
     # -- core ascii
-    "Node",
+    "Node2D"
     "Engine",
     "Camera",
     "Screen",
@@ -28,10 +29,11 @@ __all__ = [
 # -- standard
 from ..math import Vec2
 from ..overload import overload, OverloadUnmatched
+from ..template import Node
 # -- util
 from . import grapheme
 # -- core ascii
-from .node import ASCIINode as Node
+from .node import ASCIINode as Node2D
 from .engine import ASCIIEngine as Engine
 from .camera import ASCIICamera as Camera
 from .surface import ASCIISurface as Surface

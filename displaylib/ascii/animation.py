@@ -30,6 +30,7 @@ class Animation:
 
 
 class EmptyAnimation(Animation):
+    __slots__ = ("frames")
     def __init__(self) -> None:
         self.frames = []
 
@@ -38,9 +39,8 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     FIXED = 0 # TODO: implement FIXED and DELTATIME mode
     # DELTATIME = 1
 
-    def __init__(self, owner: Self | None = None, fps: float = 16, /, mode: ModeFlags = FIXED, **animations) -> None:
-        super().__init__(owner=None, x=0, y=0, z_index=0, force_sort=False) # TODO: change Node.owner --> Node.parent
-        self.owner = owner
+    def __init__(self, parent: Self | None = None, fps: float = 16, /, mode: ModeFlags = FIXED, **animations) -> None:
+        super().__init__(parent, force_sort=False) # TODO: change Node.owner --> Node.parent
         self.fps = fps
         self.mode = mode # process mode (FIXED | DELTATIME)
         self.animations: dict[Animation] = dict(animations)
@@ -50,9 +50,6 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         self._next = None
         self._has_updated = False # indicates if the first frame (per animation) have been displayed
         self._accumulated_time = 0.0
-        # -- dummy variables
-        self.visible = False
-        self.content = []
     
     def __iter__(self):
         return self
@@ -105,7 +102,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._current_frames = None
             self._next: Frame = None
         if self._next != None:
-            self.owner.content = self._next.content
+            self.parent.content = self._next.content
             self._has_updated = False
     
     def play_backwards(self, animation: str) -> None:
@@ -125,7 +122,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._current_frames = None
             self._next: Frame = None
         if self._next != None:
-            self.owner.content = self._next.content
+            self.parent.content = self._next.content
             self._has_updated = False
         
     def advance(self) -> bool:
@@ -144,7 +141,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._current_frames = None
             self._next = None
         if frame != None:
-            self.owner.content = frame.content
+            self.parent.content = frame.content
             self._has_updated = False
         return frame != None # returns true if not stopped
 
@@ -163,7 +160,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             frame = next(self)
             if frame == None:
                 return
-            self.owner.content = frame.content
+            self.parent.content = frame.content
 
             # elif self.mode == AnimationPlayer.DELTATIME:
             #     # apply delta time

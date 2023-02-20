@@ -1,17 +1,34 @@
+from typing_extensions import Self
 from ..template import Node, Engine
 from .clock import Clock
 from .screen import ASCIIScreen
 from .surface import ASCIISurface
+from .camera import ASCIICamera
 
 
 class ASCIIEngine(Engine):
     """ASCIIEngine for creating a world in ASCII graphics
     """
 
+    def __new__(cls: type[Self], *args, **kwargs) -> Self:
+        """Set `self` as root. Initialize default camera
+        """
+        instance = super().__new__(cls)
+        if ASCIICamera.current == None:
+            ASCIICamera.current = ASCIICamera() # initialize default camera
+        return instance
+
     def __init__(self, tps: int = 16, width: int = 16, height: int = 8) -> None:
+        """Initialize and start the engine (only 1 instance should exist)
+
+        Args:
+            tps (int, optional): ticks per second (fps). Defaults to 16.
+            width (int, optional): screen width. Defaults to 16.
+            height (int, optional): screen height. Defaults to 8.
+        """
         self.tps = tps
-        self.screen = ASCIIScreen(width=width, height=height) # upper level ASCIISurface
-        self.display = ASCIISurface(Node.nodes.values()) # sub level ASCIISurface | just above a ASCIISurface
+        self.screen = ASCIIScreen(width=width, height=height)
+        self.display = ASCIISurface(Node.nodes.values()) # display is rendered onto screen
         self._on_start()
 
         self.is_running = True
@@ -49,6 +66,8 @@ class ASCIIEngine(Engine):
             self._render(self.screen)
             # render nodes onto main screen
             for node in nodes:
+                if getattr(node, "__logical__") == True:
+                    continue
                 node._render(self.screen)
             
             self.screen.show()

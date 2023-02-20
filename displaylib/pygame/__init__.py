@@ -9,6 +9,7 @@ __all__ = [
     "overload",
     "OverloadUnmatched",
     "Node",
+    "Node2D",
     "Engine"
 ]
 
@@ -20,9 +21,12 @@ try: # check if pygame is installed
     _pygame.init() # init without displaying message
     del _pygame
 except ModuleNotFoundError as error:
-    raise ModuleNotFoundError("pygame is required to import this submodule") from error
+    raise ModuleNotFoundError("external module: pygame, is required to use this submodule") from error
 
+# -- standard
 from ..math import Vec2
 from ..overload import overload, OverloadUnmatched
-from .node import PygameNode as Node
+from ..template import Node
+# -- core pygame
+from .node import PygameNode as Node2D
 from .engine import PygameEngine as Engine

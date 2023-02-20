@@ -1,21 +1,21 @@
 from typing_extensions import Self
 from ..math import Vec2
-from ..template import Node
+from ..template import Node2D
 from .node import ASCIINode
 from .types import ASCIISurface, ModeFlags
 
 
-class ASCIICamera(Node):
+class ASCIICamera(Node2D):
     """ASCIICamera for moving the viewport
     """
     FIXED = 1
     CENTERED = 3
     INCLUDE_SIZE = 5
     CENTERED_AND_INCLUDE_SIZE = 8
-    current: Self
+    current: Self = None
 
-    def __init__(self, owner: ASCIINode | None = None, x: int = 0, y: int = 0, follow: bool = False, mode: ModeFlags = FIXED) -> None:
-        self.owner = owner
+    def __init__(self, parent: ASCIINode | None = None, x: int = 0, y: int = 0, follow: bool = False, mode: ModeFlags = FIXED) -> None:
+        self.parent = parent
         self.position = Vec2(x, y)
         self.mode = mode # `centered` mode only has effect if ´owner´ != None
         self.follow = follow # whether to follow the ´owner´
@@ -34,10 +34,8 @@ class ASCIICamera(Node):
         return 0 # z_index static, because it's required for the sort algorithm
     
     def _update(self, delta: float) -> None:
-        if self.follow and self.owner != None:
-            self.global_position = self.owner.global_position
+        if self.follow and self.parent != None:
+            self.global_position = self.parent.global_position
     
     def _render(self, surface: ASCIISurface) -> None:
         return
-
-ASCIICamera.current = ASCIICamera() # default camera

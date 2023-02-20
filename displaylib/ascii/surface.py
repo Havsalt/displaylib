@@ -10,6 +10,13 @@ class ASCIISurface:
     """
 
     def __init__(self, nodes: Iterable[ASCIINode] = [], width: int = 16, height: int = 8) -> None:
+        """Initialize surface from nodes given inside the given boundaries
+
+        Args:
+            nodes (Iterable[ASCIINode], optional): nodes to render onto surface. Defaults to an empty list.
+            width (int, optional): width of surface. Defaults to 16.
+            height (int, optional): height of surface. Defaults to 8.
+        """
         self._width = width
         self._height = height
         self.content = [[ASCIINode.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
@@ -17,6 +24,8 @@ class ASCIISurface:
         camera: ASCIICamera = ASCIICamera.current
         half_size = Vec2(self._width, self._height) // 2
         for node in nodes:
+            if getattr(node, "__logical__") == True:
+                continue
             if not node.visible:
                 continue
             if not node.content:
