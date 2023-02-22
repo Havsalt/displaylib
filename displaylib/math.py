@@ -25,19 +25,19 @@ class Vec2:
     def __sub__(self, other: Self) -> Self:
         return Vec2(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, other: Self) -> Self:
+    def __mul__(self, other: Self | int | float) -> Self:
         if isinstance(other, Vec2):
             return Vec2(self.x * other.x, self.y * other.y)
         elif isinstance(other, (int, float)):
             return Vec2(self.x * other, self.y * other)
     
-    def __floordiv__(self, other: Self) -> Self:
+    def __floordiv__(self, other: Self | int | float) -> Self:
         if isinstance(other, Vec2):
             return Vec2(self.x // other.x, self.y // other.y)
         elif isinstance(other, (int, float)):
             return Vec2(self.x // other, self.y // other)
     
-    def __truediv__(self, other: Self) -> Self:
+    def __truediv__(self, other: Self | int | float) -> Self:
         if isinstance(other, Vec2):
             return Vec2(self.x / other.x, self.y / other.y)
         elif isinstance(other, (int, float)):
