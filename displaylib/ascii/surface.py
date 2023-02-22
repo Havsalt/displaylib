@@ -32,7 +32,7 @@ class ASCIISurface:
                 continue
             lines = len(node.content)
             longest = len(max(node.content, key=len))
-            position = node.global_position - camera.global_position
+            position = (node.global_position - camera.global_position) // 1 # enforce int
             if camera.mode == ASCIICamera.CENTERED:
                 position += half_size
             elif camera.mode == ASCIICamera.INCLUDE_SIZE:
