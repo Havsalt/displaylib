@@ -21,8 +21,7 @@ __all__ = [ # when using default mode
     "ASCIIScreen",
     "ASCIIImage",
     "ASCIIClient",
-    "Clock",
-    ""
+    "ASCIILabel"
 ]
 
 # -- util
