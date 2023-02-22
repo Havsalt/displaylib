@@ -43,7 +43,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         super().__init__(parent, force_sort=False) # TODO: change Node.owner --> Node.parent
         self.fps = fps
         self.mode = mode # process mode (FIXED | DELTATIME)
-        self.animations: dict[Animation] = dict(animations)
+        self.animations: dict[str, Animation] = dict(animations)
         self._animation = EmptyAnimation()
         self.is_playing = False
         self._current_frames = None
