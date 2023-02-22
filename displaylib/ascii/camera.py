@@ -29,9 +29,9 @@ class ASCIICamera(Node2D):
     def z_index(self) -> int:
         return 0 # z_index is static, because it's required for the sort algorithm
 
-    @property
-    def z_index(self) -> int:
-        return 0 # z_index static, because it's required for the sort algorithm
+    @z_index.setter
+    def z_index(self, _value: int) -> None:
+        return # z_index static, because it's required for the sort algorithm
     
     def _update(self, delta: float) -> None:
         if self.follow and self.parent != None:
