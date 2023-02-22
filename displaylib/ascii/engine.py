@@ -38,8 +38,12 @@ class ASCIIEngine(Engine):
         return
     
     def _main_loop(self) -> None:
-        def sort_fn(element):
-            return element[1].z_index
+        def sort_fn(pair: tuple[int, Node]):
+            _id, node = pair
+            if getattr(node, "__logical__") == False:
+                return node.z_index
+            else:
+                return -1 # logical nodes have by default a higher process priority (default for other nodes are 0)
 
         nodes = tuple(Node.nodes.values())
         clock = Clock(self.tps)
