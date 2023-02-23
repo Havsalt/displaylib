@@ -7,8 +7,8 @@ class ASCIILabel(ASCIINode):
 
     A new line is created for each `\\n`
     """
-    def __init__(self, owner: Self | None = None, x: int = 0, y: int = 0, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
-        super().__init__(owner, x, y, z_index, force_sort)
+    def __init__(self, parent: Self | None = None, x: int = 0, y: int = 0, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
+        super().__init__(parent, x, y, z_index, force_sort)
         self.text = text
     
     @property
