@@ -18,7 +18,7 @@ class ASCIIImage:
     _cache = {}
 
     @classmethod
-    def load(cls, file_path: FilePath, /, cache: bool = True) -> ASCIISurface:
+    def load(cls, file_path: FilePath, cache: bool = True) -> ASCIISurface:
         if not isinstance(file_path, str):
             TypeError("argument 'file_path' is required to be of type 'str'. '" + type(file_path).__name__ + "' found")
         fpath = os.path.normpath(file_path)
