@@ -39,7 +39,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     FIXED = 0 # TODO: implement FIXED and DELTATIME mode
     # DELTATIME = 1
 
-    def __init__(self, parent: Self | None = None, fps: float = 16, /, mode: ModeFlags = FIXED, **animations) -> None:
+    def __init__(self, parent: Self | None = None, fps: float = 16, mode: ModeFlags = FIXED, **animations) -> None:
         super().__init__(parent, force_sort=False) # TODO: change Node.owner --> Node.parent
         self.fps = fps
         self.mode = mode # process mode (FIXED | DELTATIME)
