@@ -101,7 +101,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             animation (str): the name of the animation to play
         """
         self.is_playing = True
-        self._animation = animation
+        self._animation = self.animations[animation]
         self._current_frames = (frame for frame in self.animations[self.animation].frames)
         try:
             self._next: Frame = next(self._current_frames)
@@ -120,7 +120,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             animation (str): the name of the animation to play backwards
         """
         self.is_playing = True
-        self._animation = animation
+        self._animation = self.animations[animation]
         # reverse order frames
         self._current_frames = (frame for frame in reversed(self.animations[self.animation].frames))
         try:
