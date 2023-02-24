@@ -10,7 +10,7 @@ __all__ = [
     # -- util
     "grapheme",
     # -- core ascii
-    "Node2D"
+    "Node2D",
     "Engine",
     "Camera",
     "Screen",
