@@ -27,7 +27,7 @@ class Frame:
 class Animation:
     __slots__ = ("frames")
 
-    def __init__(self, path: str, reverse: bool = False, flip: bool = True) -> None:
+    def __init__(self, path: str, reverse: bool = False, flip: bool = False) -> None:
         fnames = os.listdir(path)
         step = 1 if not reverse else -1
         self.frames = [Frame(os.path.join(path, fname), flip=flip) for fname in fnames][::step]
