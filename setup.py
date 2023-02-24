@@ -5,7 +5,7 @@ from displaylib import __version__, __author__
 setup(
    name="displaylib",
    version=__version__,
-   description="Display an ASCII world",
+   description="A collection of frameworks used to display ASCII or Pygame graphics",
    author=__author__,
    packages=[
       "displaylib",
