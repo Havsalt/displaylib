@@ -13,24 +13,29 @@ __all__ = [
 
 
 class Frame:
-    def __init__(self, fpath: str) -> None:
-        f = open(fpath)
+    __slots__ = ("content")
+
+    def __init__(self, fpath: str, flip: bool = False) -> None:
         self.content = []
+        step = 1 if not flip else -1
+        f = open(fpath)
         for line in f.readlines():
-            self.content.append(list((line.rstrip("\n"))))
+            self.content.append(list(line.rstrip("\n"))[::step])
         f.close()
 
 
 class Animation:
     __slots__ = ("frames")
-    def __init__(self, path: str, reverse: bool = False) -> None:
+
+    def __init__(self, path: str, reverse: bool = False, flip: bool = True) -> None:
         fnames = os.listdir(path)
         step = 1 if not reverse else -1
-        self.frames = [Frame(os.path.join(path, fname)) for fname in fnames][::step]
+        self.frames = [Frame(os.path.join(path, fname), flip=flip) for fname in fnames][::step]
 
 
 class EmptyAnimation(Animation):
     __slots__ = ("frames")
+
     def __init__(self) -> None:
         self.frames = []
 
@@ -40,7 +45,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     # DELTATIME = 1
 
     def __init__(self, parent: Self | None = None, fps: float = 16, mode: ModeFlags = FIXED, **animations) -> None:
-        super().__init__(parent, force_sort=False) # TODO: change Node.owner --> Node.parent
+        super().__init__(parent, force_sort=False)
         self.fps = fps
         self.mode = mode # process mode (FIXED | DELTATIME)
         self.animations: dict[str, Animation] = dict(animations)
@@ -79,6 +84,9 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self.is_playing = False
             self._current_frames = None
             self._next = None
+    
+    def get(self, name: str) -> Animation:
+        return self.animations[name]
     
     def add(self, name: str, animation: Animation) -> None:
         self.animations[name] = animation
