@@ -1,6 +1,7 @@
 import os
 from typing_extensions import Self
 from ..template import Node
+from . import grapheme
 from .types import ModeFlags, ASCIISurface
 
 
@@ -17,10 +18,13 @@ class Frame:
 
     def __init__(self, fpath: str, flip: bool = False) -> None:
         self.content = []
-        step = 1 if not flip else -1
         f = open(fpath)
-        for line in f.readlines():
-            self.content.append(list(line.rstrip("\n"))[::step])
+        if flip:
+            for line in f.readlines():
+                self.content.append(list(grapheme.flip(line.rstrip("\n"))))
+        else:
+            for line in f.readlines():
+                self.content.append(list(line.rstrip("\n")))
         f.close()
 
 
