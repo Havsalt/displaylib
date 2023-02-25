@@ -46,15 +46,15 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
 
     def __init__(self, parent: Self | None = None, fps: float = 16, mode: ModeFlags = FIXED, **animations) -> None:
         super().__init__(parent, force_sort=False)
-        self.fps = fps
-        self.mode = mode # process mode (FIXED | DELTATIME)
+        self.fps: float = fps
+        self.mode: ModeFlags = mode # process mode (FIXED | DELTATIME)
         self.animations: dict[str, Animation] = dict(animations)
-        self._animation = EmptyAnimation()
-        self.is_playing = False
-        self._current_frames = None
-        self._next = None
-        self._has_updated = False # indicates if the first frame (per animation) have been displayed
-        self._accumulated_time = 0.0
+        self.current_animation: str = ""
+        self.is_playing: bool = False
+        self._current_frames: bool = None
+        self._next: Frame | None = None
+        self._has_updated: bool = False # indicates if the first frame (per animation) have been displayed
+        self._accumulated_time: float = 0.0
     
     def __iter__(self):
         return self
@@ -69,15 +69,25 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._next = None
             return None
 
-    @property    
-    def animation(self) -> Animation:
-        return self._animation
+    @property
+    def active_animation(self) -> Animation | None:
+        """Returns the active Animation object
+
+        Returns:
+            Animation | None: active animaion if any active, else None
+        """
+        return self.animations.get(self.current_animation, None)
     
-    @animation.setter
-    def animation(self, animation: str) -> None:
-        self._animation = self.animations[animation]
+    @active_animation.setter
+    def active_animation(self, animation: str) -> None:
+        """Sets the next frames based on animation name
+
+        Args:
+            animation (str): Animation object to be used
+        """
+        self.current_animation = animation
         # make generator
-        self._current_frames = (frame for frame in self._animation.frames)
+        self._current_frames = (frame for frame in self.animations[animation].frames)
         try:
             self._next = next(self._current_frames)
         except StopIteration:
@@ -101,8 +111,8 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             animation (str): the name of the animation to play
         """
         self.is_playing = True
-        self._animation = self.animations[animation]
-        self._current_frames = (frame for frame in self.animations[self.animation].frames)
+        self.current_animation = animation
+        self._current_frames = (frame for frame in self.animations[animation].frames)
         try:
             self._next: Frame = next(self._current_frames)
         except StopIteration:
@@ -120,9 +130,9 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             animation (str): the name of the animation to play backwards
         """
         self.is_playing = True
-        self._animation = self.animations[animation]
+        self.current_animation = animation
         # reverse order frames
-        self._current_frames = (frame for frame in reversed(self.animations[self.animation].frames))
+        self._current_frames = (frame for frame in reversed(self.animations[animation].frames))
         try:
             self._next: Frame = next(self._current_frames)
         except StopIteration:
@@ -135,6 +145,10 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         
     def advance(self) -> bool:
         """Advances 1 frame
+
+        Can be used in a `while loop`:
+        >>> while self.my_animation_player.advance():
+        ...     ... # do stuff each frame
 
         Returns:
             bool: whether it was NOT stopped
@@ -177,4 +191,5 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             #         self._accumulated_time -= self._fps_ratio # does not clear time
             #         frame = next(self)
             #         self.owner.content = frame.content
-        self._has_updated = True
+        elif not self._has_updated:
+            self._has_updated = True
