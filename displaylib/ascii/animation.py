@@ -20,6 +20,10 @@ __all__ = [
 
 
 class Frame:
+    """`Frame` used to create animations
+
+    Loaded from files
+    """
     __slots__ = ("content")
 
     def __init__(self, fpath: str, fliph: bool = False, flipv: bool = False) -> None:
@@ -36,15 +40,21 @@ class Frame:
 
 
 class Animation:
+    """`Animation` containing frames
+
+    Frames are loaded from files
+    """
     __slots__ = ("frames")
 
     def __init__(self, path: str, reverse: bool = False, fliph: bool = False, flipv: bool = False) -> None:
-        fnames = os.listdir(path)
+        fnames = os.listdir(os.path.join(os.getcwd(), path))
         step = 1 if not reverse else -1
-        self.frames = [Frame(os.path.join(path, fname), fliph=fliph, flipv=flipv) for fname in fnames][::step]
+        self.frames = [Frame(os.path.join(os.getcwd(), path, fname), fliph=fliph, flipv=flipv) for fname in fnames][::step]
 
 
 class EmptyAnimation(Animation):
+    """Empty `Animation`, more like a placeholder
+    """
     __slots__ = ("frames")
 
     def __init__(self) -> None:
@@ -52,6 +62,8 @@ class EmptyAnimation(Animation):
 
 
 class AnimationPlayer(Node): # TODO: add buffered animations on load
+    """`AnimationPlayer` to be attached to node, so it can control animations
+    """
     FIXED = 0 # TODO: implement FIXED and DELTATIME mode
     # DELTATIME = 1
 
@@ -67,10 +79,20 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         self._has_updated: bool = False # indicates if the first frame (per animation) have been displayed
         self._accumulated_time: float = 0.0
     
-    def __iter__(self):
+    def __iter__(self) -> AnimationPlayer:
+        """Use itself as main iterator
+
+        Returns:
+            AnimationPlayer: itself
+        """
         return self
 
     def __next__(self) -> Frame:
+        """Returns the next frame from the current frames (a generator)
+
+        Returns:
+            Frame: the next frame
+        """
         try:
             self._next = next(self._current_frames) # next of generator
             return self._next
@@ -106,13 +128,32 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._current_frames = None
             self._next = None
     
-    def get(self, name: str) -> Animation:
-        return self.animations[name]
+    def get(self, name: str) -> Animation | None:
+        """Returns a stored animation given its name
+
+        Args:
+            name (str): name of the animation
+
+        Returns:
+            Animation | None: animation object or None if not found
+        """
+        return self.animations.get(name, None)
     
     def add(self, name: str, animation: Animation) -> None:
+        """Adds a new animation and binds it to a name
+
+        Args:
+            name (str): name to access the animation later
+            animation (Animation): animation object to store
+        """
         self.animations[name] = animation
     
     def remove(self, name: str) -> None:
+        """Removes an animation given the name of the animation
+
+        Args:
+            name (str): name of the animation to delete
+        """
         del self.animations[name]
     
     def play(self, animation: str) -> None:
@@ -159,7 +200,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
 
         Can be used in a `while loop`:
         >>> while self.my_animation_player.advance():
-        ...     ... # do stuff each frame
+        >>>     ... # do stuff each frame
 
         Returns:
             bool: whether it was NOT stopped
@@ -187,7 +228,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     def _render(self, surface: ASCIISurface) -> None: # dummy method
         return
 
-    def _update(self, delta: float) -> None:
+    def _update(self, _delta: float) -> None:
         if self.is_playing and self._has_updated:
             # if self.mode == AnimationPlayer.FIXED:
             frame = next(self)
