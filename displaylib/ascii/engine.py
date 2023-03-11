@@ -73,11 +73,13 @@ class ASCIIEngine(Engine):
             
             if self.auto_resize_screen:
                 terminal_size = os.get_terminal_size()
-                if terminal_size.columns != self.screen.width or terminal_size.lines != self.screen.height:
+                if ((terminal_size.columns - self.screen_margin.x) != self.screen.width) or ((terminal_size.lines - self.screen_margin.y) != self.screen.height):
                     self.screen.width = terminal_size.columns - self.screen_margin.x
                     self.screen.height = terminal_size.lines - self.screen_margin.y
+                    size = Vec2(terminal_size.columns, terminal_size.lines)
                     for node in nodes:
-                        node._resize()
+                        if hasattr(node, "_on_screen_resize"):
+                            node._on_screen_resize(size)
                     os.system("cls")
             
             if Node._request_sort: # only sort once per frame if needed
