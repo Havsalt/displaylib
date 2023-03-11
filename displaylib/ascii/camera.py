@@ -27,7 +27,6 @@ class ASCIICamera(Node2D):
         self.position = Vec2(x, y)
         self.mode = mode # `centered` mode only has effect if ´owner´ != None
         self.follow = follow # whether to follow the ´owner´
-        self.content = [] # NOTE: attr ´content´ won't be used because ´visible´ will always be False
     
     @property
     def visible(self) -> int:
