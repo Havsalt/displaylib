@@ -26,6 +26,34 @@ class ASCIISurface:
         """
         self._width = width
         self._height = height
+        self.rebuild(nodes, width, height) # initial build
+
+    @property
+    def width(self) -> int:
+        return self._width
+    
+    @width.setter
+    def width(self, value: int) -> None:
+        self._width = value
+        self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
+
+    @property
+    def height(self) -> int:
+        return self._height
+    
+    @height.setter
+    def height(self, value: int) -> None:
+        self._height = value
+        self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
+
+    def rebuild(self, nodes: Iterable[Node] = [], width: int = 16, height: int = 8) -> None:
+        """Rebuilds the surface from the content of the nodes
+
+        Args:
+            nodes (Iterable[Node], optional): nodes to render. Defaults to [].
+            width (int, optional): surface width. Defaults to 16.
+            height (int, optional): surface height. Defaults to 8.
+        """
         self.content = [[ASCIINode.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
 
         camera: ASCIICamera = ASCIICamera.current # should never be None
@@ -43,9 +71,6 @@ class ASCIISurface:
             rotation = node.global_rotation # TODO: add camera rotation
             # if rotation != 0: # TODO: rotate around center if flagged
             #     position = rotate(position, rotation)
-            # TODO: enforce int
-            # position.x = int(position.x)
-            # position.y = int(position.y)
             if position.y + lines < 0 or position.y > self._height: # out of screen
                 continue
             if position.x + longest < 0 or position.x > self._width: # out of screen
@@ -86,28 +111,19 @@ class ASCIISurface:
                         else:
                             self.content[y_position][x_position] = char
 
-    @property
-    def width(self) -> int:
-        return self._width
-    
-    @width.setter
-    def width(self, value: int) -> None:
-        self._width = value
-        self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
-
-    @property
-    def height(self) -> int:
-        return self._height
-    
-    @height.setter
-    def height(self, value: int) -> None:
-        self._height = value
-        self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
-
     def clear(self) -> None:
+        """Clears the surface. Sets its content to `ASCIINode.cell_transparant`
+        """
         self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
     
     def blit(self, surface: ASCIISurface, position: Vec2 = Vec2(0, 0), transparent: bool = False) -> None:
+        """Blits the content of this surface onto the other surface
+
+        Args:
+            surface (ASCIISurface): surface to blit onto
+            position (Vec2, optional): starting point of blit. Defaults to Vec2(0, 0).
+            transparent (bool, optional): whether to override blank areas. Defaults to False.
+        """
         lines = len(surface.content)
         longest = len(max(surface.content, key=len))
         if position.x > longest and position.y > lines: # completely out of screen
