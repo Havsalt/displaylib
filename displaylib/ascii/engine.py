@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+
+from ..math import Vec2
 from ..template import Node, Engine
 from .clock import Clock
 from .screen import ASCIIScreen
@@ -19,7 +22,7 @@ class ASCIIEngine(Engine):
             ASCIICamera.current = ASCIICamera() # initialize default camera
         return instance
 
-    def __init__(self, tps: int = 16, width: int = 16, height: int = 8) -> None:
+    def __init__(self, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2 = Vec2(1, 1)) -> None:
         """Initialize and start the engine (only 1 instance should exist)
 
         Args:
@@ -28,8 +31,16 @@ class ASCIIEngine(Engine):
             height (int, optional): screen height. Defaults to 8.
         """
         self.tps = tps
+        self.auto_resize_screen = auto_resize_screen
+        self.screen_margin = screen_margin
         self.screen = ASCIIScreen(width=width, height=height)
         self.display = ASCIISurface(Node.nodes.values()) # display is rendered onto screen
+        if auto_resize_screen:
+            terminal_size = os.get_terminal_size()
+            if terminal_size.columns != self.screen.width or terminal_size.lines != self.screen.height:
+                self.screen.width = terminal_size.columns - self.screen_margin.x
+                self.screen.height = terminal_size.lines - self.screen_margin.y
+                os.system("cls")
         self._on_start()
 
         self.is_running = True
@@ -60,6 +71,15 @@ class ASCIIEngine(Engine):
                 del Node.nodes[id(node)]
             Node._queued_nodes.clear()
             
+            if self.auto_resize_screen:
+                terminal_size = os.get_terminal_size()
+                if terminal_size.columns != self.screen.width or terminal_size.lines != self.screen.height:
+                    self.screen.width = terminal_size.columns - self.screen_margin.x
+                    self.screen.height = terminal_size.lines - self.screen_margin.y
+                    for node in nodes:
+                        node._resize()
+                    os.system("cls")
+            
             if Node._request_sort: # only sort once per frame if needed
                 Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
             nodes = tuple(Node.nodes.values())
@@ -69,7 +89,7 @@ class ASCIIEngine(Engine):
             self.screen.blit(self.display, transparent=True)
             
             self._render(self.screen)
-            # render nodes onto main screen
+            # nodes can render custon data onto the screen
             for node in nodes:
                 if getattr(node, "__logical__") == True:
                     continue
