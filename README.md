@@ -1,6 +1,7 @@
 # Displaylib
 
 ### A collection of frameworks used to display ASCII or Pygame graphics
+### Requires Python version >= 3.10
 ---
 
 ## Submodules

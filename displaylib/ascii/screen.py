@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import sys
+
 from .node import ASCIINode
 from .surface import ASCIISurface
 

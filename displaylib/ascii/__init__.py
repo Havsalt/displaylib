@@ -4,8 +4,6 @@
 __all__ = [
     # -- standard
     "Vec2",
-    "overload",
-    "OverloadUnmatched",
     "Node",
     # -- util
     "grapheme",
@@ -23,12 +21,12 @@ __all__ = [
     "AnimationPlayer",
     "Clock",
     # -- prefab
-    "Label"
+    "Label",
+    "Line"
 ]
 
 # -- standard
 from ..math import Vec2
-from ..overload import overload, OverloadUnmatched
 from ..template import Node
 # -- util
 from . import grapheme
@@ -44,6 +42,7 @@ from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .clock import Clock
 # -- prefab
 from .prefab.label import ASCIILabel as Label
+from .prefab.line import ASCIILine as Line
 
 
 # -- activate ANSI escape codes

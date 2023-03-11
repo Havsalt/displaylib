@@ -1,4 +1,5 @@
-from typing_extensions import Self
+from __future__ import annotations
+
 from ..template import Node, Engine
 from .clock import Clock
 from .screen import ASCIIScreen
@@ -10,7 +11,7 @@ class ASCIIEngine(Engine):
     """ASCIIEngine for creating a world in ASCII graphics
     """
 
-    def __new__(cls: type[Self], *args, **kwargs) -> Self:
+    def __new__(cls: type[ASCIIEngine], *args, **kwargs) -> Engine:
         """Set `self` as root. Initialize default camera
         """
         instance = super().__new__(cls)

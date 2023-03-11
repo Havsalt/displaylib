@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import time
 
 
@@ -16,13 +18,14 @@ class Clock:
         self._tps = value
         self._delta = 1.0 / self._tps
     
-    def tick(self):
+    def tick(self) -> float:
         time.sleep(self._delta) # QUICKFIX
-        return
+        return self._delta
         now = time.perf_counter()
         diff = now - self._last_tick
         self._last_tick = now
         remaining = self._delta - diff
         if remaining <= 0:
-            return
+            return 0.0
         time.sleep(remaining)
+        return self._delta

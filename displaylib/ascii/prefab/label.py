@@ -1,5 +1,11 @@
-from typing_extensions import Self
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from ..node import ASCIINode
+
+if TYPE_CHECKING:
+    from ...template import Node
 
 
 class ASCIILabel(ASCIINode):
@@ -7,7 +13,7 @@ class ASCIILabel(ASCIINode):
 
     A new line is created for each `\\n`
     """
-    def __init__(self, parent: Self | None = None, x: int = 0, y: int = 0, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x, y, z_index, force_sort)
         self.text = text
     

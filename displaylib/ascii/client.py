@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import time
 import socket
 import selectors
+
 from ..template import Node, Client
 from .surface import ASCIISurface
 

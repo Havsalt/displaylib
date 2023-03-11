@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import io
 import os
+
 from ..math import Vec2
-from .types import FilePath
 from .surface import ASCIISurface
 
 
@@ -11,6 +13,7 @@ class _ASCIINodeStruct:
         self.content = content
         self.position = Vec2(0, 0)
         self.global_position = Vec2(0, 0)
+        self.global_rotation = 0.0
 
 
 class ASCIIImage:
@@ -18,7 +21,7 @@ class ASCIIImage:
     _cache = {}
 
     @classmethod
-    def load(cls, file_path: FilePath, cache: bool = True) -> ASCIISurface:
+    def load(cls, file_path: str, cache: bool = True) -> ASCIISurface:
         if not isinstance(file_path, str):
             TypeError("argument 'file_path' is required to be of type 'str'. '" + type(file_path).__name__ + "' found")
         fpath = os.path.normpath(file_path)

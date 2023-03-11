@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 import pygame
-from pygame.constants import *
+
 from ..template import Node, Engine
 from .constants import DEFAULT, MILLISECOND
-from .types import Event, Surface
 
 
 class PygameEngine(Engine):
@@ -13,7 +14,7 @@ class PygameEngine(Engine):
         self.tps = tps
         self._width = width # TODO: add setter
         self._height = height # TODO: add setter
-        self.icon_img: None | Surface = None
+        self.icon_img: None | pygame.Surface = None
         if icon_path:
             pygame.image.load(icon_path)
             pygame.display.set_icon(self.icon_img)
@@ -44,7 +45,7 @@ class PygameEngine(Engine):
         self.screen = pygame.display.set_mode(size=(self.width, self.height), flags=self.flags)
 
     @property
-    def icon(self) -> None:
+    def icon(self) -> pygame.Surface | None:
         return self.icon_img
     
     @property
@@ -52,8 +53,8 @@ class PygameEngine(Engine):
         self.icon_img = pygame.image.load(icon_path)
         pygame.display.set_icon(self.icon_img)
 
-    def _input(self, event: Event) -> None:
-        if event.type == QUIT:
+    def _input(self, event: pygame.event.Event) -> None:
+        if event.type == pygame.QUIT:
             self.is_running = False
     
     def _main_loop(self) -> None:

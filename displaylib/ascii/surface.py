@@ -1,15 +1,22 @@
-from typing import Iterable
-from typing_extensions import Self
+from __future__ import annotations
+
+import math
+from typing import TYPE_CHECKING, Iterable
+
 from ..math import Vec2
+from . import grapheme
 from .node import ASCIINode
 from .camera import ASCIICamera
+
+if TYPE_CHECKING:
+    from ..template import Node
 
 
 class ASCIISurface:
     """ASCIISurface for displaying nodes
     """
 
-    def __init__(self, nodes: Iterable[ASCIINode] = [], width: int = 16, height: int = 8) -> None:
+    def __init__(self, nodes: Iterable[Node] = [], width: int = 16, height: int = 8) -> None:
         """Initialize surface from nodes given inside the given boundaries
 
         Args:
@@ -21,7 +28,7 @@ class ASCIISurface:
         self._height = height
         self.content = [[ASCIINode.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
 
-        camera: ASCIICamera = ASCIICamera.current
+        camera: ASCIICamera = ASCIICamera.current # should never be None
         half_size = Vec2(self._width, self._height) // 2
         for node in nodes:
             if getattr(node, "__logical__") == True:
@@ -32,7 +39,18 @@ class ASCIISurface:
                 continue
             lines = len(node.content)
             longest = len(max(node.content, key=len))
-            position = (node.global_position - camera.global_position) // 1 # enforce int
+            position = node.global_position - camera.global_position
+            rotation = node.global_rotation # TODO: add camera rotation
+            # if rotation != 0: # TODO: rotate around center if flagged
+            #     position = rotate(position, rotation)
+            # TODO: enforce int
+            # position.x = int(position.x)
+            # position.y = int(position.y)
+            if position.y + lines < 0 or position.y > self._height: # out of screen
+                continue
+            if position.x + longest < 0 or position.x > self._width: # out of screen
+                continue
+
             if camera.mode == ASCIICamera.CENTERED:
                 position += half_size
             elif camera.mode == ASCIICamera.INCLUDE_SIZE:
@@ -40,18 +58,33 @@ class ASCIISurface:
             elif camera.mode == ASCIICamera.CENTERED_AND_INCLUDE_SIZE:
                 position += half_size
                 position -= Vec2(longest, lines) // 2
-            if position.y + lines < 0 or position.y > self._height:
-                continue
-            if position.x + longest < 0 or position.x > self._width:
-                continue
+            
+            if rotation != 0:
+                x_offset = longest / 2
+                y_offset = lines / 2
+                cos_rotation = math.cos(-rotation)
+                sin_rotation = math.sin(-rotation)
             for h, line in enumerate(node.content):
-                if not ((self._height) > (h + position.y) >= 0): # out of screen
-                    continue
+                # if not ((self._height) > (h + position.y) >= 0): # out of screen
+                #     continue
                 for w, char in enumerate(line):
-                    if not ((self._width) > (w + position.x) >= 0): # out of screen
+                    if rotation != 0:
+                        x_diff = w - x_offset
+                        y_diff = h - y_offset
+                        x_position = round(x_offset + position.x + cos_rotation * x_diff - sin_rotation * y_diff)
+                        y_position = round(y_offset + position.y + sin_rotation * x_diff + cos_rotation * y_diff)
+                    else:
+                        x_position = int(w + position.x)
+                        y_position = int(h + position.y)
+                    if not ((self._height) > y_position >= 0): # out of screen
+                        continue
+                    if not ((self._width) > x_position >= 0): # out of screen
                         continue
                     if char != ASCIINode.cell_transparant:
-                        self.content[h+position.y][w+position.x] = char
+                        if rotation != 0:
+                            self.content[y_position][x_position] = grapheme.rotate(char, rotation)
+                        else:
+                            self.content[y_position][x_position] = char
 
     @property
     def width(self) -> int:
@@ -74,7 +107,7 @@ class ASCIISurface:
     def clear(self) -> None:
         self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
     
-    def blit(self, surface: Self, position: Vec2 = Vec2(0, 0), transparent: bool = False) -> None:
+    def blit(self, surface: ASCIISurface, position: Vec2 = Vec2(0, 0), transparent: bool = False) -> None:
         lines = len(surface.content)
         longest = len(max(surface.content, key=len))
         if position.x > longest and position.y > lines: # completely out of screen
@@ -86,9 +119,9 @@ class ASCIISurface:
                 if self._width < w + position.x or position.x < 0: # char out of screen
                     continue
 
-                current = self.content[h+position.y][w+position.x]
+                current = self.content[int(h+position.y)][int(w+position.x)]
                 if current == ASCIINode.cell_default: # empty rendered cell
                     if not transparent:
-                        self.content[h+position.y][w+position.x] = char
+                        self.content[int(h+position.y)][int(w+position.x)] = char
                         continue
-                self.content[h+position.y][w+position.x] = char
+                self.content[int(h+position.y)][int(w+position.x)] = char

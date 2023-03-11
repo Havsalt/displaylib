@@ -1,8 +1,14 @@
+from __future__ import annotations
+
 import os
-from typing_extensions import Self
+from typing import TYPE_CHECKING, Generator
+
 from ..template import Node
 from . import grapheme
-from .types import ModeFlags, ASCIISurface
+from .types import ModeFlags
+
+if TYPE_CHECKING:
+    from .surface import ASCIISurface
 
 
 __all__ = [
@@ -16,25 +22,26 @@ __all__ = [
 class Frame:
     __slots__ = ("content")
 
-    def __init__(self, fpath: str, flip: bool = False) -> None:
+    def __init__(self, fpath: str, fliph: bool = False, flipv: bool = False) -> None:
         self.content = []
         f = open(fpath)
-        if flip:
-            for line in f.readlines():
-                self.content.append(list(grapheme.flip(line.rstrip("\n"))))
-        else:
-            for line in f.readlines():
-                self.content.append(list(line.rstrip("\n")))
+        for line in f.readlines():
+            self.content.append(list(line.rstrip("\n")))
+        if fliph:
+            self.content = grapheme.mapfliph(self.content)
+        if flipv:
+            self.content = grapheme.mapfliph(self.content)
+            
         f.close()
 
 
 class Animation:
     __slots__ = ("frames")
 
-    def __init__(self, path: str, reverse: bool = False, flip: bool = False) -> None:
+    def __init__(self, path: str, reverse: bool = False, fliph: bool = False, flipv: bool = False) -> None:
         fnames = os.listdir(path)
         step = 1 if not reverse else -1
-        self.frames = [Frame(os.path.join(path, fname), flip=flip) for fname in fnames][::step]
+        self.frames = [Frame(os.path.join(path, fname), fliph=fliph, flipv=flipv) for fname in fnames][::step]
 
 
 class EmptyAnimation(Animation):
@@ -48,15 +55,15 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     FIXED = 0 # TODO: implement FIXED and DELTATIME mode
     # DELTATIME = 1
 
-    def __init__(self, parent: Self | None = None, fps: float = 16, mode: ModeFlags = FIXED, **animations) -> None:
+    def __init__(self, parent: Node | None = None, fps: float = 16, mode: ModeFlags = FIXED, **animations) -> None:
         super().__init__(parent, force_sort=False)
         self.fps: float = fps
-        self.mode: ModeFlags = mode # process mode (FIXED | DELTATIME)
+        self.mode = mode # process mode (FIXED | DELTATIME)
         self.animations: dict[str, Animation] = dict(animations)
         self.current_animation: str = ""
         self.is_playing: bool = False
-        self._current_frames: bool = None
-        self._next: Frame | None = None
+        self._current_frames: Generator | None = None
+        self._next: None | Frame = None
         self._has_updated: bool = False # indicates if the first frame (per animation) have been displayed
         self._accumulated_time: float = 0.0
     

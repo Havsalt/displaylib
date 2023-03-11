@@ -1,18 +1,29 @@
 """DisplayLib
 ----------------
 
+Requires Python version >= 3.10
+
+----------------
 Submodules:
 - template
 - ascii (default)
 - pygame
+
+----------------
+Example using submodules to set mode:
+>>> import displaylib.ascii as dl
+>>> dl.Node2D() # will be of type ASCIINode
+ASCIINode(x, y)
+
+>>> import displaylib.pygame as dl
+>>> dl.Node2D() # will be of type PygameNode
+PygameNode(x, y)
 """
 
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 __author__ = "FloatingInt"
 __all__ = [ # when using default mode
     "Vec2",
-    "overload",
-    "OverloadUnmatched",
     "graphme",
     "ASCIINode",
     "ASCIIEngine",
@@ -21,11 +32,11 @@ __all__ = [ # when using default mode
     "ASCIIScreen",
     "ASCIIImage",
     "ASCIIClient",
-    "ASCIILabel"
+    "ASCIILabel",
+    "ASCIILine"
 ]
 
 # -- util
-from .overload import overload, OverloadUnmatched
 from .math import Vec2
 # -- imports
 from .ascii import (
@@ -45,5 +56,6 @@ from .ascii import (
     AnimationPlayer as AnimationPlayer,
     Clock as Clock,
     # -- prefab
-    Label as ASCIILabel
+    Label as ASCIILabel,
+    Line as ASCIILine
 )

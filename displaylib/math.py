@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from math import sqrt
-from typing_extensions import Self
 
 
 __all__ = ["Vec2"]
@@ -19,49 +20,49 @@ class Vec2:
     def __repr__(self) -> str:
         return f"Vec2({self.x}, {self.y})"
     
-    def __add__(self, other: Self) -> Self:
+    def __add__(self, other: Vec2) -> Vec2:
         return Vec2(self.x + other.x, self.y + other.y)
     
-    def __sub__(self, other: Self) -> Self:
+    def __sub__(self, other: Vec2) -> Vec2:
         return Vec2(self.x - other.x, self.y - other.y)
 
-    def __mul__(self, other: Self | int | float) -> Self:
+    def __mul__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
             return Vec2(self.x * other.x, self.y * other.y)
         elif isinstance(other, (int, float)):
             return Vec2(self.x * other, self.y * other)
     
-    def __floordiv__(self, other: Self | int | float) -> Self:
+    def __floordiv__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
             return Vec2(self.x // other.x, self.y // other.y)
         elif isinstance(other, (int, float)):
             return Vec2(self.x // other, self.y // other)
     
-    def __truediv__(self, other: Self | int | float) -> Self:
+    def __truediv__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
             return Vec2(self.x / other.x, self.y / other.y)
         elif isinstance(other, (int, float)):
             return Vec2(self.x / other, self.y / other)
     
-    def __mod__(self, other: int | float) -> Self:
+    def __mod__(self, other: int | float) -> Vec2:
         return Vec2(self.x % other, self.y % other)
     
-    def __eq__(self, other: Self) -> bool:
+    def __eq__(self, other: Vec2) -> bool:
         return (self.x == other.x) and (self.y == other.y)
     
-    def __ne__(self, other: Self) -> bool:
+    def __ne__(self, other: Vec2) -> bool:
         return (self.x != other.x) or (self.y != other.y)
     
-    def __gt__(self, other: Self) -> bool:
+    def __gt__(self, other: Vec2) -> bool:
         return self.x > other.x and self.y > other.y
     
-    def __lt__(self, other: Self) -> bool:
+    def __lt__(self, other: Vec2) -> bool:
         return self.x < other.x and self.y < other.y
     
-    def __ge__(self, other: Self) -> bool:
+    def __ge__(self, other: Vec2) -> bool:
         return self.x >= other.x and self.y >= other.y
 
-    def __le__(self, other: Self) -> bool:
+    def __le__(self, other: Vec2) -> bool:
         return self.x <= other.x and self.y <= other.y
 
     def length(self) -> float:
@@ -69,5 +70,8 @@ class Vec2:
             return 0.0
         return sqrt(self.x*self.x + self.y*self.y)
     
-    def normalized(self) -> Self:
+    def normalized(self) -> Vec2:
+        length = self.length()
+        if length == 0:
+            return Vec2(0, 0)
         return self / self.length()

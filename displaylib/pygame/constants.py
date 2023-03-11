@@ -1,5 +1,7 @@
+from __future__ import annotations
 
-DEFAULT = 0
-MILLISECOND = 1000
+
+DEFAULT: int = 0
+MILLISECOND: int = 1000
 
 __all__ = ["DEFAULT", "MILLISECOND"]
