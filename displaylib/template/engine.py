@@ -22,13 +22,13 @@ class Engine:
         self._on_exit()
 
     def _on_start(self) -> None:
-        return
+        ...
     
     def _on_exit(self) -> None:
-        return
+        ...
     
     def _update(self, delta: float) -> None:
-        return
+        ...
     
     def _main_loop(self) -> None:
         def sort_fn(pair: tuple[int, Node]):

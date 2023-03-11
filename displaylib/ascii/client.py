@@ -28,7 +28,7 @@ class ASCIIClient(Client):
         self._sock.send(encoded)
 
     def _on_request(self, data: str) -> None:
-        return
+        ...
     
     def _update_socket(self) -> None:
         for key, mask in self._sel.select(timeout=self._NEGATIVE_INF):

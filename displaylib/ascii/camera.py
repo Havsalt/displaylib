@@ -28,13 +28,12 @@ class ASCIICamera(Node2D):
         self.mode = mode # `centered` mode only has effect if ´owner´ != None
         self.follow = follow # whether to follow the ´owner´
     
-    @property
-    def visible(self) -> int:
-        return False # static, because it won't be displayed
-    
     def _update(self, delta: float) -> None:
         if self.follow and self.parent != None:
             self.global_position = self.parent.global_position
     
     def _render(self, surface: ASCIISurface) -> None:
-        return
+        ...
+
+    def _on_screen_resize(self, size: Vec2) -> None:
+        ...

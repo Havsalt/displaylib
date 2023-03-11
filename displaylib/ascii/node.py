@@ -23,7 +23,7 @@ class ASCIINode(Node2D): # a variant of the Node2D
         self.content: list[list[str]] = [] # 2D array
     
     def _render(self, surface: ASCIISurface) -> None:
-        return
+        ...
     
-    def _resize(self, size: Vec2) -> None:
-        return
+    def _on_screen_resize(self, size: Vec2) -> None:
+        ...

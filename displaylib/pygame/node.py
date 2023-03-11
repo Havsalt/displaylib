@@ -15,7 +15,7 @@ class PygameNode(Node2D):
         super().__init__(parent, x, y, z_index, force_sort)
     
     def _input(event: pygame.event.Event) -> None:
-        return
+        ...
     
     def _render(self, surface: pygame.Surface) -> None:
-        return
+        ...
