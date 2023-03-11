@@ -19,6 +19,8 @@ class ASCIIPoint2D(ASCIINode):
 
 class ASCIILine(ASCIINode):
     """Prefabricated `Line` node
+
+    Known issue: Does not work well when changing `rotation` or `global_rotation`
     """
     texture_default: str = "#" # only used when creating a line node
 
