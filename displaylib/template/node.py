@@ -62,7 +62,7 @@ class Node:
         Args:
             delta (float): time since last frame
         """
-        return
+        ...
     
     def queue_free(self) -> None:
         """Tells the Engine to `delete` this <Node> after
