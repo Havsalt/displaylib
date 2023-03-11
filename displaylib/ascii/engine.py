@@ -47,7 +47,7 @@ class ASCIIEngine(Engine):
         self._main_loop()
     
     def _render(self, surface: ASCIISurface) -> None:
-        return
+        ...
     
     def _main_loop(self) -> None:
         def sort_fn(pair: tuple[int, Node]):
