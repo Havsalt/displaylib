@@ -10,12 +10,16 @@ if TYPE_CHECKING:
 
 
 class ASCIIPoint2D(ASCIINode):
+    """Thin wrapper around `ASCIINode`
+    """
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, texture: str = "#", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x, y, z_index, force_sort)
         self.content = [[texture]]
 
 
 class ASCIILine(ASCIINode):
+    """Prefabricated `Line` node
+    """
     texture_default: str = "#" # only used when creating a line node
 
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: str = "", z_index: int = 0, force_sort: bool = True) -> None:
@@ -23,7 +27,7 @@ class ASCIILine(ASCIINode):
         self.start = start
         self.end = end
         self.texture = self.texture_default if texture == "" else texture
-        self.points: list[Node] = [
+        self.points: list[ASCIIPoint2D] = [
             ASCIIPoint2D(self, z_index=self.z_index, texture=self.texture).where(position=start),
             ASCIIPoint2D(self, z_index=self.z_index, texture=self.texture).where(position=end)
         ]
