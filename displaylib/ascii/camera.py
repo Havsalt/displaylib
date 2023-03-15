@@ -23,8 +23,7 @@ class ASCIICamera(Node2D):
     current: ASCIICamera = None
 
     def __init__(self, parent: ASCIINode | None = None, x: int = 0, y: int = 0, follow: bool = False, mode: ModeFlags = FIXED) -> None:
-        self.parent = parent
-        self.position = Vec2(x, y)
+        super().__init__(parent, x, y, self.logical_z_index_default, True) # TODO: move z_index into some config (the "-1" part)
         self.mode = mode # `centered` mode only has effect if ´owner´ != None
         self.follow = follow # whether to follow the ´owner´
     
