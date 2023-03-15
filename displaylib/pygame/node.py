@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from ..template import Node
 
 
-class PygameNode(Node2D):
+class PygameNode2D(Node2D):
     __logical__ = False # exists in the "real world"
 
     def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, z_index: int = 0, force_sort: bool = True) -> None:

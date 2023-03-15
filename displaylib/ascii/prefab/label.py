@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..node import ASCIINode
+from ..node import ASCIINode2D
 
 if TYPE_CHECKING:
     from ...template import Node
 
 
-class ASCIILabel(ASCIINode):
+class ASCIILabel(ASCIINode2D):
     """Prefabricated `Label` node
 
     A new line is created for each `\\n`

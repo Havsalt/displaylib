@@ -33,7 +33,7 @@ from ..template import Node
 # -- util
 from . import grapheme
 # -- core ascii
-from .node import ASCIINode as Node2D
+from .node import ASCIINode2D as Node2D
 from .engine import ASCIIEngine as Engine
 from .camera import ASCIICamera as Camera
 from .surface import ASCIISurface as Surface

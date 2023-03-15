@@ -29,5 +29,5 @@ except ModuleNotFoundError as error:
 from ..math import lerp, sign, Vec2
 from ..template import Node
 # -- core pygame
-from .node import PygameNode as Node2D
+from .node import PygameNode2D as Node2D
 from .engine import PygameEngine as Engine

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .surface import ASCIISurface
 
 
-class ASCIINode(Node2D): # a variant of the Node2D
+class ASCIINode2D(Node2D): # a variant of the Node2D
     """ASCIINode for representing 2D nodes
     """
     __logical__: bool = False # exists in the "real world"

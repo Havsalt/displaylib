@@ -3,21 +3,21 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ...math import Vec2
-from ..node import ASCIINode
+from ..node import ASCIINode2D
 
 if TYPE_CHECKING:
     from ...template import Node
 
 
-class ASCIIPoint2D(ASCIINode):
-    """Thin wrapper around `ASCIINode`
+class ASCIIPoint2D(ASCIINode2D):
+    """Thin wrapper around `ASCIINode2D`
     """
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, texture: str = "#", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x, y, z_index, force_sort)
         self.content = [[texture]]
 
 
-class ASCIILine(ASCIINode):
+class ASCIILine(ASCIINode2D):
     """Prefabricated `Line` node
 
     Known issue: Does not work well when changing `rotation` or `global_rotation`
