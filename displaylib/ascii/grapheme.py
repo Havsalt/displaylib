@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import Iterable
 from math import pi as PI
 
-
 # -- database
 class Database:
     horizontal: dict[str, str] = { # horizontal flip
@@ -53,6 +52,7 @@ def lookuph(symbol: str) -> str:
     """
     return Database.horizontal.get(symbol, symbol)
 
+
 def lookupv(symbol: str) -> str:
     """Lookup a symbol from the `vertical` database
 
@@ -63,6 +63,7 @@ def lookupv(symbol: str) -> str:
         str: result or symbol supplied
     """
     return Database.vertical.get(symbol, symbol)
+
 
 def fliph(line: str | Iterable[str]) -> str:
     """Flip a line of text `horizontally`
@@ -75,6 +76,7 @@ def fliph(line: str | Iterable[str]) -> str:
     """
     return "".join(Database.horizontal.get(letter, letter) for letter in line)[::-1]
 
+
 def flipv(line: str | Iterable[str]) -> str:
     """Flip a line of text `vertically`
 
@@ -85,6 +87,7 @@ def flipv(line: str | Iterable[str]) -> str:
         str: line flipped vertically
     """
     return "".join(Database.vertical.get(letter, letter) for letter in line)
+
 
 def mapfliph(content: Iterable[str | Iterable[str]]) -> list[str]:
     """Flip a list with text lines `horizontally`
@@ -97,6 +100,7 @@ def mapfliph(content: Iterable[str | Iterable[str]]) -> list[str]:
     """
     return [fliph(line) for line in content]
 
+
 def mapflipv(content: Iterable[str | Iterable[str]]) -> list[str]:
     """Flip a list with text lines `vertically`
 
@@ -107,6 +111,7 @@ def mapflipv(content: Iterable[str | Iterable[str]]) -> list[str]:
         str: list with lines flipped vertically
     """
     return [flipv(line) for line in content][::-1]
+
 
 def rotate(symbol: str, angle: float) -> str:
     """Returns a symbol when rotating it with the given angle
