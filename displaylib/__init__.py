@@ -23,6 +23,8 @@ PygameNode(x, y)
 __version__ = "0.0.7"
 __author__ = "FloatingInt"
 __all__ = [ # when using default mode
+    "lerp",
+    "sign",
     "Vec2",
     "graphme",
     "ASCIINode",
@@ -37,7 +39,7 @@ __all__ = [ # when using default mode
 ]
 
 # -- util
-from .math import Vec2
+from .math import lerp, sign, Vec2
 # -- imports
 from .ascii import (
     # -- util

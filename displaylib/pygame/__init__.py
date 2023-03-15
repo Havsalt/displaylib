@@ -5,8 +5,12 @@ Raises:
 """
 
 __all__ = [
+    # -- standard
+    "lerp",
+    "sign",
     "Vec2",
     "Node",
+    # -- core pygame
     "Node2D",
     "Engine"
 ]
@@ -22,7 +26,7 @@ except ModuleNotFoundError as error:
     raise ModuleNotFoundError("missing external module: pygame, which is required to use this submodule") from error
 
 # -- standard
-from ..math import Vec2
+from ..math import lerp, sign, Vec2
 from ..template import Node
 # -- core pygame
 from .node import PygameNode as Node2D

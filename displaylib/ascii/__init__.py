@@ -3,6 +3,8 @@
 
 __all__ = [
     # -- standard
+    "lerp",
+    "sign",
     "Vec2",
     "Node",
     # -- util
@@ -26,7 +28,7 @@ __all__ = [
 ]
 
 # -- standard
-from ..math import Vec2
+from ..math import lerp, sign, Vec2
 from ..template import Node
 # -- util
 from . import grapheme
