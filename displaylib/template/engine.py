@@ -11,6 +11,14 @@ class Engine:
     is_running: bool = False
 
     def __new__(cls: type[Engine], *args, **kwargs) -> Engine:
+        """Sets `Node.root` when an Engine instance is initialized 
+
+        Args:
+            cls (type[Engine]): engine object to be root
+
+        Returns:
+            Engine: the engine to be used in the program
+        """
         instance = object.__new__(cls)
         Node.root = instance
         return instance
