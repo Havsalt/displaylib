@@ -2,6 +2,8 @@
 """
 
 __all__ = [
+    "lerp",
+    "sign",
     "Vec2",
     "Node",
     "Node2D",
@@ -9,7 +11,7 @@ __all__ = [
     "Client"
 ]
 
-from ..math import Vec2
+from ..math import lerp, sign, Vec2
 from .node import Node, Node2D
 from .engine import Engine
 from .client import Client
