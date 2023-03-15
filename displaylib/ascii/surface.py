@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Iterable
 
 from ..math import Vec2
 from . import grapheme
-from .node import ASCIINode
+from .node import ASCIINode2D
 from .camera import ASCIICamera
 
 if TYPE_CHECKING:
@@ -35,7 +35,7 @@ class ASCIISurface:
     @width.setter
     def width(self, value: int) -> None:
         self._width = value
-        self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
+        self.content = [[ASCIINode2D.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
 
     @property
     def height(self) -> int:
@@ -44,7 +44,7 @@ class ASCIISurface:
     @height.setter
     def height(self, value: int) -> None:
         self._height = value
-        self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
+        self.content = [[ASCIINode2D.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
 
     def rebuild(self, nodes: Iterable[Node] = [], width: int = 16, height: int = 8) -> None:
         """Rebuilds the surface from the content of the nodes
@@ -54,7 +54,7 @@ class ASCIISurface:
             width (int, optional): surface width. Defaults to 16.
             height (int, optional): surface height. Defaults to 8.
         """
-        self.content = [[ASCIINode.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
+        self.content = [[ASCIINode2D.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
 
         camera: ASCIICamera = ASCIICamera.current # should never be None
         half_size = Vec2(self._width, self._height) // 2
@@ -105,7 +105,7 @@ class ASCIISurface:
                         continue
                     if not ((self._width) > x_position >= 0): # out of screen
                         continue
-                    if char != ASCIINode.cell_transparant:
+                    if char != ASCIINode2D.cell_transparant:
                         if rotation != 0:
                             self.content[y_position][x_position] = grapheme.rotate(char, rotation)
                         else:
@@ -114,7 +114,7 @@ class ASCIISurface:
     def clear(self) -> None:
         """Clears the surface. Sets its content to `ASCIINode.cell_transparant`
         """
-        self.content = [[ASCIINode.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
+        self.content = [[ASCIINode2D.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
     
     def blit(self, surface: ASCIISurface, position: Vec2 = Vec2(0, 0), transparent: bool = False) -> None:
         """Blits the content of this surface onto the other surface
@@ -136,7 +136,7 @@ class ASCIISurface:
                     continue
 
                 current = self.content[int(h+position.y)][int(w+position.x)]
-                if current == ASCIINode.cell_default: # empty rendered cell
+                if current == ASCIINode2D.cell_default: # empty rendered cell
                     if not transparent:
                         self.content[int(h+position.y)][int(w+position.x)] = char
                         continue
