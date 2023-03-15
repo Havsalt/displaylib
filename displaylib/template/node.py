@@ -18,22 +18,40 @@ class Node:
 
     root: Engine = None # set from a Engine subclass
     nodes: dict[int, Node] = {} # all nodes that are alive
+    logical_z_index_default: int = -1 # default z_index of nodes with __logical__ == True
     _request_sort: bool = False # requests Engine to sort
     _queued_nodes: set = set() # uses <Node>.queue_free() to ask Engine to delete them
 
     def __new__(cls: type[Node], *args, **kwargs) -> Node:
+        """In addition to default behaviour, automatically store the node in a dict.
+        Keeps the object alive by the reference stored
+
+        Args:
+            cls (type[Node]): class of the node being created
+
+        Returns:
+            Node: node instance that was stored
+        """
         instance = super().__new__(cls)
         Node.nodes[id(instance)] = instance
         return instance
 
     def __init__(self, parent: Node | None = None, *, force_sort: bool = True) -> None:
         self.parent = parent
-        self.z_index = 0 # static
+        self.z_index = 0 if (self.__class__.__logical__ == False) else self.logical_z_index_default # use default if is logical node, else 0
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_sort = True # otherwise, depent on a `z_index` change
 
     def __repr__(self) -> str:
         """Returns a default representation of the Node object
+
+        Returns:
+            str: node representation
+        """
+        return f"<{self.__class__.__name__} object at {hex(id(self))}>"
+
+    def __str__(self) -> str:
+        """Returns a default string representation of the Node object
 
         Returns:
             str: node representation
@@ -50,6 +68,11 @@ class Node:
         return self.__class__.__name__
 
     def where(self, **attributes) -> Node:
+        """Sets/overrides the given attributes the node instance
+
+        Returns:
+            Node: self after modification(s)
+        """
         for key, value in attributes.items():
             setattr(self, key, value)
         return self
@@ -80,12 +103,12 @@ class Node2D(Node):
         self.parent = parent
         self.position = Vec2(x, y)
         self.rotation = 0.0
-        self._z_index = z_index
+        self._z_index = z_index if (self.__class__.__logical__ == False) else self.logical_z_index_default # use default if is logical node, else argument passed                                                                                                                           
         self.visible = True # only nodes on the 2D plane will have the option to be visible
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_sort = True # otherwise, depend on a `z_index` change
     
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.position.x}, {self.position.y})"
 
     @property
