@@ -28,9 +28,9 @@ class ASCIILabel(ASCIINode):
     
     @text.setter
     def text(self, text: str) -> None:
-        """Set content from string
+        """Set content from string. Argument `text` is run through `str` in the process
 
         Args:
             text (str): string to be converted to content
         """
-        self.content = [list(line) for line in text.split("\n")]
+        self.content = [list(line) for line in str(text).split("\n")]
