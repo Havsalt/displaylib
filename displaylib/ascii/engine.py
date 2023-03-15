@@ -15,7 +15,13 @@ class ASCIIEngine(Engine):
     """
 
     def __new__(cls: type[ASCIIEngine], *args, **kwargs) -> Engine:
-        """Set `self` as root. Initialize default camera
+        """Sets `Node.root` when an Engine instance is initialized. Initializes default `ASCIICamera`
+
+        Args:
+            cls (type[ASCIIEngine]): engine object to be root
+
+        Returns:
+            ASCIIEngine: the engine to be used in the program
         """
         instance = super().__new__(cls)
         if ASCIICamera.current == None:
