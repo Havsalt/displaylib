@@ -2,8 +2,37 @@ from __future__ import annotations
 
 from math import sqrt
 
+__all__ = [
+    "lerp",
+    "sign",
+    "Vec2"
+]
 
-__all__ = ["Vec2"]
+
+def lerp(start: int | float, end: int | float, weight: float) -> float:
+    """Lerps between `start` and `end` with `weight` ranging from 0 to 1
+
+    Args:
+        start (int | float): starting number
+        end (int | float): target number
+        weight (float): percentage to lerp
+
+    Returns:
+        float: result of the interpolation
+    """
+    return (1 - weight) * start + (weight * end)
+
+
+def sign(number: int | float) -> int:
+    """Returns the sign of the number. The number 0 will return 0
+
+    Args:
+        number (int | float): number to get the sign of
+
+    Returns:
+        int: sign
+    """
+    return 0 if number == 0 else bool(number > 0)
 
 
 class Vec2:
@@ -16,8 +45,21 @@ class Vec2:
     def __init__(self, x: int | float = 0, y: int | float = 0) -> None:
         self.x = x
         self.y = y
-    
+
     def __repr__(self) -> str:
+        """Representation with class name an memory address
+
+        Returns:
+            str: representation of the vector
+        """
+        return f"<{self.__class__.__name__} object at {hex(id(self))}>"
+    
+    def __str__(self) -> str:
+        """String representation
+
+        Returns:
+            str: representation containing the x and y component
+        """
         return f"Vec2({self.x}, {self.y})"
     
     def __add__(self, other: Vec2) -> Vec2:
@@ -66,12 +108,43 @@ class Vec2:
         return self.x <= other.x and self.y <= other.y
 
     def length(self) -> float:
+        """Returns the length of the vector
+
+        Returns:
+            float: length
+        """
         if self.x == 0 and self.y == 0:
             return 0.0
         return sqrt(self.x*self.x + self.y*self.y)
     
     def normalized(self) -> Vec2:
+        """Returns a vector with length of 1, still with same direction
+
+        Returns:
+            Vec2: normalized vector
+        """
         length = self.length()
         if length == 0:
             return Vec2(0, 0)
         return self / self.length()
+
+    def lerp(self, target: Vec2, weight: int | float) -> Vec2:
+        """Lerp towards vector `target` with `weight` ranging from 0 to 1
+
+        Args:
+            target (Vec2): _description_
+            weight (int | float): percentage to lerp
+
+        Returns:
+            Vec2: vector after performing interpolation
+        """
+        return Vec2(lerp(self.x, target.x, weight),
+                    lerp(self.y, target.y, weight))
+
+    def sign(self) -> Vec2:
+        """Returns a Vec2 with each component being the sign of the vector
+
+        Returns:
+            Vec2: vector with signed components
+        """
+        return Vec2(sign(self.x), sign(self.y))
