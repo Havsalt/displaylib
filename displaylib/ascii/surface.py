@@ -68,7 +68,7 @@ class ASCIISurface:
             lines = len(node.content)
             longest = len(max(node.content, key=len))
             position = node.global_position - camera.global_position
-            rotation = node.global_rotation # TODO: add camera rotation
+            rotation = node.global_rotation + camera.global_rotation # FIXME: implement camera rotation the right way
             # if rotation != 0: # TODO: rotate around center if flagged
             #     position = rotate(position, rotation)
             if position.y + lines < 0 or position.y > self._height: # out of screen
