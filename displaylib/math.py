@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import sqrt
+from math import sqrt, cos, sin
 
 __all__ = [
     "lerp",
@@ -61,33 +61,50 @@ class Vec2:
             str: representation containing the x and y component
         """
         return f"Vec2({self.x}, {self.y})"
+
+    def __round__(self, ndigits: int) -> Vec2:
+        return Vec2(round(self.x, ndigits),
+                    round(self.y, ndigits))
     
     def __add__(self, other: Vec2) -> Vec2:
-        return Vec2(self.x + other.x, self.y + other.y)
+        return Vec2(self.x + other.x,
+                    self.y + other.y)
     
     def __sub__(self, other: Vec2) -> Vec2:
-        return Vec2(self.x - other.x, self.y - other.y)
+        return Vec2(self.x - other.x,
+                    self.y - other.y)
 
     def __mul__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
-            return Vec2(self.x * other.x, self.y * other.y)
+            return Vec2(self.x * other.x,
+                        self.y * other.y)
         elif isinstance(other, (int, float)):
-            return Vec2(self.x * other, self.y * other)
+            return Vec2(self.x * other,
+                        self.y * other)
     
     def __floordiv__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
-            return Vec2(self.x // other.x, self.y // other.y)
+            return Vec2(self.x // other.x,
+                        self.y // other.y)
         elif isinstance(other, (int, float)):
-            return Vec2(self.x // other, self.y // other)
+            return Vec2(self.x // other,
+                        self.y // other)
     
     def __truediv__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
-            return Vec2(self.x / other.x, self.y / other.y)
+            return Vec2(self.x / other.x,
+                        self.y / other.y)
         elif isinstance(other, (int, float)):
-            return Vec2(self.x / other, self.y / other)
+            return Vec2(self.x / other,
+                        self.y / other)
     
-    def __mod__(self, other: int | float) -> Vec2:
-        return Vec2(self.x % other, self.y % other)
+    def __mod__(self, other: Vec2 | int | float) -> Vec2:
+        if isinstance(other, Vec2):
+            return Vec2(self.x % other.x,
+                        self.y % other.y)
+        elif isinstance(other, (int, float)):
+            return Vec2(self.x % other,
+                        self.y % other)
     
     def __eq__(self, other: Vec2) -> bool:
         return (self.x == other.x) and (self.y == other.y)
@@ -148,3 +165,35 @@ class Vec2:
             Vec2: vector with signed components
         """
         return Vec2(sign(self.x), sign(self.y))
+    
+    def rotated(self, angle: float) -> Vec2:
+        """Returns a vector rotated by `angle` given in radians
+
+        Args:
+            angle (float): radians to rotate with
+
+        Returns:
+            Vec2: rotated vector
+        """
+        cos_rad = cos(angle)
+        sin_rad = sin(angle)
+        x = cos_rad * self.x + sin_rad * self.y
+        y = -sin_rad * self.x + cos_rad * self.y
+        return Vec2(x, y)
+    
+    def rotated_around(self, angle: float, point: Vec2) -> Vec2:
+        """Returns a vector rotated by `angle` given in radians, around `point`
+
+        Args:
+            angle (float): radians to rotate with
+            point (Vec2): point to rotate around
+
+        Returns:
+            Vec2: vector rotated around `point`
+        """
+        diff = self - point
+        cos_rad = cos(angle)
+        sin_rad = sin(angle)
+        x = point.x + cos_rad * diff.x + sin_rad * diff.y
+        y = point.y + -sin_rad * diff.x + cos_rad * diff.y
+        return Vec2(x, y)
