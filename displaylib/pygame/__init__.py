@@ -1,4 +1,4 @@
-"""Pygame submodule from DisplayLib
+"""## Pygame submodule of DisplayLib
 
 Raises:
     ModuleNotFoundError: `pygame` was not found
@@ -9,6 +9,7 @@ __all__ = [
     "lerp",
     "sign",
     "Vec2",
+    "Vec2i",
     "Node",
     # -- core pygame
     "Node2D",
@@ -26,7 +27,7 @@ except ModuleNotFoundError as error:
     raise ModuleNotFoundError("missing external module: pygame, which is required to use this submodule") from error
 
 # -- standard
-from ..math import lerp, sign, Vec2
+from ..math import lerp, sign, Vec2, Vec2i
 from ..template import Node
 # -- core pygame
 from .node import PygameNode2D as Node2D

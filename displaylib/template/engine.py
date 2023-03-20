@@ -20,7 +20,7 @@ class Engine:
             Engine: the engine to be used in the program
         """
         instance = object.__new__(cls)
-        Node.root = instance
+        setattr(Node, "root", instance)
         return instance
 
     def __init__(self) -> None: # default implementation

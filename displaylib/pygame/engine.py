@@ -58,7 +58,7 @@ class PygameEngine(Engine):
             self.is_running = False
     
     def _main_loop(self) -> None:
-        def sort_fn(element):
+        def sort_fn(element: tuple[int, Node]):
             return element[1].z_index
 
         clock = pygame.time.Clock()
@@ -68,22 +68,26 @@ class PygameEngine(Engine):
         pygame.display.flip()
 
         while self.is_running:
-            self._update(delta)
             nodes = tuple(Node.nodes.values())
+            
             for event in pygame.event.get():
                 self._input(event)
                 for node in nodes:
                     node._input(event)
+            
+            self._update(delta)
             for node in nodes:
                 node._update(delta)
+
             if Node._request_sort: # only sort once per frame if needed
                 Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
             
-            self.display.fill(self.bg_color)
-            for node in nodes: # render nodes onto the display
-                node._render(self.display)
+            # self.display.fill(self.bg_color)
+            # self.screen.blit(self.display, (0, 0)) # render display onto the main screen
             # TODO: implement camera
-            self.screen.blit(self.display, (0, 0)) # render display onto the main screen
+            self.screen.fill(self.bg_color)
+            for node in nodes: # render nodes onto the display
+                node._render(self.screen)
             
             pygame.display.flip()
             delta = clock.tick(self.tps) / MILLISECOND # milliseconds -> seconds

@@ -1,4 +1,20 @@
+"""### Graphme cluster utility module
+
+Provides functions related to alter text
+"""
+
 from __future__ import annotations
+
+__all__ = [
+    "Database",
+    "lookuph",
+    "lookupv",
+    "fliph",
+    "flipv",
+    "mapfliph",
+    "mapflipv",
+    "rotate"
+]
 
 from collections.abc import Iterable
 from math import pi as PI

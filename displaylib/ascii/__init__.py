@@ -1,4 +1,6 @@
-"""ASCII submodule from DisplayLib
+"""## ASCII submodule of DisplayLib
+
+Provides a framework for creating 2D worlds in ASCII
 """
 
 __all__ = [
@@ -6,13 +8,14 @@ __all__ = [
     "lerp",
     "sign",
     "Vec2",
+    "Vec2i",
     "Node",
     # -- util
     "grapheme",
     # -- core ascii
     "Node2D",
     "Engine",
-    "Camera",
+    "Camera2D",
     "Screen",
     "Surface",
     "Image",
@@ -28,14 +31,14 @@ __all__ = [
 ]
 
 # -- standard
-from ..math import lerp, sign, Vec2
+from ..math import lerp, sign, Vec2, Vec2i
 from ..template import Node
 # -- util
 from . import grapheme
 # -- core ascii
 from .node import ASCIINode2D as Node2D
 from .engine import ASCIIEngine as Engine
-from .camera import ASCIICamera as Camera
+from .camera import ASCIICamera2D as Camera2D
 from .surface import ASCIISurface as Surface
 from .screen import ASCIIScreen as Screen
 from .image import ASCIIImage as Image

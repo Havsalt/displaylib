@@ -1,7 +1,7 @@
-"""DisplayLib
+"""# DisplayLib
 ----------------
 
-Requires Python version >= 3.10
+`Requires Python version >= 3.10`
 
 ----------------
 Submodules:
@@ -26,10 +26,12 @@ __all__ = [ # when using default mode
     "lerp",
     "sign",
     "Vec2",
+    "Vec2i",
     "graphme",
-    "ASCIINode",
+    "Node",
+    "ASCIINode2D",
     "ASCIIEngine",
-    "ASCIICamera",
+    "ASCIICamera2D",
     "ASCIISurface",
     "ASCIIScreen",
     "ASCIIImage",
@@ -39,15 +41,17 @@ __all__ = [ # when using default mode
 ]
 
 # -- util
-from .math import lerp, sign, Vec2
+from .math import lerp, sign, Vec2, Vec2i
+# -- standard
+from .template import Node
 # -- imports
 from .ascii import (
     # -- util
     grapheme as graphme,
     # -- core
-    Node as ASCIINode,
+    Node2D as ASCIINode2D,
     Engine as ASCIIEngine,
-    Camera as ASCIICamera,
+    Camera2D as ASCIICamera2D,
     Surface as ASCIISurface,
     Screen as ASCIIScreen,
     Image as ASCIIImage,

@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Generator
 
 from ..template import Node
 from . import grapheme
-from .types import ModeFlags
 
 if TYPE_CHECKING:
+    from .node import ASCIINode2D
     from .surface import ASCIISurface
 
 
@@ -62,21 +62,22 @@ class EmptyAnimation(Animation):
 
 
 class AnimationPlayer(Node): # TODO: add buffered animations on load
-    """`AnimationPlayer` to be attached to node, so it can control animations
+    """`AnimationPlayer` to be attached to a node, so it can control animations
     """
-    FIXED = 0 # TODO: implement FIXED and DELTATIME mode
-    # DELTATIME = 1
+    FIXED = 0
+    DELTATIME = 1 # TODO: DELTATIME mode
+    mode_default = FIXED
 
-    def __init__(self, parent: Node | None = None, fps: float = 16, mode: ModeFlags = FIXED, **animations) -> None:
+    def __init__(self, parent: ASCIINode2D | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
         super().__init__(parent, force_sort=False)
         self.fps: float = fps
-        self.mode = mode # process mode (FIXED | DELTATIME)
+        self.mode: int = mode
         self.animations: dict[str, Animation] = dict(animations)
         self.current_animation: str = ""
         self.is_playing: bool = False
-        self._current_frames: Generator | None = None
+        self._current_frames: Generator[Frame, None, None] | None = None
         self._next: None | Frame = None
-        self._has_updated: bool = False # indicates if the first frame (per animation) have been displayed
+        self._has_updated: bool = False # indicates if the first frame (per animation) has been displayed
         self._accumulated_time: float = 0.0
     
     def __iter__(self) -> AnimationPlayer:
