@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Iterable
 
-from ..math import Vec2
+from ..math import Vec2, Vec2i
 from . import grapheme
 from .camera import ASCIICamera2D
 from .sprite import ASCIISprite2D
@@ -65,7 +65,7 @@ class ASCIISurface:
         # print(ASCIICamera2D.current)
         # print(2)
         camera: ASCIICamera2D = ASCIICamera2D.current # should never be None
-        half_size = Vec2(self._width, self._height) // 2
+        half_size = Vec2i(self._width // 2, self._height // 2)
         camera_rotation = camera.global_rotation
         cos_rotation_camera = math.cos(-camera_rotation)
         sin_rotation_camera = math.sin(-camera_rotation)

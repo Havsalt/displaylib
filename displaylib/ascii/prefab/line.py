@@ -29,7 +29,7 @@ class ASCIILine(ASCIINode2D):
         self.start = start
         self.end = end
         self.texture = self.texture_default if texture == "" else texture
-        self.points: list[ASCIIPoint2D] = [
+        self.points: list[Node] = [
             ASCIIPoint2D(self, z_index=self.z_index, texture=self.texture).where(position=start),
             ASCIIPoint2D(self, z_index=self.z_index, texture=self.texture).where(position=end)
         ]
