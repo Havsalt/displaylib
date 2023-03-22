@@ -3,14 +3,26 @@ from __future__ import annotations
 from .node import Node
 
 
-class Engine:
+class EnginePriorityMeta(type):
+    """Engine metaclass for initializing `Engine` subclass before other `mixin` classes
+    """
+    @staticmethod
+    def _mixin_sort(base: type) -> bool:
+        return not issubclass(base, Engine)
+
+    def __new__(cls, name: str, bases: tuple[type], dct: dict[str, object]):
+        sorted_bases = tuple(sorted(bases, key=EnginePriorityMeta._mixin_sort))
+        return super().__new__(cls, name, sorted_bases, dct)
+
+
+class Engine(metaclass=EnginePriorityMeta):
     """Engine base class
     NOTE: only one Engine instance should exist per script instance
     """
     tps: int = 4
     is_running: bool = False
 
-    def __new__(cls: type[Engine], *args, **kwargs) -> Engine:
+    def __new__(cls: type[Engine]) -> Engine:
         """Sets `Node.root` when an Engine instance is initialized 
 
         Args:
@@ -19,7 +31,7 @@ class Engine:
         Returns:
             Engine: the engine to be used in the program
         """
-        instance = object.__new__(cls)
+        instance = super().__new__(cls)
         setattr(Node, "root", instance)
         return instance
 
@@ -39,13 +51,9 @@ class Engine:
         ...
     
     def _main_loop(self) -> None:
-        def sort_fn(pair: tuple[int, Node]):
-            _id, node = pair
-            if getattr(node, "__logical__") == False:
-                return node.z_index
-            else:
-                return -1 # logical nodes have by default a higher process priority (default for other nodes are 0)
-
+        def sort_fn(element: tuple[int, Node]):
+            return element[1].z_index
+        
         delta = 1.0 / self.tps
         nodes = tuple(Node.nodes.values())
         while self.is_running:
