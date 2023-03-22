@@ -8,7 +8,19 @@ if TYPE_CHECKING:
     from .engine import Engine
 
 
-class Node:
+class NodePriorityMeta(type):
+    """Node metaclass for initializing `Node` subclass before other `mixin` classes
+    """
+    @staticmethod
+    def _mixin_sort(base: type) -> bool:
+        return not issubclass(base, Node)
+
+    def __new__(cls, name: str, bases: tuple[type], dct: dict[str, object]):
+        sorted_bases = tuple(sorted(bases, key=NodePriorityMeta._mixin_sort))
+        return super().__new__(cls, name, sorted_bases, dct)
+
+
+class Node(metaclass=NodePriorityMeta):
     """Node base class
 
     Automatically keeps track of alive Node(s) by reference.
@@ -17,7 +29,7 @@ class Node:
     root: Engine # set from a Engine subclass
     nodes: dict[int, Node] = {} # all nodes that are alive
     _request_sort: bool = False # requests Engine to sort
-    _queued_nodes: set = set() # uses <Node>.queue_free() to ask Engine to delete them
+    _queued_nodes: set[Node] = set() # uses <Node>.queue_free() to ask Engine to delete them
 
     def __new__(cls: type[Node], *args, **kwargs) -> Node:
         """In addition to default behaviour, automatically store the node in a dict.
@@ -45,7 +57,7 @@ class Node:
         Returns:
             str: node representation
         """
-        return f"<{self.__class__.__name__} object at {hex(id(self))}>"
+        return f"<{self.__class__.__qualname__} object at {hex(id(self))}>"
 
     def __str__(self) -> str:
         """Returns a default string representation of the Node object
@@ -95,11 +107,11 @@ class Node2D(Node):
     """Node2D class with transform attributes
     """
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, z_index: int = 0, force_sort: bool = True) -> None:
+        self._z_index = z_index # has to be before Node init
         super().__init__(parent, force_sort=force_sort)
         self.parent = parent
         self.position = Vec2(x, y)
         self.rotation = 0.0
-        self._z_index = z_index                                                                            
         self.visible = True # only nodes on the 2D plane will have the option to be visible
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_sort = True # otherwise, depend on a `z_index` change
@@ -119,13 +131,17 @@ class Node2D(Node):
     
     @property
     def global_position(self) -> Vec2:
+        linear_segments = [] # top parent -> branches -> leaf
         position = self.position
-        node = self.parent
-        while node != None:
-            if not isinstance(node, Node2D):
+        current = self
+        parent = self.parent
+        while parent != None:
+            if not isinstance(parent, Node2D):
                 break
-            position += node.position
-            node = node.parent
+            # -- do stuff
+            position += current.position.rotated_around(current.rotation, parent.position)
+            # -- end
+            current, parent = parent, parent.parent
         return position
     
     @global_position.setter
