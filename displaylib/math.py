@@ -43,6 +43,7 @@ class Vec2:
 
     Usefull for storing position or direction
     """
+
     def __init__(self, x: int | float = 0, y: int | float = 0, /) -> None:
         self.x = x
         self.y = y
@@ -62,7 +63,7 @@ class Vec2:
             str: representation containing the x and y component
         """
         return f"Vec2({self.x}, {self.y})"
-
+    
     def __round__(self, ndigits: int = 0) -> Vec2:
         return Vec2(round(self.x, ndigits),
                     round(self.y, ndigits))
@@ -70,12 +71,8 @@ class Vec2:
     def __add__(self, other: Vec2) -> Vec2:
         return Vec2(self.x + other.x,
                     self.y + other.y)
-        return Vec2(self.x + other.x,
-                    self.y + other.y)
     
     def __sub__(self, other: Vec2) -> Vec2:
-        return Vec2(self.x - other.x,
-                    self.y - other.y)
         return Vec2(self.x - other.x,
                     self.y - other.y)
 
@@ -124,6 +121,9 @@ class Vec2:
 
     def __le__(self, other: Vec2) -> bool:
         return (self.x <= other.x) and (self.y <= other.y)
+
+    def __serialize__(self) -> str:
+        return f"{self.__class__.__qualname__}({self.x}, {self.y})"
 
     def length(self) -> float:
         """Returns the length of the vector
