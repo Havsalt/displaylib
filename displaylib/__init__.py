@@ -29,9 +29,10 @@ __all__ = [ # when using default mode
     "Vec2i",
     "graphme",
     "Node",
+    "Node2D",
     "ASCIINode2D",
     "ASCIIEngine",
-    "ASCIICamera2D",
+    "ASCIICamera",
     "ASCIISurface",
     "ASCIIScreen",
     "ASCIIImage",
@@ -43,7 +44,7 @@ __all__ = [ # when using default mode
 # -- util
 from .math import lerp, sign, Vec2, Vec2i
 # -- standard
-from .template import Node
+from .template import Node, Node2D
 # -- imports
 from .ascii import (
     # -- util
@@ -51,7 +52,7 @@ from .ascii import (
     # -- core
     Node2D as ASCIINode2D,
     Engine as ASCIIEngine,
-    Camera2D as ASCIICamera2D,
+    Camera as ASCIICamera,
     Surface as ASCIISurface,
     Screen as ASCIIScreen,
     Image as ASCIIImage,
