@@ -1,78 +1,63 @@
 from __future__ import annotations
 
-import time
-import socket
-import selectors
+import os
 
+from ..math import Vec2i
 from ..template import Node, Client
 from .surface import ASCIISurface
+from .clock import Clock
+from .node import ASCIINode2D
 
 
 class ASCIIClient(Client):
-    _BUFF_SIZE = 4096
-    _DELIMITER = b"$"
-    _ARGUMENT_DELIMITER = ":"
-    _NEGATIVE_INF = float("-inf")
-
-    def __init__(self, host: str, port: int) -> None:
-        self._address = (host, port)
-        self._sel = selectors.DefaultSelector()
-        self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._sel.register(self._sock, selectors.EVENT_READ)
-        self._sock.connect(self._address)
-        self._sock.setblocking(False)
-        self._buffer = bytes()
-
-    def send(self, request: str) -> None:
-        encoded = request.encode(encoding="utf-8") + self._DELIMITER
-        self._sock.send(encoded)
-
-    def _on_request(self, data: str) -> None:
-        ...
-    
-    def _update_socket(self) -> None:
-        for key, mask in self._sel.select(timeout=self._NEGATIVE_INF):
-            connection = key.fileobj
-            if mask & selectors.EVENT_READ:
-                data = connection.recv(self._BUFF_SIZE)
-                if data: # a readable client socket that has data.
-                    if self._DELIMITER in data:
-                        head, *rest = data.split(self._DELIMITER)
-                        self._buffer += head
-                        data = self._buffer.decode()
-                        request, *args = data.split(self._ARGUMENT_DELIMITER)
-                        self._buffer = bytes()
-                        self._on_request(request, list(args))
-                        for content in rest[:-1]:
-                            data = content.decode()
-                            request, *args = data.split(self._ARGUMENT_DELIMITER)
-                            self._on_request(request, list(args))
-                        self._buffer += rest[-1]
-                    else:
-                        self._buffer += data
-                    # print('  received {!r}'.format(data))
-    
     def _main_loop(self) -> None:
-        def sort_fn(element):
+        def sort_fn(element: tuple[int, Node]):
             return element[1].z_index
 
+        nodes = tuple(Node.nodes.values())
+        clock = Clock(self.tps)
         while self.is_running:
             delta = 1.0 / self.tps
-            if Node._request_sort: # only sort once per frame if needed
-                Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
-            self._update_socket() # <--- updates socket
             self.screen.clear()
+            
             self._update(delta)
-            nodes = tuple(Node.nodes.values())
             for node in nodes:
                 node._update(delta)
-            # render nodes onto main screen
-            surface = ASCIISurface(nodes, self.display.width, self.display.height) # create a Surface from all the Nodes
-            self.screen.blit(surface)
-            self.screen.display()
+
+            for node in Node._queued_nodes:
+                del Node.nodes[id(node)]
+            Node._queued_nodes.clear()
             
-            time.sleep(delta) # TODO: implement clock
+            if self.auto_resize_screen:
+                terminal_size = os.get_terminal_size()
+                if ((terminal_size.columns - self.screen_margin.x) != self.screen.width) or ((terminal_size.lines - self.screen_margin.y) != self.screen.height):
+                    self.screen.width = int(terminal_size.columns - self.screen_margin.x)
+                    self.screen.height = int(terminal_size.lines - self.screen_margin.y)
+                    size = Vec2i(terminal_size.columns, terminal_size.lines)
+                    for node in nodes:
+                        if isinstance(node, ASCIINode2D):
+                            node._on_screen_resize(size)
+                    os.system("cls")
+            
+            if Node._request_sort: # only sort once per frame if needed
+                Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
+            nodes = tuple(Node.nodes.values())
+
+            # render content of visible nodes onto a surface
+            self.screen.rebuild(Node.nodes.values(), self.screen.width, self.screen.height)
+            
+            self._render(self.screen)
+            # nodes can render custon data onto the screen
+            for node in nodes:
+                if isinstance(node, ASCIINode2D):
+                    node._render(self.screen)
+            
+            self.screen.show()
+            self._update_socket()
+            clock.tick()
+        
+        # v exit protocol v
         self._on_exit()
-        surface = ASCIISurface(nodes, self.display.width, self.display.height) # create a Surface from all the Nodes
+        surface = ASCIISurface(Node.nodes.values(), self.screen.width, self.screen.height) # create a Surface from all the Nodes
         self.screen.blit(surface)
-        self.screen.display()
+        self.screen.show()
