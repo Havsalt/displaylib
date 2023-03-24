@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-import socket
-import selectors
 import json
+import selectors
+import socket
+from typing import Any
 
 from ..template import Node
 
@@ -11,7 +12,8 @@ class SerializeError(TypeError): ...
 
 
 def serialize(instance: object) -> str:
-    """Calls the underlaying `__serialize__` on argument `instance`
+    """Calls the underlaying `__serialize__` on argument `instance`.
+    If not found, tries to serialize based on `__recipe__`
     
     ----
     #### Syntax of `__recipe__`:
@@ -32,11 +34,11 @@ def serialize(instance: object) -> str:
         return str(instance)
     
     # alternative to implementing `__serialize__` (using `__recipe__`)
-    elif hasattr(instance, "__recipe__"): # important attributes to recreate an instance
+    elif hasattr(instance, "__recipe__"): # uses important attributes to recreate an instance
         arg_values = []
         kwarg_values = []
         modification_values = []
-        for instruction in instance.__recipe__:
+        for instruction in getattr(instance, "__recipe__"):
             attr, suffix, = instruction, ""
             if "!" in instruction:
                 attr, suffix, _ = instruction.partition("!")
@@ -54,82 +56,117 @@ def serialize(instance: object) -> str:
                 arg_values.append(value)
         values = (*arg_values, *kwarg_values, *modification_values)
         return f"{instance.__class__.__qualname__}({', '.join(values)})"
-    
     raise SerializeError(f"instance of class '{instance.__class__.__qualname__}' missing either __serialized__ or __recipe__, or is not a builtin type")
 
 
 class Client:
     buffer_size: int = 4096
     timeout: float = 0
-    request_delimiter: str = "$"
-    argument_delimiter: str = ":"
     encoding: str = "utf-8"
-    _queued_changes: dict[str, dict[str, str]] = {}
+    _queued_changes: dict[str, dict[str, dict[str, str]]] = {"system": {},"custom": {}}
 
-    def __new__(cls: type[Client], *args, **kwargs) -> Client:
-        instance = super().__new__(cls)
-
-        def __setattr__(self, name: str, value: object):
+    def __new__(cls: type[Client], *args, **kwargs) -> Client: # Engine instance
+        def __setattr__(self: Node, name: str, value: object):
+            """Overridden `__setattr__` that automaticlly queues changes to be sent as a network request
+            """
             change = {name: serialize(value)}
-            request = change
             local_uid = hex(id(self))
-            if not local_uid in Client._queued_changes:
-                Client._queued_changes[local_uid] = request
+            if local_uid not in Client._queued_changes["system"]:
+                Client._queued_changes["system"][local_uid] = change
             else:
-                Client._queued_changes[local_uid].update(request)
+                Client._queued_changes["system"][local_uid].update(change)
             return object.__setattr__(self, name, value)
-        
-        Node.__setattr__ = __setattr__
-        for node in Node.nodes.values():
-            node.__setattr__ = __setattr__
+
+        Node.__setattr__ = __setattr__ # no nodes are made prior to this change
+        instance = super().__new__(cls)
         return instance
-        #request = bytes(json.dumps(change), cls.encoding)
 
-    # TODO: build custom __init__ args
-    def __init__(self, host: str, port: int) -> None:
+    def __init__(self, host: str = "localhost", port: int = 8080, *args, **kwargs) -> None:
         self._address = (host, port)
-        self._sel = selectors.DefaultSelector()
+        self._selector = selectors.DefaultSelector()
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._sel.register(self._socket, selectors.EVENT_READ)
-        self._socket.connect(self._address)
-        self._socket.setblocking(False)
+        self._selector.register(self._socket, selectors.EVENT_READ)
         self._buffer = bytes()
+        try:
+            self._socket.connect(self._address)
+        except ConnectionRefusedError as error:
+            self._on_connection_refused(error)
+        self._on_connection_established(host, port)
+        self._socket.setblocking(False)
+        super(__class__, self).__init__(*args, **kwargs)
+        self._update_socket()
+    
+    def _on_connection_refused(self, error: Exception) -> None:
+        ...
+    
+    def _on_connection_established(self, host: str, port: int) -> None:
+        ...
 
-    def _on_request(self, data: str) -> None:
+    def _on_response(self, response: str) -> None:
         ...
     
     def _update_socket(self) -> None:
         # -- send request
-        if Client._queued_changes:
+        if Client._queued_changes["system"] or Client._queued_changes["custom"]:
             request = bytes(json.dumps(Client._queued_changes), Client.encoding)
-            Client._queued_changes.clear()
+            Client._queued_changes = {"system": {},"custom": {}} # reset dict
             if request:
-                self.send_raw(request)
+                self._socket.send(request) # send the request
         # -- recieve request
-        for key, mask in self._sel.select(timeout=self.timeout):
+        for key, mask in self._selector.select(timeout=self.timeout):
             connection = key.fileobj
             if mask & selectors.EVENT_READ:
                 data = connection.recv(self.buffer_size)
-                if data: # a readable client socket that has data.
+                if data: # indicates a readable client socket that has data
                     if self.request_delimiter in data:
                         head, *rest = data.split(self.request_delimiter)
                         self._buffer += head
                         data = self._buffer.decode()
-                        request, *args = data.split(self.argument_delimiter)
+                        response, *args = data.split(self.argument_delimiter)
                         self._buffer = bytes()
-                        self._on_request(request, list(args))
+                        self._on_response(response, list(args))
                         for content in rest[:-1]:
                             data = content.decode()
-                            request, *args = data.split(self.argument_delimiter)
-                            self._on_request(request, list(args))
+                            response, *args = data.split(self.argument_delimiter)
+                            self._on_response(response, list(args))
                         self._buffer += rest[-1]
                     else:
                         self._buffer += data
-                    # print('  received {!r}'.format(data))
-
-    def send(self, request: str) -> None:
-        encoded = request.encode(encoding="utf-8") + bytes(self.request_delimiter, "utf-8")
-        self._socket.send(encoded)
     
-    def send_raw(self, request: bytes) -> None:
-        self._socket.send(request)
+    def _main_loop(self) -> None:
+        def sort_fn(element: tuple[int, Node]):
+            return element[1].z_index
+        
+        delta = 1.0 / self.tps
+        nodes = tuple(Node.nodes.values())
+        while self.is_running:
+            self._update(delta)
+            for node in nodes:
+                node._update(delta)
+
+            for node in Node._queued_nodes:
+                del Node.nodes[id(node)]
+            Node._queued_nodes.clear()
+
+            if Node._request_sort: # only sort once per frame if needed
+                Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
+            nodes = tuple(Node.nodes.values())
+
+            self._update_socket()
+
+    def send(self, request: dict[str, dict[str, Any]]) -> None:
+        """Queues the request to be sent
+
+        Format: `{node_id: {attr, value}, ...}`
+
+        Args:
+            request (dict[int, dict[str, Any]]): the changes to be sent
+        """
+        # -- serialize each change
+        for local_uid, changes in request.items():
+            for name, value in changes.items():
+                change = {name: serialize(value)}
+                if local_uid not in Client._queued_changes["custom"]:
+                    Client._queued_changes["custom"][local_uid] = change
+                else:
+                    Client._queued_changes["custom"][local_uid].update(change)
