@@ -7,8 +7,9 @@ from ..template import Node, Engine
 from .clock import Clock
 from .screen import ASCIIScreen
 from .surface import ASCIISurface
-from .camera import ASCIICamera2D
+from .camera import ASCIICamera
 from .node import ASCIINode2D
+from .texture import Texture
 
 
 class ASCIIEngine(Engine):
@@ -25,12 +26,12 @@ class ASCIIEngine(Engine):
             ASCIIEngine: the engine to be used in the program
         """
         instance = super().__new__(cls)
-        if hasattr(ASCIICamera2D, "current"):
-            camera = ASCIICamera2D()
-            setattr(ASCIICamera2D, "current", camera) # initialize default camera
+        if not hasattr(ASCIICamera, "current"):
+            camera = ASCIICamera()
+            setattr(ASCIICamera, "current", camera) # initialize default camera
         return instance
 
-    def __init__(self, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2 = Vec2(1, 1)) -> None:
+    def __init__(self, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2 = Vec2(1, 1), *args, **kwargs) -> None:
         """Initialize and start the engine (only 1 instance should exist)
 
         Args:
@@ -48,6 +49,7 @@ class ASCIIEngine(Engine):
                 self.screen.width = int(terminal_size.columns - self.screen_margin.x)
                 self.screen.height = int(terminal_size.lines - self.screen_margin.y)
                 os.system("cls")
+        super(__class__, self).__init__(*args, **kwargs)
         self._on_start()
 
         self.is_running = True
@@ -90,7 +92,7 @@ class ASCIIEngine(Engine):
             nodes = tuple(Node.nodes.values())
 
             # render content of visible nodes onto a surface
-            self.screen.rebuild(Node.nodes.values(), self.screen.width, self.screen.height)
+            self.screen.rebuild(Texture._instances, self.screen.width, self.screen.height)
             
             self._render(self.screen)
             # nodes can render custon data onto the screen
