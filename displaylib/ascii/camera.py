@@ -9,14 +9,14 @@ if TYPE_CHECKING:
     from .surface import ASCIISurface
 
 
-class ASCIICamera2D(Node2D):
+class ASCIICamera(Node2D):
     """`ASCIICamera` for moving the viewport
     """
     FIXED = 1
     CENTERED = 3
     INCLUDE_SIZE = 5
     CENTERED_AND_INCLUDE_SIZE = 8
-    current: ASCIICamera2D
+    current: ASCIICamera
 
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, follow: bool = False, mode: int = FIXED) -> None:
         self._z_index = 0 # required in <Node2D>.__init__
