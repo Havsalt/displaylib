@@ -15,7 +15,7 @@ __all__ = [
     # -- core ascii
     "Node2D",
     "Engine",
-    "Camera2D",
+    "Camera",
     "Screen",
     "Surface",
     "Image",
@@ -25,6 +25,8 @@ __all__ = [
     "EmptyAnimation",
     "AnimationPlayer",
     "Clock",
+    # -- mixin classes
+    "Texture",
     # -- prefab
     "Label",
     "Line"
@@ -38,13 +40,15 @@ from . import grapheme
 # -- core ascii
 from .node import ASCIINode2D as Node2D
 from .engine import ASCIIEngine as Engine
-from .camera import ASCIICamera2D as Camera2D
+from .camera import ASCIICamera as Camera
 from .surface import ASCIISurface as Surface
 from .screen import ASCIIScreen as Screen
 from .image import ASCIIImage as Image
 from .client import ASCIIClient as Client
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .clock import Clock
+# -- mixin classes
+from .texture import Texture
 # -- prefab
 from .prefab.label import ASCIILabel as Label
 from .prefab.line import ASCIILine as Line
