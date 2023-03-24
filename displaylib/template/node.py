@@ -8,19 +8,19 @@ if TYPE_CHECKING:
     from .engine import Engine
 
 
-class NodePriorityMeta(type):
-    """Node metaclass for initializing `Node` subclass before other `mixin` classes
+class NodeMixinSortMeta(type):
+    """Node metaclass for initializing `Node` subclass after other `mixin` classes
     """
     @staticmethod
     def _mixin_sort(base: type) -> bool:
-        return not issubclass(base, Node)
+        return issubclass(base, Node)
 
-    def __new__(cls, name: str, bases: tuple[type], dct: dict[str, object]):
-        sorted_bases = tuple(sorted(bases, key=NodePriorityMeta._mixin_sort))
-        return super().__new__(cls, name, sorted_bases, dct)
+    def __new__(cls, name: str, bases: tuple[type], attrs: dict[str, object]):
+        sorted_bases = tuple(sorted(bases, key=NodeMixinSortMeta._mixin_sort))
+        return super().__new__(cls, name, sorted_bases, attrs)
 
 
-class Node(metaclass=NodePriorityMeta):
+class Node(metaclass=NodeMixinSortMeta):
     """Node base class
 
     Automatically keeps track of alive Node(s) by reference.
@@ -75,6 +75,15 @@ class Node(metaclass=NodePriorityMeta):
             str: class name
         """
         return self.__class__.__name__
+    
+    @property
+    def uid(self) -> str:
+        """Returns the unique ID of the node
+
+        Returns:
+            str: unique ID (memory address)
+        """
+        return hex(id(self))
 
     def where(self, **attributes) -> Node:
         """Sets/overrides the given attributes the node instance
@@ -112,7 +121,7 @@ class Node2D(Node):
         self.parent = parent
         self.position = Vec2(x, y)
         self.rotation = 0.0
-        self.visible = True # only nodes on the 2D plane will have the option to be visible
+        self._visible = True # only nodes on the 2D plane will have the option to be visible
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_sort = True # otherwise, depend on a `z_index` change
     
@@ -138,7 +147,7 @@ class Node2D(Node):
         while parent != None:
             if not isinstance(parent, Node2D):
                 break
-            # -- do stuff
+            # -- do stuff | TODO: test this
             position += current.position.rotated_around(current.rotation, parent.position)
             # -- end
             current, parent = parent, parent.parent
@@ -152,15 +161,32 @@ class Node2D(Node):
     @property
     def global_rotation(self) -> float:
         rotation = self.rotation
-        node = self.parent
-        while node != None:
-            if not isinstance(node, Node2D):
+        parent = self.parent
+        while parent != None:
+            if not isinstance(parent, Node2D):
                 break
-            rotation += node.rotation
-            node = node.parent
+            rotation += parent.rotation
+            parent = parent.parent
         return rotation
 
     @global_rotation.setter
     def global_rotation(self, rotation: float) -> None:
         diff = rotation - self.global_rotation
         self.rotation += diff
+    
+    @property
+    def visible(self) -> bool: # global visibility
+        if not self._visible:
+            return False
+        parent = self.parent
+        while parent != None:
+            if not isinstance(parent, Node2D):
+                return True
+            if not parent._visible:
+                return False
+            parent = parent.parent
+        return True
+
+    @visible.setter
+    def visible(self, value: bool) -> None: # local visibility
+        self._visible = value
