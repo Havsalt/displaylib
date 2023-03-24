@@ -4,9 +4,10 @@ import math
 from typing import TYPE_CHECKING, Iterable
 
 from ..math import Vec2, Vec2i
+from ..template import Node2D
 from . import grapheme
-from .camera import ASCIICamera2D
-from .sprite import ASCIISprite2D
+from .camera import ASCIICamera
+from .texture import Texture
 
 if TYPE_CHECKING:
     from ..template import Node
@@ -58,19 +59,15 @@ class ASCIISurface:
         """
         self.texture = [[self.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
 
-        if not hasattr(ASCIICamera2D, "current"):
-            print(1)
-            return
-        
-        # print(ASCIICamera2D.current)
-        # print(2)
-        camera: ASCIICamera2D = ASCIICamera2D.current # should never be None
+        camera: ASCIICamera = ASCIICamera.current # should never be None
         half_size = Vec2i(self._width // 2, self._height // 2)
         camera_rotation = camera.global_rotation
         cos_rotation_camera = math.cos(-camera_rotation)
         sin_rotation_camera = math.sin(-camera_rotation)
 
-        for node in ASCIISprite2D._instances:
+        for node in nodes:
+            if not isinstance(node, Texture) or not isinstance(node, Node2D):
+                continue
             if not node.visible:
                 continue
             if not node.texture:
@@ -84,11 +81,11 @@ class ASCIISurface:
             # if rotation != 0: # TODO: rotate around center if flagged
             #     position = rotate(position, rotation)
 
-            if camera.mode == ASCIICamera2D.CENTERED:
+            if camera.mode == ASCIICamera.CENTERED:
                 position += half_size
-            elif camera.mode == ASCIICamera2D.INCLUDE_SIZE:
+            elif camera.mode == ASCIICamera.INCLUDE_SIZE:
                 position -= Vec2(longest, lines) // 2
-            elif camera.mode == ASCIICamera2D.CENTERED_AND_INCLUDE_SIZE:
+            elif camera.mode == ASCIICamera.CENTERED_AND_INCLUDE_SIZE:
                 position += half_size
                 position -= Vec2(longest, lines) // 2
 
@@ -150,11 +147,11 @@ class ASCIISurface:
                 for h, line in enumerate(node.texture):
                     if not ((self._height) > position.y >= 0): # out of screen
                         continue
-                    y_position = int(position.y)
+                    y_position = int(h + position.y)
                     for w, char in enumerate(line):
                         if not ((self._width) > position.x >= 0): # out of screen
                             continue
-                        x_position = int(position.x)
+                        x_position = int(w + position.x)
                         if char != self.cell_transparant:
                             self.texture[y_position][x_position] = char
 
