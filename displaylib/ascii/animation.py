@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Generator
 
 from ..template import Node
 from . import grapheme
+from .texture import Texture
 
 if TYPE_CHECKING:
     from .node import ASCIINode2D
@@ -24,18 +25,17 @@ class Frame:
 
     Loaded from files
     """
-    __slots__ = ("content")
+    __slots__ = ("texture")
 
     def __init__(self, fpath: str, fliph: bool = False, flipv: bool = False) -> None:
-        self.content = []
+        self.texture = []
         f = open(fpath)
         for line in f.readlines():
-            self.content.append(list(line.rstrip("\n")))
+            self.texture.append(list(line.rstrip("\n")))
         if fliph:
-            self.content = grapheme.mapfliph(self.content)
+            self.texture = grapheme.mapfliph(self.texture)
         if flipv:
-            self.content = grapheme.mapfliph(self.content)
-            
+            self.texture = grapheme.mapfliph(self.texture)
         f.close()
 
 
@@ -68,7 +68,9 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     DELTATIME = 1 # TODO: DELTATIME mode
     mode_default = FIXED
 
-    def __init__(self, parent: ASCIINode2D | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
+    def __init__(self, parent: Texture | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
+        if not isinstance(parent, Texture) or parent == None:
+            raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}'")
         super().__init__(parent, force_sort=False)
         self.fps: float = fps
         self.mode: int = mode
@@ -173,7 +175,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._current_frames = None
             self._next: Frame = None
         if self._next != None:
-            self.parent.content = self._next.content
+            self.parent.texture = self._next.texture
             self._has_updated = False
     
     def play_backwards(self, animation: str) -> None:
@@ -193,7 +195,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._current_frames = None
             self._next: Frame = None
         if self._next != None:
-            self.parent.content = self._next.content
+            self.parent.texture = self._next.texture
             self._has_updated = False
         
     def advance(self) -> bool:
@@ -216,7 +218,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._current_frames = None
             self._next = None
         if frame != None:
-            self.parent.content = frame.content
+            self.parent.texture = frame.texture
             self._has_updated = False
         return frame != None # returns true if not stopped
 
@@ -235,7 +237,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             frame = next(self)
             if frame == None:
                 return
-            self.parent.content = frame.content
+            self.parent.texture = frame.texture
 
             # elif self.mode == AnimationPlayer.DELTATIME:
             #     # apply delta time
@@ -243,6 +245,6 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             #     if self._accumulated_time >= self._fps_ratio:
             #         self._accumulated_time -= self._fps_ratio # does not clear time
             #         frame = next(self)
-            #         self.owner.content = frame.content
+            #         self.owner.texture = frame.texture
         elif not self._has_updated:
             self._has_updated = True
