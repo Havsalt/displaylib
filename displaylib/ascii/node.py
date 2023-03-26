@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class ASCIINode2D(Node2D): # a variant of the Node2D
-    """`ASCIINode` for representing 2D nodes
+    """`ASCIINode2D` for representing 2D nodes
     """
     def _render(self, surface: ASCIISurface) -> None:
         ...
