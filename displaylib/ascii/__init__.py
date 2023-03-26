@@ -29,7 +29,8 @@ __all__ = [
     "Texture",
     # -- prefab
     "Label",
-    "Line"
+    "Line",
+    "Sprite"
 ]
 
 # -- standard
@@ -52,6 +53,7 @@ from .texture import Texture
 # -- prefab
 from .prefab.label import ASCIILabel as Label
 from .prefab.line import ASCIILine as Line
+from .prefab.sprite import ASCIISprite as Sprite
 
 
 # -- activate ANSI escape codes

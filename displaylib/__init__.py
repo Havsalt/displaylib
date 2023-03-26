@@ -38,7 +38,8 @@ __all__ = [ # when using default mode
     "ASCIIImage",
     "ASCIIClient",
     "ASCIILabel",
-    "ASCIILine"
+    "ASCIILine",
+    "ASCIISprite"
 ]
 
 # -- util
@@ -64,5 +65,6 @@ from .ascii import (
     Clock as Clock,
     # -- prefab
     Label as ASCIILabel,
-    Line as ASCIILine
+    Line as ASCIILine,
+    Sprite as ASCIISprite
 )
