@@ -63,7 +63,7 @@ class Engine(metaclass=EngineMixinSortMeta):
                 node._update(delta)
 
             for node in Node._queued_nodes:
-                del Node.nodes[id(node)]
+                del Node.nodes[node.uid]
             Node._queued_nodes.clear()
 
             if Node._request_sort: # only sort once per frame if needed

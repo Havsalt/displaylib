@@ -70,11 +70,10 @@ class Client:
             """Overridden `__setattr__` that automaticlly queues changes to be sent as a network request
             """
             change = {name: serialize(value)}
-            local_uid = hex(id(self))
-            if local_uid not in Client._queued_changes["system"]:
-                Client._queued_changes["system"][local_uid] = change
+            if self.uid not in Client._queued_changes["system"]:
+                Client._queued_changes["system"][self.uid] = change
             else:
-                Client._queued_changes["system"][local_uid].update(change)
+                Client._queued_changes["system"][self.uid].update(change)
             return object.__setattr__(self, name, value)
 
         Node.__setattr__ = __setattr__ # no nodes are made prior to this change
@@ -157,16 +156,16 @@ class Client:
     def send(self, request: dict[str, dict[str, Any]]) -> None:
         """Queues the request to be sent
 
-        Format: `{node_id: {attr, value}, ...}`
+        Format: `{node_id: {attr, value}, ...}`. Treated as "custom" when sent to server (instead of "system")
 
         Args:
             request (dict[int, dict[str, Any]]): the changes to be sent
         """
         # -- serialize each change
-        for local_uid, changes in request.items():
+        for uid, changes in request.items():
             for name, value in changes.items():
                 change = {name: serialize(value)}
-                if local_uid not in Client._queued_changes["custom"]:
-                    Client._queued_changes["custom"][local_uid] = change
+                if uid not in Client._queued_changes["custom"]:
+                    Client._queued_changes["custom"][uid] = change
                 else:
-                    Client._queued_changes["custom"][local_uid].update(change)
+                    Client._queued_changes["custom"][uid].update(change)

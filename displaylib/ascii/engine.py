@@ -73,7 +73,7 @@ class ASCIIEngine(Engine):
                 node._update(delta)
 
             for node in Node._queued_nodes:
-                del Node.nodes[id(node)]
+                del Node.nodes[node.uid]
             Node._queued_nodes.clear()
             
             if self.auto_resize_screen:

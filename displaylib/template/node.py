@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from typing import TYPE_CHECKING
 
 from ..math import Vec2
@@ -27,9 +28,11 @@ class Node(metaclass=NodeMixinSortMeta):
     An Engine subclass may access it's nodes through the `nodes` class attribute
     """
     root: Engine # set from a Engine subclass
-    nodes: dict[int, Node] = {} # all nodes that are alive
+    nodes: dict[str, Node] = {} # all nodes that are alive
     _request_sort: bool = False # requests Engine to sort
     _queued_nodes: set[Node] = set() # uses <Node>.queue_free() to ask Engine to delete them
+    # instance spesific
+    uid: str
 
     def __new__(cls: type[Node], *args, **kwargs) -> Node:
         """In addition to default behaviour, automatically store the node in a dict.
@@ -42,7 +45,9 @@ class Node(metaclass=NodeMixinSortMeta):
             Node: node instance that was stored
         """
         instance = super().__new__(cls)
-        Node.nodes[id(instance)] = instance
+        uid = uuid.uuid1().hex # globally unique (includes across networks)
+        Node.uid = uid # TODO: premake about 1-10k UIDs in a List
+        Node.nodes[uid] = instance
         return instance
 
     def __init__(self, parent: Node | None = None, *, force_sort: bool = True) -> None:
@@ -75,18 +80,9 @@ class Node(metaclass=NodeMixinSortMeta):
             str: class name
         """
         return self.__class__.__name__
-    
-    @property
-    def uid(self) -> str:
-        """Returns the unique ID of the node
-
-        Returns:
-            str: unique ID (memory address)
-        """
-        return hex(id(self))
 
     def where(self, **attributes) -> Node:
-        """Sets/overrides the given attributes the node instance
+        """Sets/overrides the given attributes on the node instance
 
         Returns:
             Node: self after modification(s)
@@ -140,17 +136,14 @@ class Node2D(Node):
     
     @property
     def global_position(self) -> Vec2:
-        linear_segments = [] # top parent -> branches -> leaf
         position = self.position
-        current = self
         parent = self.parent
         while parent != None:
             if not isinstance(parent, Node2D):
                 break
-            # -- do stuff | TODO: test this
-            position += current.position.rotated_around(current.rotation, parent.position)
-            # -- end
-            current, parent = parent, parent.parent
+            # position += self.position.rotated(parent.rotation)
+            position += parent.position
+            parent = parent.parent
         return position
     
     @global_position.setter
