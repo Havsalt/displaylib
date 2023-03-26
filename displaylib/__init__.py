@@ -21,7 +21,7 @@ PygameNode(x, y)
 """
 
 __version__ = "0.0.7"
-__author__ = "FloatingInt"
+__author__ = "Floating-Int"
 __all__ = [ # when using default mode
     "lerp",
     "sign",
