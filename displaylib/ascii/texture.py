@@ -5,6 +5,8 @@ from ..template import Node2D
 
 
 class Texture: # Component (mixin class)
+    """Mixin class `Texture` for adding ASCII graphics to a Node class
+    """
     texture: list[list[str]] # type hint
     visible: bool
     _instances = []
