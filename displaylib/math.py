@@ -43,6 +43,7 @@ class Vec2:
 
     Usefull for storing position or direction
     """
+    __slots__ = ("x", "y")
 
     def __init__(self, x: int | float = 0, y: int | float = 0, /) -> None:
         self.x = x
@@ -203,10 +204,12 @@ class Vec2:
 class Vec2i(Vec2):
     """`Vector2 integer` data structure
 
-    Components: `x`, `y` as only type `int`
+    Components: `x`, `y` only type `int`
 
     Usefull for storing whole numbers in 2D space
     """
+    __slots__ = ("x", "y")
+
     def __init__(self, x: int = 0, y: int = 0, /) -> None:
         self.x = x
         self.y = y
