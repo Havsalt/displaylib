@@ -22,7 +22,7 @@ class NodeMixinSortMeta(type):
 
 
 class Node(metaclass=NodeMixinSortMeta):
-    """Node base class
+    """`Node` base class
 
     Automatically keeps track of alive Node(s) by reference.
     An Engine subclass may access it's nodes through the `nodes` class attribute
@@ -30,7 +30,7 @@ class Node(metaclass=NodeMixinSortMeta):
     root: Engine # set from a Engine subclass
     nodes: dict[str, Node] = {} # all nodes that are alive
     _request_sort: bool = False # requests Engine to sort
-    _queued_nodes: set[Node] = set() # uses <Node>.queue_free() to ask Engine to delete them
+    _queued_nodes: set[str] = set() # uses <Node>.queue_free() to ask Engine to delete a node based on UID
     # instance spesific
     uid: str
 
@@ -46,7 +46,7 @@ class Node(metaclass=NodeMixinSortMeta):
         """
         instance = super().__new__(cls)
         uid = uuid.uuid1().hex # globally unique (includes across networks)
-        Node.uid = uid # TODO: premake about 1-10k UIDs in a List
+        instance.uid = uid # TODO: premake about 1-10k UIDs in a List
         Node.nodes[uid] = instance
         return instance
 
@@ -102,16 +102,16 @@ class Node(metaclass=NodeMixinSortMeta):
         ...
     
     def queue_free(self) -> None:
-        """Tells the Engine to `delete` this <Node> after
+        """Tells the Engine to `delete` this `<Node>` after
         every node has been called `_update` on
         """
-        Node._queued_nodes.add(self)
+        Node._queued_nodes.add(self.uid)
 
 
 class Node2D(Node):
-    """Node2D class with transform attributes
+    """`Node2D` class with transform attributes
     """
-    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, z_index: int = 0, force_sort: bool = True) -> None:
         self._z_index = z_index # has to be before Node init
         super().__init__(parent, force_sort=force_sort)
         self.parent = parent
