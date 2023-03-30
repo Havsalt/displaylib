@@ -33,10 +33,10 @@ def sign(number: int | float, /) -> int:
     Returns:
         int: sign
     """
-    return 0 if number == 0 else bool(number > 0)
+    return 0 if number == 0 else (1 if number > 0 else -1)
 
 
-class Vec2:
+class Vec2: # TODO: add support for network notify protocol
     """`Vector2` data structure
 
     Components: `x`, `y`
