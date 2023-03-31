@@ -16,10 +16,10 @@ import displaylib.ascii as dl
 # mode selected   ^^^^^
 
 
-class Square(dl.Node2D):
+class Square(dl.Node2D, dl.Texture):
     def __init__(self, parent: dl.Node | None = None, x: int = 0, y: int = 0) -> None:
-        super().__init__(parent, x, y) # the most important args to pass down
-        self.content = [ # you can use this style to define its visual
+        super().__init__(parent, x, y) # the most important arguments to pass down
+        self.texture = [ # you can use this style to define its visual
             [*"OO+OO"], # the "+" represents transparancy
             [*"O+++O"], # changed through `dl.Node2D.cell_transparancy`
             [*"OO+OO"]
@@ -33,18 +33,25 @@ class Square(dl.Node2D):
 
 
 class App(dl.Engine):
-    def _on_ready(self) -> None: # use this instead of __init__
+    def _on_start(self) -> None: # use this instead of __init__
         # -- config
-        dl.Node2D.cell_transparent = "+" # represents transparancy
-        dl.Node2D.cell_default = "." # changes background default
+        dl.Screen.cell_transparant = "+" # represents transparancy
+        dl.Screen.cell_default = "." # changes background default
         # -- create nodes
         self.my_square = Square(x=5, y=3)
         # nodes are kept alive by `Node.nodes` (dict) by default
         # this means `del self.my_square` is needed to fully free it
+        self.direction = 1
     
-    def _update(self, delta: float) -> None:
-        ... # called every frame
-
+    def _update(self, delta: float) -> None: # called every frame
+        if self.direction == 1:
+            self.my_square.position.x += 1
+            if self.my_square.position.x == 22:
+                self.direction = -1
+        elif self.direction == -1:
+            self.my_square.position.x -= 1
+            if self.my_square.position.x == 4:
+                self.direction = 1
 
 if __name__ == "__main__":
     # autorun on instance creation
