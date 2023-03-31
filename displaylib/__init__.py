@@ -22,49 +22,54 @@ PygameNode(x, y)
 
 __version__ = "0.0.7"
 __author__ = "Floating-Int"
-__all__ = [ # when using default mode
+__all__ = [ # default mode is used when using the star notation
+    # math
     "lerp",
     "sign",
     "Vec2",
     "Vec2i",
+    # utility
     "graphme",
+    # standard
     "Node",
     "Node2D",
+    # core ascii
     "ASCIINode2D",
     "ASCIIEngine",
     "ASCIICamera",
     "ASCIISurface",
     "ASCIIScreen",
     "ASCIIImage",
-    "ASCIIClient",
     "ASCIILabel",
     "ASCIILine",
-    "ASCIISprite"
+    "ASCIISprite",
+    # networking (module)
+    "networking"
 ]
 
-# -- util
+# math
 from .math import lerp, sign, Vec2, Vec2i
-# -- standard
+# standard
 from .template import Node, Node2D
-# -- imports
 from .ascii import (
-    # -- util
-    grapheme as graphme,
-    # -- core
+    # utility
+    grapheme as graphme, # (module)
+    # ascii nodes
     Node2D as ASCIINode2D,
     Engine as ASCIIEngine,
     Camera as ASCIICamera,
     Surface as ASCIISurface,
     Screen as ASCIIScreen,
     Image as ASCIIImage,
-    Client as ASCIIClient,
     Frame as Frame,
     Animation as Animation,
     EmptyAnimation as EmptyAnimation,
     AnimationPlayer as AnimationPlayer,
     Clock as Clock,
-    # -- prefab
+    # prefabricated
     Label as ASCIILabel,
     Line as ASCIILine,
-    Sprite as ASCIISprite
+    Sprite as ASCIISprite,
+    # networking
+    networking # (module)
 )
