@@ -5,7 +5,7 @@ from ..template import Node2D
 
 
 class Texture: # Component (mixin class)
-    """Mixin class `Texture` for adding ASCII graphics to a Node class
+    """`Texture` mixin class for adding ASCII graphics to a Node class
     """
     texture: list[list[str]] # type hint
     visible: bool
@@ -20,6 +20,9 @@ class Texture: # Component (mixin class)
         return instance
 
     def queue_free(self) -> None:
+        """Decrements this node's reference by removing it from `Texture._instances`.
+        Then queues the node to be deleted by the engine
+        """
         if self in Texture._instances:
             Texture._instances.remove(self)
-        super().queue_free()
+        super().queue_free() # called on an instance deriving from Node
