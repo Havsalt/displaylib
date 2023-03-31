@@ -1,4 +1,6 @@
 """## Networking submodule of DisplayLib.ascii
+
+Provies both `Client` and `Server` classes for integrating networking compatible with `displaylib.ascii`
 """
 
 __all__ = [
