@@ -13,8 +13,11 @@ setup(
    packages=[
       "displaylib",
       "displaylib.template",
+      "displaylib.template.networking",
       "displaylib.ascii",
       "displaylib.ascii.prefab",
-      "displaylib.pygame"
+      "displaylib.ascii.networking",
+      "displaylib.pygame",
+      "displaylib.pygame.networking"
    ]
 )
