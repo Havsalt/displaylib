@@ -1,4 +1,8 @@
 """## Template submodule of DisplayLib
+
+Provides a skeleton for extending functionality
+
+Provides both `Client` and `Server` classes for integrating networking compatible with `displaylib.template`
 """
 
 __all__ = [
@@ -9,10 +13,10 @@ __all__ = [
     "Node",
     "Node2D",
     "Engine",
-    "Client"
+    "networking" # (module)
 ]
 
 from ..math import lerp, sign, Vec2, Vec2i
 from .node import Node, Node2D
 from .engine import Engine
-from .client import Client
+from . import networking

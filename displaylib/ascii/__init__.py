@@ -4,56 +4,60 @@ Provides a framework for creating 2D worlds in ASCII
 """
 
 __all__ = [
-    # -- standard
+    # math
     "lerp",
     "sign",
     "Vec2",
     "Vec2i",
+    # standard
     "Node",
-    # -- util
-    "grapheme",
-    # -- core ascii
+    # utility
+    "grapheme", # (module)
+    # core ascii
     "Node2D",
     "Engine",
     "Camera",
     "Screen",
     "Surface",
-    "Image",
-    "Client",
     "Frame",
     "Animation",
     "EmptyAnimation",
     "AnimationPlayer",
     "Clock",
-    # -- mixin classes
+    # mixin classes
     "Texture",
-    # -- prefab
+    # prefabricated
+    "Image",
     "Label",
     "Line",
-    "Sprite"
+    "Sprite",
+    # networking (module)
+    "networking"
 ]
 
-# -- standard
+# math
 from ..math import lerp, sign, Vec2, Vec2i
+# standard
 from ..template import Node
-# -- util
+# utility
 from . import grapheme
-# -- core ascii
+# core ascii
 from .node import ASCIINode2D as Node2D
 from .engine import ASCIIEngine as Engine
 from .camera import ASCIICamera as Camera
 from .surface import ASCIISurface as Surface
 from .screen import ASCIIScreen as Screen
-from .image import ASCIIImage as Image
-from .client import ASCIIClient as Client
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .clock import Clock
-# -- mixin classes
+# mixin classes
 from .texture import Texture
-# -- prefab
+# prefabricated
+from .prefab.image import ASCIIImage as Image
 from .prefab.label import ASCIILabel as Label
 from .prefab.line import ASCIILine as Line
 from .prefab.sprite import ASCIISprite as Sprite
+# networking
+from . import networking
 
 
 # -- activate ANSI escape codes
