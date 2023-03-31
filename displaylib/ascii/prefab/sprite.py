@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ...math import Vec2
+from ...math import Vec2i
 from ..node import ASCIINode2D
 from ..texture import Texture
 
@@ -12,7 +12,7 @@ class ASCIISprite(ASCIINode2D, Texture):
         `Texture`: allows the node to be displayed
     """
     
-    def size(self) -> Vec2:
+    def size(self) -> Vec2i:
         """Returns the width and height of content as a vector
 
         Returns:
@@ -20,4 +20,4 @@ class ASCIISprite(ASCIINode2D, Texture):
         """
         longest = len(max(self.texture, key=len))
         lines = len(self.texture)
-        return Vec2(longest, lines)
+        return Vec2i(longest, lines)
