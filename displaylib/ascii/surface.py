@@ -14,9 +14,9 @@ if TYPE_CHECKING:
 
 
 class ASCIISurface:
-    """ASCIISurface for displaying nodes
+    """`ASCIISurface` for displaying nodes
     """
-    cell_transparant: str = " " # type used to indicate that a cell is transparent
+    cell_transparant: str = " " # symbol used to indicate that a cell is transparent
     cell_default: str = " " # the default look of an empty cell
 
     def __init__(self, nodes: Iterable[Node] = [], width: int = 16, height: int = 8) -> None:
@@ -53,7 +53,7 @@ class ASCIISurface:
         """Rebuilds the surface from the texture of the nodes
 
         Args:
-            nodes (Iterable[Node], optional): nodes to render. Defaults to [].
+            nodes (Iterable[Node], optional): nodes to render (has to derive from `Texture`). Defaults to [].
             width (int, optional): surface width. Defaults to 16.
             height (int, optional): surface height. Defaults to 8.
         """
@@ -145,13 +145,13 @@ class ASCIISurface:
             
             else: # no rotation
                 for h, line in enumerate(node.texture):
-                    if not ((self._height) > position.y >= 0): # out of screen
-                        continue
                     y_position = int(h + position.y)
+                    if not ((self._height) > y_position >= 0): # out of screen
+                        continue
                     for w, char in enumerate(line):
-                        if not ((self._width) > position.x >= 0): # out of screen
-                            continue
                         x_position = int(w + position.x)
+                        if not ((self._width) > x_position >= 0): # out of screen
+                            continue
                         if char != self.cell_transparant:
                             self.texture[y_position][x_position] = char
 
