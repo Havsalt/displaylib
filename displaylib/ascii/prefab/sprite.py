@@ -9,7 +9,7 @@ class ASCIISprite(ASCIINode2D, Texture):
     """Prefabricated `ASCIISprite`
 
     Components:
-        Texture: allows the node to be displayed
+        `Texture`: allows the node to be displayed
     """
     
     def size(self) -> Vec2:
