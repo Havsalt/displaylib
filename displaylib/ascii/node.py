@@ -6,6 +6,7 @@ from ..template import Node2D
 
 if TYPE_CHECKING:
     from ..math import Vec2i
+    from .engine import ASCIIEngine
     from .surface import ASCIISurface
 
 
@@ -16,6 +17,8 @@ class ASCIINode2D(Node2D): # a variant of the Node2D
         - `_render(self, surface: ASCIISurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
+    root: ASCIIEngine
+
     def _render(self, surface: ASCIISurface) -> None:
         """Override for custom functionality
 
