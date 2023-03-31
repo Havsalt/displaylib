@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 
-from ..math import Vec2, Vec2i
+from ..math import Vec2i
 from ..template import Node, Engine
 from .clock import Clock
 from .screen import ASCIIScreen
@@ -14,10 +14,14 @@ from .texture import Texture
 
 class ASCIIEngine(Engine):
     """`ASCIIEngine` for creating a world in ASCII graphics
+
+    Hooks:
+        - `_render(self, surface: ASCIISurface) -> None`
+        - `_on_screen_resize(self, size: Vec2i) -> None`
     """
 
     def __new__(cls: type[ASCIIEngine], *args, **kwargs) -> Engine:
-        """Sets `Node.root` when an Engine instance is initialized. Initializes default `ASCIICamera`
+        """Sets `Node.root` when an Engine instance is created. Initializes default `ASCIICamera`
 
         Args:
             cls (type[ASCIIEngine]): engine object to be root
@@ -31,13 +35,15 @@ class ASCIIEngine(Engine):
             setattr(ASCIICamera, "current", camera) # initialize default camera
         return instance
 
-    def __init__(self, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2 = Vec2(1, 1), *args, **kwargs) -> None:
+    def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> None:
         """Initialize and start the engine (only 1 instance should exist)
 
         Args:
             tps (int, optional): ticks per second (fps). Defaults to 16.
             width (int, optional): screen width. Defaults to 16.
             height (int, optional): screen height. Defaults to 8.
+            auto_resize_screen (bool, optional): whether to automatically resize the screen to fit. Defaults to False.
+            screen_margin (Vec2i, optional): subtracted from os terminal size. Defaults to Vec2i(1, 1).
         """
         self.tps = tps
         self.auto_resize_screen = auto_resize_screen
@@ -49,43 +55,57 @@ class ASCIIEngine(Engine):
                 self.screen.width = int(terminal_size.columns - self.screen_margin.x)
                 self.screen.height = int(terminal_size.lines - self.screen_margin.y)
                 os.system("cls")
-        super(__class__, self).__init__(*args, **kwargs)
-        self._on_start()
-
-        self.is_running = True
-        self._main_loop()
+        super(__class__, self).__init__(**config)
     
     def _render(self, surface: ASCIISurface) -> None:
+        """Override for custom functionality
+
+        Args:
+            surface (ASCIISurface): surface to blit onto
+        """
+        ...
+    
+    def _on_screen_resize(self, size: Vec2i) -> None:
+        """Override for custom functionality
+
+        Args:
+            size (Vec2i): new terminal screen size
+        """
         ...
     
     def _main_loop(self) -> None:
+        """Overriden main loop spesific for `ascii.ascii` mode
+        """
         def sort_fn(element: tuple[int, Node]):
             return element[1].z_index
 
         nodes = tuple(Node.nodes.values())
         clock = Clock(self.tps)
         while self.is_running:
-            delta = 1.0 / self.tps
             self.screen.clear()
-            
-            self._update(delta)
-            for node in nodes:
-                node._update(delta)
-
-            for node in Node._queued_nodes:
-                del Node.nodes[node.uid]
-            Node._queued_nodes.clear()
-            
+                        
             if self.auto_resize_screen:
                 terminal_size = os.get_terminal_size()
                 if ((terminal_size.columns - self.screen_margin.x) != self.screen.width) or ((terminal_size.lines - self.screen_margin.y) != self.screen.height):
                     self.screen.width = int(terminal_size.columns - self.screen_margin.x)
                     self.screen.height = int(terminal_size.lines - self.screen_margin.y)
                     size = Vec2i(terminal_size.columns, terminal_size.lines)
+                    self._on_screen_resize(size)
                     for node in nodes:
                         if isinstance(node, ASCIINode2D):
                             node._on_screen_resize(size)
                     os.system("cls")
+                
+            for task in self.per_frame_tasks:
+                task()
+            
+            self._update(clock.get_delta())
+            for node in nodes:
+                node._update(clock.get_delta())
+
+            for node_uid in Node._queued_nodes:
+                del Node.nodes[node_uid]
+            Node._queued_nodes.clear()
             
             if Node._request_sort: # only sort once per frame if needed
                 Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
