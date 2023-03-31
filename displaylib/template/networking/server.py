@@ -6,6 +6,14 @@ import socket
 
 class Server:
     """`Server` base class
+
+    Hooks:
+        - `_on_connection_refused(self, error: Exception) -> None`
+        - `_on_client_connected(self, connection: socket.socket, host: str, port: int) -> None`
+        - `_on_client_disconnected(self, connection: socket.socket, error: Exception) -> None`
+        - `_on_request_received(self, sender: socket.socket, request: bytes) -> None`
+        - `_on_system_request(self, request: dict[str, str]) -> None`
+        - `_on_custom_request(self, request: dict[str, str]) -> None`
     """
     buffer_size: int = 4096
     timeout: float = 0
