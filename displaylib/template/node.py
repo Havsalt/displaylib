@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeVar
 
 from ..math import Vec2
 
 if TYPE_CHECKING:
     from .engine import Engine
+
+Self = TypeVar("Self")
 
 
 class NodeMixinSortMeta(type):
@@ -26,6 +28,9 @@ class Node(metaclass=NodeMixinSortMeta):
 
     Automatically keeps track of alive Node(s) by reference.
     An Engine subclass may access it's nodes through the `nodes` class attribute
+
+    Hooks:
+        - `_update(self, delta: float) -> None`
     """
     root: Engine # set from a Engine subclass
     nodes: dict[str, Node] = {} # all nodes that are alive
@@ -81,7 +86,7 @@ class Node(metaclass=NodeMixinSortMeta):
         """
         return self.__class__.__name__
 
-    def where(self, **attributes) -> Node:
+    def where(self: Self, **attributes) -> Self:
         """Sets/overrides the given attributes on the node instance
 
         Returns:
@@ -102,7 +107,7 @@ class Node(metaclass=NodeMixinSortMeta):
         ...
     
     def queue_free(self) -> None:
-        """Tells the Engine to `delete` this `<Node>` after
+        """Tells the Engine to `delete` this node after
         every node has been called `_update` on
         """
         Node._queued_nodes.add(self.uid)
@@ -110,6 +115,9 @@ class Node(metaclass=NodeMixinSortMeta):
 
 class Node2D(Node):
     """`Node2D` class with transform attributes
+    
+    Hooks:
+        - `_update(self, delta: float) -> None`
     """
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, z_index: int = 0, force_sort: bool = True) -> None:
         self._z_index = z_index # has to be before Node init
