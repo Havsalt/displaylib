@@ -11,6 +11,12 @@ from .serialize import serialize
 
 class Client:
     """`Client` base class
+
+    Hooks:
+        - `_on_connection_refused(self, error: Exception) -> None`
+        - `_on_connection_established(self, host: str, port: int) -> None`
+        - `_on_response_received(self, response: bytes) -> None`
+        - `_on_response(self, response: str) -> None`
     """
     buffer_size: int = 4096 * 16
     timeout: float = 0
@@ -33,6 +39,12 @@ class Client:
         return instance
 
     def __init__(self, *, host: str = "localhost", port: int = 8080, **kwargs) -> None:
+        """Initializes `Client` functionality on the `Engine`
+
+        Args:
+            host (str, optional): host name. Defaults to "localhost".
+            port (int, optional): port number. Defaults to 8080.
+        """
         self._address = (host, port)
         self._selector = selectors.DefaultSelector()
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -104,14 +116,13 @@ class Client:
                 if response:
                     self._on_response_received(response)
                     
-
     def send(self, request: dict[str, dict[str, Any]]) -> None:
         """Queues the request to be sent
 
         Format: `{node_id: {attr, value}, ...}`. Treated as "custom" when sent to server (instead of "system")
 
         Args:
-            request (dict[int, dict[str, Any]]): the changes to be sent
+            request (dict[str, dict[str, Any]]): the changes to be sent
         """
         # -- serialize each change
         for uid, changes in request.items():
