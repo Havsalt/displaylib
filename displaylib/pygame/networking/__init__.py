@@ -4,9 +4,11 @@ Provides both `Client` and `Server` classes for integrating networking compatibl
 """
 
 __all__ = [
+    "register_class",
     "serialize",
     "deserialize",
     "SerializeError",
+    "DeserializeError",
     "Client",
     "Server",
     "BroadcastServer"
