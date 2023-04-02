@@ -36,7 +36,7 @@ class ASCIIEngine(Engine):
         return instance
 
     def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> None:
-        """Initialize and start the engine (only 1 instance should exist)
+        """Initializes and starts the engine (only 1 instance should exist)
 
         Args:
             tps (int, optional): ticks per second (fps). Defaults to 16.
@@ -74,7 +74,7 @@ class ASCIIEngine(Engine):
         ...
     
     def _main_loop(self) -> None:
-        """Overriden main loop spesific for `ascii.ascii` mode
+        """Overriden main loop spesific for `displaylib.ascii` mode
         """
         def sort_fn(element: tuple[int, Node]):
             return element[1].z_index
