@@ -20,6 +20,13 @@ class Server:
     encoding: str = "utf-8"
 
     def __init__(self, *, host: str = "localhost", port: int = 8080, backlog: int = 4, **config) -> None:
+        """Initializes `Server` functionality on the `Engine`
+
+        Args:
+            host (str, optional): host name. Defaults to "localhost".
+            port (int, optional): port number. Defaults to 8080.
+            backlog (int, optional): number of connections allowed to connect at once. Defaults to 4.
+        """
         self._address = (host, port)
         self._selector = selectors.DefaultSelector()
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,19 +78,19 @@ class Server:
         """
         ...
     
-    def _on_system_request(self, request: dict[str, str]) -> None:
+    def _on_system_request(self, request: dict[str, dict[str, str]]) -> None:
         """Override for custom functionality
 
         Args:
-            request (bytes): dict with string encoded values for catagory `system`
+            request (dict[str, dict[str, str]]): dict with string encoded changes for catagory `system`
         """
         ...
     
-    def _on_custom_request(self, request: dict[str, str]) -> None:
+    def _on_custom_request(self, request: dict[str, dict[str, str]]) -> None:
         """Override for custom functionality
 
         Args:
-            request (bytes): dict with string encoded values for catagory `custom`
+            request (dict[str, dict[str, str]]): dict with string encoded changes for catagory `custom`
         """
         ...
     
