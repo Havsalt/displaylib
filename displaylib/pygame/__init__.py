@@ -5,30 +5,35 @@ Raises:
 """
 
 __all__ = [
-    # -- standard
+    # math
     "lerp",
     "sign",
     "Vec2",
     "Vec2i",
+    # standard
     "Node",
-    # -- core pygame
+    # core pygame
     "Node2D",
-    "Engine"
+    "Engine",
+    # networking
+    "networking"
 ]
 
 try: # check if pygame is installed
-    import pygame as _pygame
-    import os as _os
-    _os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "True"
-    del _os
+    import contextlib as _contextlib
+    with _contextlib.redirect_stdout(None):
+        import pygame as _pygame
     _pygame.init() # init without displaying message
-    del _pygame
+    del _contextlib, _pygame
 except ModuleNotFoundError as error:
     raise ModuleNotFoundError("missing external module: pygame, which is required to use this submodule") from error
 
-# -- standard
+# math
 from ..math import lerp, sign, Vec2, Vec2i
+# standard
 from ..template import Node
-# -- core pygame
+# core pygame
 from .node import PygameNode2D as Node2D
 from .engine import PygameEngine as Engine
+# networking
+from . import networking
