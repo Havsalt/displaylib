@@ -24,13 +24,13 @@ class Square(dl.Node2D, dl.Texture):
             [*"O+++O"], # changed through `dl.Node2D.cell_transparancy`
             [*"OO+OO"]
         ]
-    
-    def _update(self, delta: float) -> None:
-        # access engine namespaces with `self.root.[namespace]`
-        if self.position.x > self.root.screen.width:
-            return # guard statement
-        self.position.x += 1 # moves the square by 1 on the x-axis
 
+    def _update(self, delta: float) -> None: # called every frame
+        if len(self.texture[1]) == 5: # modifying the middle line
+            self.texture[1].append(")")
+        else:
+            self.texture[1].pop()
+    
 
 class App(dl.Engine):
     def _on_start(self) -> None: # use this instead of __init__
