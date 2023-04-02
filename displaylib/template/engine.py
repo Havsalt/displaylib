@@ -7,8 +7,12 @@ class EngineMixinSortMeta(type):
     """Engine metaclass for initializing `Engine` subclass after other `mixin` classes
     """
     @staticmethod
-    def _mixin_sort(base: type) -> bool:
-        return issubclass(base, Engine)
+    def _mixin_sort(base: type) -> int:
+        if base == Engine:
+            return 2
+        elif issubclass(base, Engine):
+            return 1
+        return 0
 
     def __new__(cls, name: str, bases: tuple[type], attrs: dict[str, object]):
         sorted_bases = tuple(sorted(bases, key=EngineMixinSortMeta._mixin_sort))
