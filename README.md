@@ -1,13 +1,27 @@
-# Displaylib
+# DisplayLib
 
-### A collection of frameworks used to display ASCII or Pygame graphics
-### Requires Python version >= 3.10
+### A collection of frameworks used to display `ASCII` or `Pygame` graphics in an `infite world`
+### Requires Python `version` >= `3.10`
 ---
 
 ## Submodules
 - `template`
 - `ascii` (default)
 - `pygame`
+---
+
+## Networking support
+DisplayLib provides mixin classes for enabling networking. Networking is available in each submodule through `dl.networking` (when using `import displaylib.[mode] as dl`).
+
+To create a `Client`, use:
+```python
+class MyApp(dl.Engine, dl.Client): ...
+```
+Creating a `Server` is as simple as:
+```python
+class MyServer(dl.Engine, dl.Server): ...
+```
+
 ---
 
 Example using `displaylib` in `ascii` mode:
@@ -56,5 +70,53 @@ class App(dl.Engine):
 if __name__ == "__main__":
     # autorun on instance creation
     app = App(tps=4, width=24, height=8)
+
+```
+---
+
+Example using `displaylib` in `pygame` mode:
+```python 
+import displaylib.pygame as dl
+# mode selected   ^^^^^^
+import pygame # import pygame
+
+import random
+import math
+
+
+class Cirlce(dl.Node2D):
+    def __init__(self, parent: dl.Node | None = None, x: int = 0, y: int = 0) -> None:
+        super().__init__(parent, x, y)
+        self.radius = 20
+        self.width = 2
+        self.time_elapsed = 0.0
+    
+    def _update(self, delta: float) -> None:
+        self.time_elapsed += delta
+        self.width = round(math.cos(self.time_elapsed) * 3 +5)
+    
+    def _render(self, surface: pygame.Surface) -> None:
+        pygame.draw.circle(surface, (200, 50, 255), (self.position.x, self.position.y), self.radius, self.width)
+
+
+class App(dl.Engine):
+    def _on_start(self) -> None:
+        print("= Started Pygame program")
+        self.circle = Cirlce(x=200, y=100)
+        self.elapsed_time = 0.0
+    
+    def _update(self, delta: float) -> None:
+        self.circle.position = dl.Vec2(
+            math.cos(self.elapsed_time) * 50,
+            math.sin(self.elapsed_time) * 50
+        ) + dl.Vec2i(200, 100)
+        self.elapsed_time += delta
+    
+    def _render(self, surface: pygame.Surface) -> None:
+        pygame.draw.line(surface, color=(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), start_pos=(50, 50), end_pos=(200, 100), width=5)
+
+
+if __name__ == "__main__":
+    app = App("Pygame example using DisplayLib")
 
 ```
