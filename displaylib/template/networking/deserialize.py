@@ -2,20 +2,11 @@ from __future__ import annotations
 
 import re
 from ast import literal_eval
-
-from ...math import Vec2, Vec2i
+ 
+from . import class_register
 
 
 class DeserializeError(TypeError): ...
-
-
-types = {
-    "Vec2": Vec2,
-    "Vec2i": Vec2i
-}
-
-def register_type(name: str, cls_type: type) -> None: # TODO: make better API
-    types[name] = cls_type
 
 
 def is_float_str(string: str) -> bool:
@@ -54,9 +45,9 @@ def construct_unknown(encoded: str) -> object:
         object: instance based on the information contained in argument `encoded`
     """
     name, _delimiter, arguments = encoded[:-1].partition("(") # TODO: make more flexible
-    if not name in types:
+    if not name in class_register.cache:
         return encoded # is most likely of type str
-    cls = types[name]
+    cls = class_register.cache[name]
     solution = getattr(cls, "__deserialize__", None)
     if solution:
         # format of variable `arguments`: "arg1, arg2, arg3", where each arg can end with either "=" or "!"
