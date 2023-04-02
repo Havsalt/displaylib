@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar, TypeVar
 
 from ..math import Vec2i
 from ..template import Node, Node2D
 
 if TYPE_CHECKING:
     from .surface import ASCIISurface
+
+Self = TypeVar("Self")
 
 
 class ASCIICamera(Node2D):
@@ -26,7 +28,7 @@ class ASCIICamera(Node2D):
     CENTERED = 3
     INCLUDE_SIZE = 5
     CENTERED_AND_INCLUDE_SIZE = 8
-    current: ASCIICamera
+    current: ClassVar[ASCIICamera]
 
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, follow: bool = False, mode: int = FIXED) -> None:
         super().__init__(parent, x, y, z_index=-1, force_sort=True) # TODO: move z_index into some config (the "-1" part)
@@ -48,3 +50,18 @@ class ASCIICamera(Node2D):
             size (Vec2i): the new screen size
         """
         ...
+    
+    def set_current(self) -> None:
+        """Sets this camera as the currently active one
+        """
+        ASCIICamera.current = self
+    
+    def as_current(self: Self) -> Self:
+        """Sets this camera as the currently active one,
+        along returning itself
+
+        Returns:
+            Self: itself after set as current camera
+        """
+        getattr(self, "set_current")()
+        return self
