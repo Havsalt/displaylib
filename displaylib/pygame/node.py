@@ -15,7 +15,7 @@ class PygameNode2D(Node2D):
         `_input(self, event: pygame.event.Event) -> None`
         `_render(self, surface: pygame.Surface) -> None`
     """
-    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x, y, z_index=z_index, force_sort=force_sort)
     
     def _input(self, event: pygame.event.Event) -> None:
