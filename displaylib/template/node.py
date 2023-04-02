@@ -76,6 +76,14 @@ class Node(metaclass=NodeMixinSortMeta):
             str: node representation
         """
         return f"{self.__class__.__name__}()"
+
+    def __serialize__(self) -> str:
+        """Low level implementation for serializing nodes
+
+        Returns:
+            str: serialized data about this node
+        """
+        return f"{self.__class__.__name__}()"
     
     @property
     def name(self) -> str:
@@ -87,7 +95,7 @@ class Node(metaclass=NodeMixinSortMeta):
         return self.__class__.__name__
 
     def where(self: Self, **attributes) -> Self:
-        """Sets/overrides the given attributes on the node instance
+        """Sets/overrides the given attributes of the node instance
 
         Returns:
             Node: self after modification(s)
