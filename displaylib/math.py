@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import sqrt, cos, sin
+from math import sqrt, cos, sin, atan2
 
 __all__ = [
     "lerp",
@@ -146,6 +146,14 @@ class Vec2: # TODO: add support for network notify protocol
         if length == 0:
             return Vec2(0, 0)
         return self / self.length()
+
+    def angle(self) -> float:
+        """Returns the angle (measured in radians)
+
+        Returns:
+            float: angle given in radians
+        """
+        return atan2(self.y, self.x)
 
     def lerp(self, target: Vec2, weight: int | float, /) -> Vec2:
         """Lerp towards vector `target` with `weight` ranging from 0 to 1
