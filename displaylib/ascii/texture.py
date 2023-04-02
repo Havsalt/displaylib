@@ -5,11 +5,11 @@ from ..template import Node2D
 
 
 class Texture: # Component (mixin class)
-    """`Texture` mixin class for adding ASCII graphics to a Node class
+    """`Texture` mixin class for adding ASCII graphics to a node class
     """
-    texture: list[list[str]] # type hint
+    texture: list[list[str]]
     visible: bool
-    _instances = []
+    _instances: list[Texture] = [] # nodes with Texture component
 
     def __new__(cls, *args, **kwargs):
         instance = super().__new__(cls, *args, **kwargs)
