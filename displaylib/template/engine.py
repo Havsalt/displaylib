@@ -91,5 +91,8 @@ class Engine(metaclass=EngineMixinSortMeta):
                 node._update(delta)
 
             if Node._request_sort: # only sort once per frame if needed
-                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn) if uid not in Node._queued_nodes}
-            Node._queued_nodes.clear()
+                for uid in set(Node._queued_nodes):
+                    del Node.nodes[uid]
+                Node._queued_nodes.clear()
+                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn)}
+                nodes = tuple(Node.nodes.values())
