@@ -29,7 +29,7 @@ class Engine(metaclass=EngineMixinSortMeta):
         - `_on_exit(self) -> None`
         - `_update(self, delta: float) -> None`
     """
-    tps: int = 4
+    tps: int = 16
     is_running: bool = False
     per_frame_tasks = [] # list[function]
 
@@ -75,12 +75,11 @@ class Engine(metaclass=EngineMixinSortMeta):
         ...
     
     def _main_loop(self) -> None:
-        """Base implementation for `ascii.template` mode
+        """Base implementation for `displaylib.template` mode
         """
         def sort_fn(element: tuple[int, Node]):
             return element[1].z_index
         
-        nodes = tuple(Node.nodes.values())
         while self.is_running:
             for task in self.per_frame_tasks:
                 task()
@@ -88,13 +87,9 @@ class Engine(metaclass=EngineMixinSortMeta):
             # TODO: add clock with delta, but no sleep
             delta = 1.0 / self.tps # static delta
             self._update(delta)
-            for node in nodes:
+            for node in tuple(Node.nodes.values()):
                 node._update(delta)
 
-            for node_uid in Node._queued_nodes:
-                del Node.nodes[node_uid]
-            Node._queued_nodes.clear()
-
             if Node._request_sort: # only sort once per frame if needed
-                Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
-            nodes = tuple(Node.nodes.values())
+                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn) if uid not in Node._queued_nodes}
+            Node._queued_nodes.clear()
