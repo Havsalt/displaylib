@@ -70,7 +70,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
 
     def __init__(self, parent: Texture | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
         if not isinstance(parent, Texture) or parent == None:
-            raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}'")
+            raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}' (requires Texture in MRO)")
         super().__init__(parent, force_sort=False)
         self.fps: float = fps
         self.mode: int = mode
