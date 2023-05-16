@@ -121,7 +121,8 @@ class Node(metaclass=NodeMixinSortMeta):
         """Tells the Engine to `delete` this node after
         every node has been called `_update` on
         """
-        Node._queued_nodes.append(self.uid)
+        if not self.uid in Node._queued_nodes:
+            Node._queued_nodes.append(self.uid)
         Node._request_sort = True
 
 
