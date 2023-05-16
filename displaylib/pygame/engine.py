@@ -122,7 +122,8 @@ class PygameEngine(Engine):
                 node._update(delta)
 
             if Node._request_sort: # only sort once per frame if needed
-                Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
+                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn) if uid not in Node._queued_nodes}
+            Node._queued_nodes.clear()
             
             self._render(self.screen)
             for node in nodes: # render nodes onto the display
