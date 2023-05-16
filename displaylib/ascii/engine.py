@@ -103,19 +103,16 @@ class ASCIIEngine(Engine):
             for node in nodes:
                 node._update(clock.get_delta())
 
-            for node_uid in Node._queued_nodes:
-                del Node.nodes[node_uid]
-            Node._queued_nodes.clear()
-            
             if Node._request_sort: # only sort once per frame if needed
-                Node.nodes = {k: v for k, v in sorted(Node.nodes.items(), key=sort_fn)}
+                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn) if uid not in Node._queued_nodes}
+            Node._queued_nodes.clear()
             nodes = tuple(Node.nodes.values())
 
             # render content of visible nodes onto a surface
             self.screen.rebuild(Texture._instances, self.screen.width, self.screen.height)
             
             self._render(self.screen)
-            # nodes can render custon data onto the screen
+            # nodes can render custom data onto the screen
             for node in nodes:
                 if isinstance(node, ASCIINode2D):
                     node._render(self.screen)
@@ -125,6 +122,6 @@ class ASCIIEngine(Engine):
         
         # v exit protocol v
         self._on_exit()
-        surface = ASCIISurface(Node.nodes.values(), self.screen.width, self.screen.height) # create a Surface from all the Nodes
+        surface = ASCIISurface(Texture._instances, self.screen.width, self.screen.height) # create a Surface from all the Nodes
         self.screen.blit(surface)
         self.screen.show()
