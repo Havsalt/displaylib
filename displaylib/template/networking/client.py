@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 import json
 import selectors
 import socket
@@ -21,10 +22,12 @@ class Client:
     buffer_size: int = 4096 * 16
     timeout: float = 0
     encoding: str = "utf-8"
+    uids_buffer_size: int = 1_000
     _queued_changes: dict[str, dict[str, dict[str, str]]] = {"system": {},"custom": {}} # TODO: add 'pickle' category
+    _premade_uids: list[str] = [uuid.uuid1().hex for _ in range(uids_buffer_size)]
 
     def __new__(cls: type[Client], *args, **kwargs) -> Client: # Engine instance
-        def __setattr__(self: Node, name: str, value: object):
+        def __setattr__(self: Node, name: str, value: object) -> None:
             """Overridden `__setattr__` that automaticlly queues changes to be sent as a network request
             """
             change = {name: serialize(value)}
@@ -33,10 +36,33 @@ class Client:
                 Client._queued_changes["system"][self.uid] = change
             else:
                 Client._queued_changes["system"][self.uid].update(change)
+        setattr(Node, "__setattr__", __setattr__)
 
-        Node.__setattr__ = __setattr__ # no nodes are made prior to this change
-        instance = super().__new__(cls)
+        def __serialize__(self) -> str:
+            """Low level implementation for serializing nodes
+
+            Returns:
+                str: serialized data about this node
+            """
+            return f"{self.__class__.__name__}()"
+        setattr(Node, "__serialize__", __serialize__)
+
+        setattr(Node, "generate_uid", cls.generate_uid) # updates the method
+
+        instance = super().__new__(cls) # no nodes are made prior to these changes
         return instance
+
+    @classmethod
+    def generate_uid(cls) -> str:
+        """Generates a unique ID using uuid.uuid1()
+
+        Returns:
+            str: unique id in the form of uuid.uuid1().hex
+        """
+        uid = cls._premade_uids.pop(0)
+        if not cls._premade_uids:
+            cls._premade_uids = [uuid.uuid1().hex for _ in range(cls.uids_buffer_size)]
+        return uid # globally unique (includes across networks)
 
     def __init__(self, *, host: str = "localhost", port: int = 8080, **kwargs) -> None:
         """Initializes `Client` functionality on the `Engine`
