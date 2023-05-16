@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import uuid
 from typing import TYPE_CHECKING, TypeVar
 
 from ..math import Vec2
@@ -34,8 +33,9 @@ class Node(metaclass=NodeMixinSortMeta):
     """
     root: Engine # set from a Engine subclass
     nodes: dict[str, Node] = {} # all nodes that are alive
+    _uid_counter: int = 0 # is read and increments for each generated uid
     _request_sort: bool = False # requests Engine to sort
-    _queued_nodes: set[str] = set() # uses <Node>.queue_free() to ask Engine to delete a node based on UID
+    _queued_nodes: list[str] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
     # instance spesific
     uid: str
 
@@ -50,10 +50,21 @@ class Node(metaclass=NodeMixinSortMeta):
             Node: node instance that was stored
         """
         instance = super().__new__(cls)
-        uid = uuid.uuid1().hex # globally unique (includes across networks)
-        instance.uid = uid # TODO: premake about 1-10k UIDs in a List
+        uid = cls.generate_uid()
+        instance.uid = uid
         Node.nodes[uid] = instance
         return instance
+        
+    @classmethod
+    def generate_uid(cls) -> str:
+        """Generates a unique ID by incrementing an internal counter
+
+        Returns:
+            str: unique id
+        """
+        uid = cls._uid_counter
+        cls._uid_counter += 1
+        return str(uid)
 
     def __init__(self, parent: Node | None = None, *, force_sort: bool = True) -> None:
         self.parent = parent
@@ -74,14 +85,6 @@ class Node(metaclass=NodeMixinSortMeta):
 
         Returns:
             str: node representation
-        """
-        return f"{self.__class__.__name__}()"
-
-    def __serialize__(self) -> str:
-        """Low level implementation for serializing nodes
-
-        Returns:
-            str: serialized data about this node
         """
         return f"{self.__class__.__name__}()"
     
@@ -118,7 +121,8 @@ class Node(metaclass=NodeMixinSortMeta):
         """Tells the Engine to `delete` this node after
         every node has been called `_update` on
         """
-        Node._queued_nodes.add(self.uid)
+        Node._queued_nodes.append(self.uid)
+        Node._request_sort = True
 
 
 class Node2D(Node):
@@ -146,7 +150,7 @@ class Node2D(Node):
 
     @z_index.setter
     def z_index(self, value: int) -> None:
-        if self._z_index != value:
+        if self._z_index != value: # if updated
             self._z_index = value
             Node._request_sort = True
     
@@ -154,11 +158,8 @@ class Node2D(Node):
     def global_position(self) -> Vec2:
         position = self.position
         parent = self.parent
-        while parent != None:
-            if not isinstance(parent, Node2D):
-                break
-            # position += self.position.rotated(parent.rotation)
-            position += parent.position
+        while parent is not None and isinstance(parent, Node2D):
+            position += parent.position.rotated(parent.rotation)
             parent = parent.parent
         return position
     
@@ -171,9 +172,7 @@ class Node2D(Node):
     def global_rotation(self) -> float:
         rotation = self.rotation
         parent = self.parent
-        while parent != None:
-            if not isinstance(parent, Node2D):
-                break
+        while parent is not None and isinstance(parent, Node2D):
             rotation += parent.rotation
             parent = parent.parent
         return rotation
