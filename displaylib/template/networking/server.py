@@ -38,7 +38,7 @@ class Server:
             self._socket.listen(backlog)
         except ConnectionRefusedError as error:
             self._on_connection_refused(error)
-            return # does not start the main loop
+            return # does not start the main loop if failed to connect
         self._socket.setblocking(False)
         self.per_frame_tasks.append(self._update_socket) # Engine task
         super(__class__, self).__init__(**config)
