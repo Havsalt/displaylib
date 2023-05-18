@@ -27,16 +27,17 @@ class Client:
     _premade_uids: list[str] = [uuid.uuid1().hex for _ in range(uids_buffer_size)]
 
     def __new__(cls: type[Client], *args, **kwargs) -> Client: # Engine instance
-        def __setattr__(self: Node, name: str, value: object) -> None:
-            """Overridden `__setattr__` that automaticlly queues changes to be sent as a network request
-            """
-            change = {name: serialize(value)}
-            object.__setattr__(self, name, value)
-            if self.uid not in Client._queued_changes["system"]:
-                Client._queued_changes["system"][self.uid] = change
-            else:
-                Client._queued_changes["system"][self.uid].update(change)
-        setattr(Node, "__setattr__", __setattr__)
+        # DISABLED: auto broadcast attribute changes
+        # def __setattr__(self: Node, name: str, value: object) -> None:
+        #     """Overridden `__setattr__` that automaticlly queues changes to be sent as a network request
+        #     """
+        #     change = {name: serialize(value)}
+        #     object.__setattr__(self, name, value)
+        #     if self.uid not in Client._queued_changes["system"]:
+        #         Client._queued_changes["system"][self.uid] = change
+        #     else:
+        #         Client._queued_changes["system"][self.uid].update(change)
+        # setattr(Node, "__setattr__", __setattr__)
 
         def __serialize__(self) -> str:
             """Low level implementation for serializing nodes
@@ -47,22 +48,24 @@ class Client:
             return f"{self.__class__.__name__}()"
         setattr(Node, "__serialize__", __serialize__)
 
-        setattr(Node, "generate_uid", cls.generate_uid) # updates the method
+        @classmethod
+        def generate_uid(node_cls) -> str:
+            """Generates a unique ID using uuid.uuid1()
+
+            Returns:
+                str: unique id in the form of uuid.uuid1().hex
+            """
+            uid = cls._premade_uids[node_cls._uid_counter]
+            node_cls._uid_counter += 1
+            if node_cls._uid_counter >= cls.uids_buffer_size:
+                node_cls._uid_counter = 0
+                cls._premade_uids = [uuid.uuid1().hex for _ in range(cls.uids_buffer_size)]
+            return uid # globally unique (includes across networks)
+
+        setattr(Node, "generate_uid", generate_uid) # updates the method
 
         instance = super().__new__(cls) # no nodes are made prior to these changes
         return instance
-
-    @classmethod
-    def generate_uid(cls) -> str:
-        """Generates a unique ID using uuid.uuid1()
-
-        Returns:
-            str: unique id in the form of uuid.uuid1().hex
-        """
-        uid = cls._premade_uids.pop(0)
-        if not cls._premade_uids:
-            cls._premade_uids = [uuid.uuid1().hex for _ in range(cls.uids_buffer_size)]
-        return uid # globally unique (includes across networks)
 
     def __init__(self, *, host: str = "localhost", port: int = 8080, **kwargs) -> None:
         """Initializes `Client` functionality on the `Engine`
@@ -141,7 +144,7 @@ class Client:
                     return
                 if response:
                     self._on_response_received(response)
-                    
+    
     def send(self, request: dict[str, dict[str, Any]]) -> None:
         """Queues the request to be sent
 
