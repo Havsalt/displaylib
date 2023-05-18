@@ -6,7 +6,7 @@ import socket
 from .server import Server
 
 
-class BroadcastServer(Server):
+class BroadcastServer(Server): # NOTE: not fully implemented yet
     """`BroadcastServer` that only broadcasts info to the other clients
 
     Data hooks (a raw request is split and deligated):
@@ -19,11 +19,11 @@ class BroadcastServer(Server):
     
     def _on_client_connected(self, connection: socket.socket, _host: str, _port: int) -> None:
         # self.connections.append(connection)
-        print(f"[Info] Disconnected {connection}")
+        print(f"[Info] Client connected {connection}")
     
     def _on_client_disconnected(self, connection: socket.socket, error: Exception) -> None:
         # self.connections.remove(connection) # FIXME: connection not in list. _on_client_connected not called
-        print(f"[Info] Disconnected {connection}")
+        print(f"[Info] Disconnected client {connection}")
         print(f"[Cause] {error}")
 
     def _on_request_received(self, sender: socket.socket, request: bytes) -> None:
@@ -48,11 +48,11 @@ class BroadcastServer(Server):
         data_to_send: dict[str, dict[str, dict[str, str]]] = {"system": data["system"]} | {"custom": data["custom"]}
         as_json = json.dumps(data_to_send)
         encoded = bytes(as_json, self.encoding)
-        for connection in tuple(self.connections):
-            if connection == sender: # do not send to sender
-                continue
-            try:
-                connection.sendall(encoded)
-            except (ConnectionAbortedError, ConnectionResetError):
-                self.connections.remove(connection)
-                continue
+        # for connection in tuple(self.connections):
+        #     if connection == sender: # do not send to sender
+        #         continue
+        #     try:
+        #         connection.sendall(encoded)
+        #     except (ConnectionAbortedError, ConnectionResetError):
+        #         self.connections.remove(connection)
+        #         continue
