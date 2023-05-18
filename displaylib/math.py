@@ -148,7 +148,7 @@ class Vec2: # TODO: add support for network notify protocol
         return self / self.length()
 
     def angle(self) -> float:
-        """Returns the angle (measured in radians)
+        """Returns the angle (measured in radians), using atan2
 
         Returns:
             float: angle given in radians
