@@ -49,16 +49,16 @@ class Client:
         setattr(Node, "__serialize__", __serialize__)
 
         @classmethod
-        def generate_uid(node_cls) -> str:
+        def generate_uid(_node_cls) -> str:
             """Generates a unique ID using uuid.uuid1()
 
             Returns:
                 str: unique id in the form of uuid.uuid1().hex
             """
-            uid = cls._premade_uids[node_cls._uid_counter]
-            node_cls._uid_counter += 1
-            if node_cls._uid_counter >= cls.uids_buffer_size:
-                node_cls._uid_counter = 0
+            uid = cls._premade_uids[Node._uid_counter] # remember that `cls` in this function is from Client
+            Node._uid_counter += 1
+            if Node._uid_counter >= cls.uids_buffer_size:
+                Node._uid_counter = 0
                 cls._premade_uids = [uuid.uuid1().hex for _ in range(cls.uids_buffer_size)]
             return uid # globally unique (includes across networks)
 

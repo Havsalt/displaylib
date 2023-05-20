@@ -62,8 +62,8 @@ class Node(metaclass=NodeMixinSortMeta):
         Returns:
             str: unique id
         """
-        uid = cls._uid_counter
-        cls._uid_counter += 1
+        uid = Node._uid_counter
+        Node._uid_counter += 1
         return str(uid)
 
     def __init__(self, parent: Node | None = None, *, force_sort: bool = True) -> None:
