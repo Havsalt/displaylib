@@ -13,7 +13,7 @@ class ASCIISprite(ASCIINode2D, Texture):
     """
     
     def size(self) -> Vec2i:
-        """Returns the width and height of content as a vector
+        """Returns the width and height of `.texture` as a vector
 
         Returns:
             Vec2: size of the content
