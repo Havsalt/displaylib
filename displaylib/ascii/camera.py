@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar, TypeVar
 
 from ..math import Vec2i
-from ..template import Node, Node2D
+from ..template import Node
+from .node import ASCIINode2D
 
 if TYPE_CHECKING:
     from .surface import ASCIISurface
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
 Self = TypeVar("Self")
 
 
-class ASCIICamera(Node2D):
+class ASCIICamera(ASCIINode2D):
     """`ASCIICamera` for moving the viewport
 
     Hooks:
@@ -23,6 +24,8 @@ class ASCIICamera(Node2D):
         - 3 `CENTERED`
         - 5 `INCLUDE_SIZE`
         - 8 `CENTERED_AND_INCLUDE_SIZE` (`CENTERED + INCLUDE_SIZE`)
+    
+    Any invalid flag combination will be treated as `FIXED` (1)
     """
     FIXED = 1
     CENTERED = 3
@@ -31,8 +34,8 @@ class ASCIICamera(Node2D):
     current: ClassVar[ASCIICamera]
 
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, follow: bool = False, mode: int = FIXED) -> None:
-        super().__init__(parent, x, y, z_index=-1, force_sort=True) # TODO: move z_index into some config (the "-1" part)
-        self.mode = mode # `centered` mode only has effect if `parent` != None
+        super().__init__(parent, x=x, y=y, force_sort=True)
+        self.mode = mode # `centered` mode only has effect if `parent` is not None
         self.follow = follow # whether to follow the `parent`
     
     def _render(self, surface: ASCIISurface) -> None:
