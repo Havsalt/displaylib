@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, ClassVar, TypeVar
 
 from ..math import Vec2
 
@@ -32,7 +32,7 @@ class Node(metaclass=NodeMixinSortMeta):
         - `_update(self, delta: float) -> None`
     """
     root: Engine # set from a Engine subclass
-    nodes: dict[str, Node] = {} # all nodes that are alive
+    nodes: ClassVar[dict[str, Node]] = {} # all nodes that are alive
     _uid_counter: int = 0 # is read and increments for each generated uid
     _request_sort: bool = False # requests Engine to sort
     _queued_nodes: list[str] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
@@ -60,7 +60,7 @@ class Node(metaclass=NodeMixinSortMeta):
         """Generates a unique ID by incrementing an internal counter
 
         Returns:
-            str: unique id
+            str: unique ID
         """
         uid = Node._uid_counter
         Node._uid_counter += 1
