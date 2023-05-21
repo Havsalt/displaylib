@@ -13,10 +13,13 @@ __all__ = [
     "Node",
     "Node2D",
     "Engine",
+    "Transform2D",
     "networking" # (module)
 ]
 
 from ..math import lerp, sign, Vec2, Vec2i
-from .node import Node, Node2D
+from .node import Node
+from .node2d import Node2D
 from .engine import Engine
+from .transform import Transform2D
 from . import networking

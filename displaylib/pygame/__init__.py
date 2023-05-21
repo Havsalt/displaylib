@@ -11,8 +11,9 @@ __all__ = [
     "Vec2",
     "Vec2i",
     # standard
-    "Node",
+    "Transform2D",
     # core pygame
+    "Node",
     "Node2D",
     "Engine",
     # networking
@@ -31,9 +32,9 @@ except ModuleNotFoundError as error:
 # math
 from ..math import lerp, sign, Vec2, Vec2i
 # standard
-from ..template import Node
+from ..template import Transform2D
 # core pygame
-from .node import PygameNode2D as Node2D
+from .node import PygameNode as Node, PygameNode2D as Node2D
 from .engine import PygameEngine as Engine
 # networking
 from . import networking
