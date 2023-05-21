@@ -32,6 +32,7 @@ class Clock:
         Returns:
             float: time since last tick
         """
+        return self._target_delta
         return max(0.0, time.perf_counter() - self._last_tick)
     
     def tick(self) -> float:
@@ -40,6 +41,8 @@ class Clock:
         Returns:
             float: delta time since last tick
         """
+        time.sleep(self._target_delta)
+        return self._target_delta
         now = time.perf_counter()
         diff = now - self._last_tick
         remaining = self._target_delta - diff
