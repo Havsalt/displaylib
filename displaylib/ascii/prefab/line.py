@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ...template import Node
 
 
-class ASCIIPoint2D(ASCIINode2D, Texture):
+class ASCIIPoint2D(Texture, ASCIINode2D):
     """Thin wrapper around `ASCIINode2D` capable of displaying a single point
     
     Components:
