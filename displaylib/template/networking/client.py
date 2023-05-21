@@ -4,10 +4,12 @@ import uuid
 import json
 import selectors
 import socket
-from typing import Any
+from typing import TypeVar, Any
 
 from ...template import Node
 from .serialize import serialize
+
+EngineLike = TypeVar("EngineLike")
 
 
 class Client:
@@ -23,10 +25,10 @@ class Client:
     timeout: float = 0
     encoding: str = "utf-8"
     uids_buffer_size: int = 1_000
-    _queued_changes: dict[str, dict[str, dict[str, str]]] = {"system": {},"custom": {}} # TODO: add 'pickle' category
     _premade_uids: list[str] = [uuid.uuid1().hex for _ in range(uids_buffer_size)]
+    _queued_changes: dict[str, dict[str, dict[str, str]]] = {"system": {},"custom": {}} # TODO: add 'pickle' category
 
-    def __new__(cls: type[Client], *args, **kwargs) -> Client: # Engine instance
+    def __new__(cls: type[EngineLike], *args, **kwargs) -> EngineLike:
         # DISABLED: auto broadcast attribute changes
         # def __setattr__(self: Node, name: str, value: object) -> None:
         #     """Overridden `__setattr__` that automaticlly queues changes to be sent as a network request
@@ -50,10 +52,10 @@ class Client:
 
         @classmethod
         def generate_uid(_node_cls) -> str:
-            """Generates a unique ID using uuid.uuid1()
+            """Generates a unique ID using uuid.uuid1().hex
 
             Returns:
-                str: unique id in the form of uuid.uuid1().hex
+                str: unique ID in the form of uuid.uuid1().hex
             """
             uid = cls._premade_uids[Node._uid_counter] # remember that `cls` in this function is from Client
             Node._uid_counter += 1
