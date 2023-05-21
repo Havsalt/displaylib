@@ -1,23 +1,22 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from ..template import Node2D
+from ..template import Node, Node2D
 
 if TYPE_CHECKING:
     import pygame
-    from ..template import Node
+    from .engine import PygameEngine
 
 
-class PygameNode2D(Node2D):
-    """`PygameNode2D` with additional hooks from Node2D
+class Pygame: # mode class with common hooks
+    """`Pygame` class that enables common hooks for the `pygame` mode
 
     Hooks:
         `_input(self, event: pygame.event.Event) -> None`
         `_render(self, surface: pygame.Surface) -> None`
     """
-    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, z_index: int = 0, force_sort: bool = True) -> None:
-        super().__init__(parent, x, y, z_index=z_index, force_sort=force_sort)
-    
+    root: PygameEngine
+
     def _input(self, event: pygame.event.Event) -> None:
         """Override for custom functionality
 
@@ -33,3 +32,21 @@ class PygameNode2D(Node2D):
             surface (pygame.Surface): surface to render custom content onto
         """
         ...
+
+
+class PygameNode(Pygame, Node): # a variant of the Node
+    """`PygameNode` with additional hooks related to `pygame` mode functionality
+
+    Hooks:
+        `_input(self, event: pygame.event.Event) -> None`
+        `_render(self, surface: pygame.Surface) -> None`
+    """
+
+
+class PygameNode2D(Pygame, Node2D): # a variant of the Node2D
+    """`PygameNode2D` with additional hooks related to `pygame` mode functionality
+
+    Hooks:
+        `_input(self, event: pygame.event.Event) -> None`
+        `_render(self, surface: pygame.Surface) -> None`
+    """
