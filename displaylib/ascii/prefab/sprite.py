@@ -5,7 +5,7 @@ from ..node import ASCIINode2D
 from ..texture import Texture
 
 
-class ASCIISprite(ASCIINode2D, Texture):
+class ASCIISprite(Texture, ASCIINode2D):
     """Prefabricated `ASCIISprite`
 
     Components:
