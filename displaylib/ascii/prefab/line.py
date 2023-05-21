@@ -14,10 +14,13 @@ class ASCIIPoint2D(Texture, ASCIINode2D):
     """Thin wrapper around `ASCIINode2D` capable of displaying a single point
     
     Components:
-        `Texture`: allows the node to be displayed
+        `Texture`: allows the node to be shown
     """
-    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, texture: str = "#", z_index: int = 0, force_sort: bool = True) -> None:
-        super().__init__(parent, x, y, z_index=z_index, force_sort=force_sort)
+    def __new__(cls, *args, texture: str = "#", **kwargs): # pulling: `texture`
+        return super().__new__(*args, **kwargs)
+
+    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, texture: str = "#", force_sort: bool = True) -> None:
+        super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.texture = [[texture]]
 
 
@@ -28,11 +31,15 @@ class ASCIILine(ASCIINode2D):
     """
     texture_default: ClassVar[str] = "#" # only used when creating a line node
 
+    def __new__(cls, *args, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: str | None = None, **kwargs): # pulling: `start`, `end`, `texture`
+        return super().__new__(*args, **kwargs)
+
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: str | None = None, z_index: int = 0, force_sort: bool = True) -> None:
-        super().__init__(parent, x, y, z_index=z_index, force_sort=force_sort)
+        super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.start = start
         self.end = end
         self.texture = texture or self.texture_default
+        self.z_index = z_index
         self.points: list[ASCIIPoint2D] = [
             ASCIIPoint2D(self, z_index=self.z_index, texture=self.texture).where(position=start),
             ASCIIPoint2D(self, z_index=self.z_index, texture=self.texture).where(position=end)

@@ -15,7 +15,7 @@ class ASCIILabel(Texture, ASCIINode2D):
     Components:
         `Texture`: allows the node to be shown
     """
-    def __new__(cls, *args, text: str, **kwargs):
+    def __new__(cls, *args, text: str = "", **kwargs): # pulling: `text`
         return super().__new__(cls, *args, **kwargs)
 
     def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
