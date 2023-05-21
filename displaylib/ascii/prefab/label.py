@@ -9,13 +9,17 @@ if TYPE_CHECKING:
     from ...template import Node
 
 
-class ASCIILabel(ASCIINode2D, Texture):
-    """Prefabricated `Label` node
-
-    A new line is created for each `\\n`
+class ASCIILabel(Texture, ASCIINode2D):
+    """Prefabricated `Label` node where a new line is created for each `\\n`
+    
+    Components:
+        `Texture`: allows the node to be shown
     """
-    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
-        super().__init__(parent, x, y, z_index=z_index, force_sort=force_sort)
+    def __new__(cls, *args, text: str, **kwargs):
+        return super().__new__(cls, *args, **kwargs)
+
+    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
+        super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.text = text
     
     @property
