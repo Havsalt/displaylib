@@ -1,23 +1,41 @@
 from __future__ import annotations
 
+from typing import ClassVar
 
-from ..template import Node2D
+from ..template import Transform2D
 
 
 class Texture: # Component (mixin class)
     """`Texture` mixin class for adding ASCII graphics to a node class
+
+    Requires Components:
+        `Transform2D`: uses position and rotation to place the texture
     """
     texture: list[list[str]]
     visible: bool
     _instances: list[Texture] = [] # nodes with Texture component
+    _request_z_index_sort: ClassVar[bool] = False # requests Engine to sort
 
-    def __new__(cls, *args, **kwargs):
-        instance = super().__new__(cls, *args, **kwargs)
-        if not isinstance(instance, Node2D):
-            raise TypeError(f"in class '{instance.__class__.__qualname__}': mixin class '{__class__.__qualname__}' requires to be used in combination with a node class deriving from 'Node2D'")
+    def __new__(cls, *args, z_index: int = 0, force_sort: bool = True, **kwargs):
+        instance = super().__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
+        if not isinstance(instance, Transform2D):
+            raise TypeError(f"in class '{instance.__class__.__qualname__}': mixin class '{__class__.__qualname__}' requires to be used in combination with a node class deriving from 'Transform2D'")
         setattr(instance, "texture", list())
+        setattr(instance, "_z_index", z_index)
+        if force_sort:
+            Texture._request_z_index_sort = True
         Texture._instances.append(instance)
         return instance
+    
+    @property
+    def z_index(self) -> int:
+        return self._z_index
+
+    @z_index.setter
+    def z_index(self, value: int) -> None:
+        if self._z_index != value: # if changed
+            self._z_index = value
+            Texture._request_z_index_sort = True
 
     def queue_free(self) -> None:
         """Decrements this node's reference by removing it from `Texture._instances`.
