@@ -99,10 +99,7 @@ class PygameEngine(Engine):
     def _main_loop(self) -> None:
         """Overriden main loop spesific for `displaylib.ascii` mode
         """
-        def sort_fn(element: tuple[int, Node]):
-            return element[1].z_index
-
-        nodes = tuple(Node.nodes.values())
+        Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
         clock = pygame.time.Clock()
         delta = 0.0
         # update one time at the very start
@@ -113,23 +110,23 @@ class PygameEngine(Engine):
             
             for event in pygame.event.get():
                 self._input(event)
-                for node in nodes:
+                for node in Node.nodes.values():
                     if isinstance(node, PygameNode2D):
                         node._input(event)
             
             self._update(delta)
-            for node in nodes:
+            for node in Node.nodes.values():
                 node._update(delta)
 
-            if Node._request_sort: # only sort once per frame if needed
-                for uid in set(Node._queued_nodes):
+            if Node._request_process_priority_sort: # only sort once per frame if needed
+                Node._request_process_priority_sort = False
+                for uid in Node._queued_nodes:
                     del Node.nodes[uid]
                 Node._queued_nodes.clear()
-                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn)}
-                nodes = tuple(Node.nodes.values())
+                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
             
             self._render(self.screen)
-            for node in nodes: # render nodes onto the display
+            for node in Node.nodes.values(): # render nodes onto the display
                 if isinstance(node, PygameNode2D):
                     node._render(self.screen)
             

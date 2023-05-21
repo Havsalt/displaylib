@@ -8,7 +8,7 @@ from .clock import Clock
 from .screen import ASCIIScreen
 from .surface import ASCIISurface
 from .camera import ASCIICamera
-from .node import ASCIINode2D
+from .node import ASCII
 from .texture import Texture
 
 
@@ -73,17 +73,18 @@ class ASCIIEngine(Engine):
         """
         ...
     
+    @staticmethod
+    def sort_function_for_z_index(element: Texture) -> int:
+        return element.z_index
+    
     def _main_loop(self) -> None:
         """Overriden main loop spesific for `displaylib.ascii` mode
         """
-        def sort_fn(element: tuple[int, Node]):
-            return element[1].z_index
-
-        nodes = tuple(Node.nodes.values())
+        Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
         clock = Clock(self.tps)
         while self.is_running:
             self.screen.clear()
-                        
+
             if self.auto_resize_screen:
                 terminal_size = os.get_terminal_size()
                 if ((terminal_size.columns - self.screen_margin.x) != self.screen.width) or ((terminal_size.lines - self.screen_margin.y) != self.screen.height):
@@ -91,8 +92,8 @@ class ASCIIEngine(Engine):
                     self.screen.height = int(terminal_size.lines - self.screen_margin.y)
                     size = Vec2i(terminal_size.columns, terminal_size.lines)
                     self._on_screen_resize(size)
-                    for node in nodes:
-                        if isinstance(node, ASCIINode2D):
+                    for node in Node.nodes.values():
+                        if isinstance(node, ASCII):
                             node._on_screen_resize(size)
                     os.system("cls")
                 
@@ -100,23 +101,24 @@ class ASCIIEngine(Engine):
                 task()
             
             self._update(clock.get_delta())
-            for node in nodes:
+            for node in Node.nodes.values():
                 node._update(clock.get_delta())
 
-            if Node._request_sort: # only sort once per frame if needed
-                for uid in set(Node._queued_nodes):
+            if Node._request_process_priority_sort: # only sort once per frame if needed
+                for uid in Node._queued_nodes:
                     del Node.nodes[uid]
                 Node._queued_nodes.clear()
-                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn)}
-                nodes = tuple(Node.nodes.values())
+                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
+            if Texture._request_z_index_sort:
+                Texture._instances.sort(key=self.sort_function_for_z_index)
 
             # render content of visible nodes onto a surface
             self.screen.rebuild(Texture._instances, self.screen.width, self.screen.height)
             
             self._render(self.screen)
             # nodes can render custom data onto the screen
-            for node in nodes:
-                if isinstance(node, ASCIINode2D):
+            for node in Node.nodes.values():
+                if isinstance(node, ASCII):
                     node._render(self.screen)
             
             self.screen.show()

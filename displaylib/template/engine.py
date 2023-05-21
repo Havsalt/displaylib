@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+from types import FunctionType
+from typing import TYPE_CHECKING, TypeVar
+
 from .node import Node
+
+EngineLike = TypeVar("EngineLike")
 
 
 class EngineMixinSortMeta(type):
@@ -22,7 +27,7 @@ class EngineMixinSortMeta(type):
 class Engine(metaclass=EngineMixinSortMeta):
     """`Engine` base class
 
-    Important: `Only one Engine instance should exist per script instance`
+    Important: `Only 1 Engine instance should exist per script instance`
 
     Hooks:
         - `_on_start(self) -> None`
@@ -31,9 +36,9 @@ class Engine(metaclass=EngineMixinSortMeta):
     """
     tps: int = 16
     is_running: bool = False
-    per_frame_tasks = [] # list[function]
+    per_frame_tasks: list[FunctionType] = []
 
-    def __new__(cls: type[Engine], *args, **kwargs) -> Engine:
+    def __new__(cls: type[EngineLike], *args, **kwargs) -> EngineLike:
         """Sets `Node.root` when an `Engine instance` is initialized 
 
         Args:
@@ -74,12 +79,14 @@ class Engine(metaclass=EngineMixinSortMeta):
         """
         ...
     
+    @staticmethod
+    def sort_function_for_process_priority(elements: tuple[str, Node]) -> int:
+        return elements[1].process_priority
+    
     def _main_loop(self) -> None:
         """Base implementation for `displaylib.template` mode
         """
-        def sort_fn(element: tuple[int, Node]):
-            return element[1].z_index
-        
+        Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
         while self.is_running:
             for task in self.per_frame_tasks:
                 task()
@@ -87,12 +94,12 @@ class Engine(metaclass=EngineMixinSortMeta):
             # TODO: add clock with delta, but no sleep
             delta = 1.0 / self.tps # static delta
             self._update(delta)
-            for node in tuple(Node.nodes.values()):
+            for node in Node.nodes.values():
                 node._update(delta)
 
-            if Node._request_sort: # only sort once per frame if needed
-                for uid in set(Node._queued_nodes):
+            if Node._request_process_priority_sort: # only sort once per frame if needed
+                Node._request_process_priority_sort = False
+                for uid in Node._queued_nodes: # list should not contain duplicants
                     del Node.nodes[uid]
                 Node._queued_nodes.clear()
-                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=sort_fn)}
-                nodes = tuple(Node.nodes.values())
+                Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
