@@ -20,7 +20,7 @@ ASCIINode(x, y)
 PygameNode(x, y)
 """
 
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 __author__ = "Floating-Int"
 __all__ = [ # default mode is used when using the star notation
     # math
