@@ -8,7 +8,6 @@ from . import grapheme
 from .texture import Texture
 
 if TYPE_CHECKING:
-    from .node import ASCIINode2D
     from .surface import ASCIISurface
 
 
@@ -62,11 +61,18 @@ class EmptyAnimation(Animation):
 
 
 class AnimationPlayer(Node): # TODO: add buffered animations on load
-    """`AnimationPlayer` to be attached to a node, so it can control animations
+    """`AnimationPlayer` that plays animations, changing the `.texture` attribute of the parent
+
+    Parent Requires Components:
+        - `Transform2D`: uses position and rotation to place the texture
+        - `Texture`: changes its texture
     """
     FIXED = 0
-    DELTATIME = 1 # TODO: DELTATIME mode
+    DELTATIME = 1 # TODO: add DELTATIME mode
     mode_default = FIXED
+
+    def __new__(cls, *args, fps: float = 16, mode: int = mode_default, **animations): # pulling: `fps`, `mode`, `**animations`
+        return super().__new__(cls, *args)
 
     def __init__(self, parent: Texture | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
         if not isinstance(parent, Texture) or parent == None:
