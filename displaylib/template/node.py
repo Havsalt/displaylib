@@ -38,8 +38,8 @@ class Node(metaclass=NodeMixinSortMeta):
     uid: str
     parent: Node | None
 
-    def __new__(cls: type[Node], *args, force_sort: bool = True) -> Node:
-        """In addition to default behaviour, automatically store the node in a dict.
+    def __new__(cls: type[Self], *parent: Node | None, force_sort: bool = True) -> Self: # pulling: optional "parent", "force_sort"
+        """In addition to default behaviour, automatically stores the node in a dict.
         Keeps the object alive by the reference stored
 
         Args:
@@ -48,6 +48,8 @@ class Node(metaclass=NodeMixinSortMeta):
         Returns:
             Node: node instance that was stored
         """
+        if len(parent) > 1: # if passing anything more than `parent` as positional argument
+            raise ValueError(f"expected 0-1 argument for 'parent', was given {len(parent)}: {parent}")
         instance = super().__new__(cls)
         uid = cls.generate_uid()
         instance.uid = uid
