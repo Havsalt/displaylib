@@ -115,7 +115,7 @@ class PygameEngine(Engine):
                         node._input(event)
             
             self._update(delta)
-            for node in Node.nodes.values():
+            for node in tuple(Node.nodes.values()):
                 node._update(delta)
 
             if Node._request_process_priority_sort: # only sort once per frame if needed

@@ -94,7 +94,7 @@ class Engine(metaclass=EngineMixinSortMeta):
             # TODO: add clock with delta, but no sleep
             delta = 1.0 / self.tps # static delta
             self._update(delta)
-            for node in Node.nodes.values():
+            for node in tuple(Node.nodes.values()):
                 node._update(delta)
 
             if Node._request_process_priority_sort: # only sort once per frame if needed

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from typing import TypeVar
 
 from ..math import Vec2i
 from ..template import Node, Engine
@@ -11,6 +12,8 @@ from .camera import ASCIICamera
 from .node import ASCII
 from .texture import Texture
 
+EngineLike = TypeVar("EngineLike")
+
 
 class ASCIIEngine(Engine):
     """`ASCIIEngine` for creating a world in ASCII graphics
@@ -20,7 +23,7 @@ class ASCIIEngine(Engine):
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
 
-    def __new__(cls: type[ASCIIEngine], *args, **kwargs) -> Engine:
+    def __new__(cls: type[EngineLike], *args, **kwargs) -> EngineLike:
         """Sets `Node.root` when an Engine instance is created. Initializes default `ASCIICamera`
 
         Args:
@@ -74,8 +77,8 @@ class ASCIIEngine(Engine):
         ...
     
     @staticmethod
-    def sort_function_for_z_index(element: Texture) -> int:
-        return element.z_index
+    def sort_function_for_z_index(element: Texture & Node) -> tuple[int, int]:
+        return element.z_index, element.process_priority
     
     def _main_loop(self) -> None:
         """Overriden main loop spesific for `displaylib.ascii` mode
@@ -101,7 +104,7 @@ class ASCIIEngine(Engine):
                 task()
             
             self._update(clock.get_delta())
-            for node in Node.nodes.values():
+            for node in tuple(Node.nodes.values()): # tuple, because removing a ref in lets say an list will free the node during iteration
                 node._update(clock.get_delta())
 
             if Node._request_process_priority_sort: # only sort once per frame if needed
