@@ -49,6 +49,8 @@ __all__ = [ # default mode is used when using the star notation
 
 # math
 from .math import lerp, sign, Vec2, Vec2i
+# utility
+from .util import pull
 # standard
 from .template import Node, Node2D
 from .ascii import (
@@ -65,6 +67,7 @@ from .ascii import (
     Animation as Animation,
     EmptyAnimation as EmptyAnimation,
     AnimationPlayer as AnimationPlayer,
+    AudioStreamPlayer as AudioStreamPlayer,
     Clock as Clock,
     # prefabricated
     Label as ASCIILabel,

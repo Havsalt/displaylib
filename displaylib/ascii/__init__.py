@@ -10,6 +10,7 @@ __all__ = [
     "Vec2",
     "Vec2i",
     # utility
+    "pull",
     "grapheme", # (module)
     # core ascii
     "Node",
@@ -22,6 +23,7 @@ __all__ = [
     "Animation",
     "EmptyAnimation",
     "AnimationPlayer",
+    "AudioStreamPlayer",
     "Clock",
     # mixin classes
     "Transform2D",
@@ -38,6 +40,7 @@ __all__ = [
 # math
 from ..math import lerp, sign, Vec2, Vec2i
 # utility
+from ..util import pull
 from . import grapheme
 # core ascii
 from .node import ASCIINode as Node, ASCIINode2D as Node2D
@@ -46,6 +49,7 @@ from .camera import ASCIICamera as Camera
 from .surface import ASCIISurface as Surface
 from .screen import ASCIIScreen as Screen
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
+from .audio import AudioStreamPlayer
 from .clock import Clock
 # mixin classes
 from ..template import Transform2D
