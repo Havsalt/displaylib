@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from typing import TypeVar
 
 from ..math import Vec2
-from .node import Node
 
 Self = TypeVar("Self")
 
@@ -12,13 +13,11 @@ class Transform2D: # Component (mixin class)
     position: Vec2
     rotation: float
 
-    def __new__(cls: type[Self], *args, x: int | float = 0, y: int | float = 0, force_sort: bool = True, **kwargs) -> Self:
-        instance = super().__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
+    def __new__(cls: type[Self], *args, x: int | float = 0, y: int | float = 0, **kwargs) -> Self:
+        instance = super().__new__(cls, *args, **kwargs)
         setattr(instance, "position",  Vec2(x, y))
         setattr(instance, "rotation", 0.0)
         setattr(instance, "_visible", True) # only nodes with Transform2D will have the option to be visible
-        if force_sort: # if True, requests sort every frame a new node is created
-            Node._request_process_priority_sort = True # otherwise, depend on a `process_priority` change
         return instance
 
     def __str__(self) -> str:
