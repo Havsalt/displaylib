@@ -11,28 +11,29 @@ if TYPE_CHECKING:
     from ...template import Node
 
 
-@pull("texture")
+@pull("texture", "z_index")
 class ASCIIPoint2D(Texture, ASCIINode2D):
     """Thin wrapper around `ASCIINode2D` capable of displaying a single point
     
     Components:
         `Texture`: allows the node to be shown
     """
-    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, texture: str = "#", z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, texture: str = "#", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.texture = [[texture]]
         self.z_index = z_index
 
 
-@pull("start", "end", "texture")
+@pull("start", "end", "texture", "z_index")
 class ASCIILine(ASCIINode2D):
-    """Prefabricated `Line` node
+    """Prefabricated `ASCIILine` node
 
-    Known issue: Does not work well when changing `rotation` or `global_rotation`
+    Known Issues:
+        - `Does not work well when changing '.rotation' or '.global_rotation'`
     """
     texture_default: ClassVar[str] = "#" # only used when creating a line node
 
-    def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: str = texture_default, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: str = texture_default, z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.z_index = z_index
         self.force_sort = force_sort

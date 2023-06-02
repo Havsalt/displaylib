@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from ...template import Node
 
 
-@pull("text")
+@pull("text", "z_index")
 class ASCIILabel(Texture, ASCIINode2D):
     """Prefabricated `Label` node where a new line is created for each `\\n`
     
