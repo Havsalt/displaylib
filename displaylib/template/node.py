@@ -24,7 +24,7 @@ class Node(metaclass=NodeMixinSortMeta):
     """`Node` base class
 
     Automatically keeps track of alive Node(s) by reference.
-    An Engine subclass may access it's nodes through the `nodes` class attribute
+    An Engine subclass may access it's nodes through the `.nodes` class attribute
 
     Hooks:
         - `_update(self, delta: float) -> None`
@@ -38,7 +38,7 @@ class Node(metaclass=NodeMixinSortMeta):
     uid: str
     parent: Node | None
 
-    def __new__(cls: type[Self], *parent: Node | None, force_sort: bool = True) -> Self: # pulling: optional "parent", "force_sort"
+    def __new__(cls: type[Self], *parent_as_positional: Node | None, parent: Node | None = None, force_sort: bool = True) -> Self: # pulling: optional "parent", "force_sort"
         """In addition to default behaviour, automatically stores the node in a dict.
         Keeps the object alive by the reference stored
 
@@ -48,12 +48,16 @@ class Node(metaclass=NodeMixinSortMeta):
         Returns:
             Node: node instance that was stored
         """
-        if len(parent) > 1: # if passing anything more than `parent` as positional argument
-            raise ValueError(f"expected 0-1 argument for 'parent', was given {len(parent)}: {parent}")
+        if len(parent_as_positional) > 1: # if passing anything more than `parent` as positional argument
+            raise ValueError(f"expected 0-1 argument for 'parent', was given {len(parent_as_positional)}: {parent_as_positional}")
+        elif parent is not None and parent_as_positional: # conflicting overload
+            raise ValueError(f"parameter 'parent' was supplied both positional only and keyword only argument(s): positional(s) = {parent_as_positional} & keyword = {parent_as_positional}")
         instance = super().__new__(cls)
         uid = cls.generate_uid()
         instance.uid = uid
         Node.nodes[uid] = instance
+        if force_sort: # if True, requests sort every frame a new node is created
+            Node._request_process_priority_sort = True # otherwise, depend on a `process_priority` change
         return instance
 
     @classmethod
