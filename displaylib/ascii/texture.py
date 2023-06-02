@@ -17,7 +17,6 @@ class Texture: # Component (mixin class)
     visible: bool
     _instances: ClassVar[list[Texture]] = [] # references to nodes with Texture component
     _request_z_index_sort: ClassVar[bool] = False # requests Engine to sort
-    _request_instance_removal: ClassVar[bool] = False # requests Engine to decrement ref count to Texture instance
 
     def __new__(cls: type[Self], *args, z_index: int = 0, force_sort: bool = True, **kwargs) -> Self:
         instance = super().__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
