@@ -16,7 +16,7 @@ class AudioStreamPlayer(Node):
 
     Known Issues:
         - `Globally, only one sound can be played at the same time, the rest is queued for when the current sound finishes`
-        - `Attribute 'is_playing' is True when calling '.play()', and False when finished`
+        - `Attribute '.is_playing' is True when calling '.play()', and False when finished`
     """
     stream_default: ClassVar[bytes] = bytes()
     max_sound_count_default: ClassVar[int] = 1 # number of sounds this AudioStreamPlayer can play at the same time
