@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from types import FunctionType
-from typing import TYPE_CHECKING, TypeVar
+from typing import TypeVar
 
 from .node import Node
 
@@ -72,7 +72,7 @@ class Engine(metaclass=EngineMixinSortMeta):
         ...
     
     def _update(self, delta: float) -> None:
-        """Called every frame. Deltatime between frames is passes as argument `delta`
+        """Called every frame. Deltatime between frames is passed as argument `delta`
 
         Args:
             delta (float): deltatime between frames
