@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from ...template import Node
 
 
-@pull("texture", "z_index")
 class ASCIIPoint2D(Texture, ASCIINode2D):
     """Thin wrapper around `ASCIINode2D` capable of displaying a single point
     
@@ -24,7 +23,7 @@ class ASCIIPoint2D(Texture, ASCIINode2D):
         self.z_index = z_index
 
 
-@pull("start", "end", "texture", "z_index")
+@pull("start", "end")
 class ASCIILine(ASCIINode2D):
     """Prefabricated `ASCIILine` node
 

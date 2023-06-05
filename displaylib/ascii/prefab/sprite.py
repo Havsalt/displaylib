@@ -11,7 +11,6 @@ from ..texture import Texture
 Self = TypeVar("Self")
 
 
-@pull("texture", "z_index")
 class ASCIISprite(Texture, ASCIINode2D):
     """Prefabricated `ASCIISprite`
 
