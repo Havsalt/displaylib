@@ -5,14 +5,14 @@ from typing import TypeVar
 from ...math import Vec2i
 from ...util import pull
 from ...template import Node
-from ..node import ASCIINode2D
+from ..node import AsciiNode2D
 from ..texture import Texture
 
 Self = TypeVar("Self")
 
 
-class ASCIISprite(Texture, ASCIINode2D):
-    """Prefabricated `ASCIISprite`
+class AsciiSprite(Texture, AsciiNode2D):
+    """Prefabricated `AsciiSprite`
 
     Components:
         `Texture`: allows the node to be displayed

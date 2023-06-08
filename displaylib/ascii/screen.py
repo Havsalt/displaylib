@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import sys
 
-from .surface import ASCIISurface
+from .surface import AsciiSurface
 
 
-class ASCIIScreen(ASCIISurface):
-    """`ASCIIScreen` for displaying ASCII graphics
+class AsciiScreen(AsciiSurface):
+    """`AsciiScreen` for displaying Ascii graphics
 
     Behaves like a surface. Has the option to write its content to the terminal
     """

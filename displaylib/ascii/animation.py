@@ -8,7 +8,7 @@ from . import grapheme
 from .texture import Texture
 
 if TYPE_CHECKING:
-    from .surface import ASCIISurface
+    from .surface import AsciiSurface
 
 
 __all__ = [
@@ -234,7 +234,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         """
         self.is_playing = False
 
-    def _render(self, surface: ASCIISurface) -> None: # dummy method
+    def _render(self, surface: AsciiSurface) -> None: # dummy method
         return
 
     def _update(self, _delta: float) -> None:

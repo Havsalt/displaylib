@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ...util import pull
-from ..node import ASCIINode2D
+from ..node import AsciiNode2D
 from ..texture import Texture
 
 if TYPE_CHECKING:
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 @pull("text")
-class ASCIILabel(Texture, ASCIINode2D):
+class AsciiLabel(Texture, AsciiNode2D):
     """Prefabricated `Label` node where a new line is created for each `\\n`
     
     Components:

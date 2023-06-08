@@ -12,8 +12,8 @@ Submodules:
 ----------------
 Example using submodules to set mode:
 >>> import displaylib.ascii as dl
->>> dl.Node2D() # will be of type ASCIINode
-ASCIINode(x, y)
+>>> dl.Node2D() # will be of type AsciiNode
+AsciiNode(x, y)
 
 >>> import displaylib.pygame as dl
 >>> dl.Node2D() # will be of type PygameNode
@@ -35,15 +35,15 @@ __all__ = [ # default mode is used when using the star notation
     "Node",
     "Node2D",
     # core ascii
-    "ASCIINode2D",
-    "ASCIIEngine",
-    "ASCIICamera",
-    "ASCIISurface",
-    "ASCIIScreen",
-    "ASCIIImage",
-    "ASCIILabel",
-    "ASCIILine",
-    "ASCIISprite",
+    "AsciiNode2D",
+    "AsciiEngine",
+    "AsciiCamera",
+    "AsciiSurface",
+    "AsciiScreen",
+    "AsciiImage",
+    "AsciiLabel",
+    "AsciiLine",
+    "AsciiSprite",
     # networking (module)
     "networking"
 ]
@@ -58,12 +58,12 @@ from .ascii import (
     # utility
     grapheme as graphme, # (module)
     # ascii nodes
-    Node2D as ASCIINode2D,
-    Engine as ASCIIEngine,
-    Camera as ASCIICamera,
-    Surface as ASCIISurface,
-    Screen as ASCIIScreen,
-    Image as ASCIIImage,
+    Node2D as AsciiNode2D,
+    Engine as AsciiEngine,
+    Camera as AsciiCamera,
+    Surface as AsciiSurface,
+    Screen as AsciiScreen,
+    Image as AsciiImage,
     Frame as Frame,
     Animation as Animation,
     EmptyAnimation as EmptyAnimation,
@@ -71,9 +71,9 @@ from .ascii import (
     AudioStreamPlayer as AudioStreamPlayer,
     Clock as Clock,
     # prefabricated
-    Label as ASCIILabel,
-    Line as ASCIILine,
-    Sprite as ASCIISprite,
+    Label as AsciiLabel,
+    Line as AsciiLine,
+    Sprite as AsciiSprite,
     # networking
     networking # (module)
 )

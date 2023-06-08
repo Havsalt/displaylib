@@ -1,6 +1,6 @@
-"""## ASCII submodule of DisplayLib
+"""## Ascii submodule of DisplayLib
 
-Provides a framework for creating 2D worlds in ASCII
+Provides a framework for creating 2D worlds in Ascii
 """
 
 __all__ = [
@@ -43,11 +43,11 @@ from ..math import lerp, sign, Vec2, Vec2i
 from ..util import pull
 from . import grapheme
 # core ascii
-from .node import ASCIINode as Node, ASCIINode2D as Node2D
-from .engine import ASCIIEngine as Engine
-from .camera import ASCIICamera as Camera
-from .surface import ASCIISurface as Surface
-from .screen import ASCIIScreen as Screen
+from .node import AsciiNode as Node, AsciiNode2D as Node2D
+from .engine import AsciiEngine as Engine
+from .camera import AsciiCamera as Camera
+from .surface import AsciiSurface as Surface
+from .screen import AsciiScreen as Screen
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .audio import AudioStreamPlayer
 from .clock import Clock
@@ -55,10 +55,10 @@ from .clock import Clock
 from ..template import Transform2D
 from .texture import Texture
 # prefabricated
-from .prefab.image import ASCIIImage as Image
-from .prefab.label import ASCIILabel as Label
-from .prefab.line import ASCIILine as Line
-from .prefab.sprite import ASCIISprite as Sprite
+from .prefab.image import AsciiImage as Image
+from .prefab.label import AsciiLabel as Label
+from .prefab.line import AsciiLine as Line
+from .prefab.sprite import AsciiSprite as Sprite
 # networking
 from . import networking
 

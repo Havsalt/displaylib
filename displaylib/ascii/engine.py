@@ -6,36 +6,36 @@ from typing import TypeVar
 from ..math import Vec2i
 from ..template import Node, Engine
 from .clock import Clock
-from .screen import ASCIIScreen
-from .surface import ASCIISurface
-from .camera import ASCIICamera
-from .node import ASCII
+from .screen import AsciiScreen
+from .surface import AsciiSurface
+from .camera import AsciiCamera
+from .node import Ascii
 from .texture import Texture
 
 EngineLike = TypeVar("EngineLike")
 
 
-class ASCIIEngine(Engine):
-    """`ASCIIEngine` for creating a world in ASCII graphics
+class AsciiEngine(Engine):
+    """`AsciiEngine` for creating a world in Ascii graphics
 
     Hooks:
-        - `_render(self, surface: ASCIISurface) -> None`
+        - `_render(self, surface: AsciiSurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
 
     def __new__(cls: type[EngineLike], *args, **kwargs) -> EngineLike:
-        """Sets `Node.root` when an Engine instance is created. Initializes default `ASCIICamera`
+        """Sets `Node.root` when an Engine instance is created. Initializes default `AsciiCamera`
 
         Args:
-            cls (type[ASCIIEngine]): engine object to be root
+            cls (type[AsciiEngine]): engine object to be root
 
         Returns:
-            ASCIIEngine: the engine to be used in the program
+            AsciiEngine: the engine to be used in the program
         """
         instance = super().__new__(cls)
-        if not hasattr(ASCIICamera, "current"):
-            camera = ASCIICamera()
-            setattr(ASCIICamera, "current", camera) # initialize default camera
+        if not hasattr(AsciiCamera, "current"):
+            camera = AsciiCamera()
+            setattr(AsciiCamera, "current", camera) # initialize default camera
         return instance
 
     def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> None:
@@ -51,7 +51,7 @@ class ASCIIEngine(Engine):
         self.tps = tps
         self.auto_resize_screen = auto_resize_screen
         self.screen_margin = screen_margin # TODO: add setter/getter to force screen update
-        self.screen = ASCIIScreen(width=width, height=height)
+        self.screen = AsciiScreen(width=width, height=height)
         if auto_resize_screen:
             terminal_size = os.get_terminal_size()
             if terminal_size.columns != self.screen.width or terminal_size.lines != self.screen.height:
@@ -60,11 +60,11 @@ class ASCIIEngine(Engine):
                 os.system("cls")
         super(__class__, self).__init__(**config)
     
-    def _render(self, surface: ASCIISurface) -> None:
+    def _render(self, surface: AsciiSurface) -> None:
         """Override for custom functionality
 
         Args:
-            surface (ASCIISurface): surface to blit onto
+            surface (AsciiSurface): surface to blit onto
         """
         ...
     
@@ -96,7 +96,7 @@ class ASCIIEngine(Engine):
                     size = Vec2i(terminal_size.columns, terminal_size.lines)
                     self._on_screen_resize(size)
                     for node in Node.nodes.values():
-                        if isinstance(node, ASCII):
+                        if isinstance(node, Ascii):
                             node._on_screen_resize(size)
                     os.system("cls")
                 
@@ -121,7 +121,7 @@ class ASCIIEngine(Engine):
             self._render(self.screen)
             # nodes can render custom data onto the screen
             for node in Node.nodes.values():
-                if isinstance(node, ASCII):
+                if isinstance(node, Ascii):
                     node._render(self.screen)
             
             self.screen.show()
@@ -129,6 +129,6 @@ class ASCIIEngine(Engine):
         
         # v exit protocol v
         self._on_exit()
-        surface = ASCIISurface(Texture._instances, self.screen.width, self.screen.height) # create a Surface from all the Nodes
+        surface = AsciiSurface(Texture._instances, self.screen.width, self.screen.height) # create a Surface from all the Nodes
         self.screen.blit(surface)
         self.screen.show()

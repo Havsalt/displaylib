@@ -4,18 +4,18 @@ import io
 import os
 from typing import ClassVar
 
-from ..surface import ASCIISurface
-from .sprite import ASCIISprite
+from ..surface import AsciiSurface
+from .sprite import AsciiSprite
 
 
-class ASCIIImage:
-    """Prefabricated `ASCIIImage` used to `.load()` an image from disk
+class AsciiImage:
+    """Prefabricated `AsciiImage` used to `.load()` an image from disk
     """
     extension: ClassVar[str] = ".txt"
     _cache: ClassVar[dict[str, tuple[list[list[str]], int, int]]] = {}
 
     @classmethod
-    def load(cls, file_path: str, /, *, cache: bool = True) -> ASCIISurface:
+    def load(cls, file_path: str, /, *, cache: bool = True) -> AsciiSurface:
         """Load texture from file path as surface
 
         Args:
@@ -27,7 +27,7 @@ class ASCIIImage:
             ValueError: file_path did not end with the correct extension
 
         Returns:
-            ASCIISurface: a surface with the texture rendered onto it
+            AsciiSurface: a surface with the texture rendered onto it
         """
         if not isinstance(file_path, str):
             TypeError(f"argument 'file_path' is required to be of type 'str'. '{type(file_path).__name__}' found")
@@ -35,8 +35,8 @@ class ASCIIImage:
         fpath = os.path.normpath(file_path)
         if fpath in cls._cache and cache: # from cache
             (texture, width, height) = cls._cache[fpath]
-            sprite = ASCIISprite().where(texture=texture)
-            surface = ASCIISurface(nodes=[sprite], width=width, height=height)
+            sprite = AsciiSprite().where(texture=texture)
+            surface = AsciiSurface(nodes=[sprite], width=width, height=height)
             sprite.queue_free()
             return surface
         
@@ -46,10 +46,10 @@ class ASCIIImage:
         file: io.TextIOWrapper = open(fpath, "r") # from disk
         texture = list(map(list, file.readlines()))
         file.close()
-        sprite = ASCIISprite().where(texture=texture)
+        sprite = AsciiSprite().where(texture=texture)
         width = len(max(texture, key=len))
         height = len(texture)
         cls._cache[fpath] = (sprite.texture, width, height)
-        surface = ASCIISurface(nodes=[sprite], width=width, height=height)
+        surface = AsciiSurface(nodes=[sprite], width=width, height=height)
         sprite.queue_free()
         return surface

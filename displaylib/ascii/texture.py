@@ -8,7 +8,7 @@ Self = TypeVar("Self")
 
 
 class Texture: # Component (mixin class)
-    """`Texture` mixin class for adding ASCII graphics to a node class
+    """`Texture` mixin class for adding `ASCII graphics` to a node class
 
     Requires Components:
         - `Transform2D`: uses position and rotation to place the texture

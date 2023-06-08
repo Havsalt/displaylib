@@ -6,24 +6,25 @@ from typing import TYPE_CHECKING, Iterable
 from ..math import Vec2, Vec2i
 from ..template import Node2D
 from . import grapheme
-from .camera import ASCIICamera
+from .node import AsciiNode
+from .camera import AsciiCamera
 from .texture import Texture
 
 if TYPE_CHECKING:
     from ..template import Node
 
 
-class ASCIISurface:
-    """`ASCIISurface` for displaying nodes
+class AsciiSurface:
+    """`AsciiSurface` for displaying nodes
     """
     cell_transparant: str = " " # symbol used to indicate that a cell is transparent
     cell_default: str = " " # the default look of an empty cell
 
-    def __init__(self, nodes: Iterable[Node] = [], width: int = 16, height: int = 8) -> None:
+    def __init__(self, nodes: Iterable[AsciiNode] = [], width: int = 16, height: int = 8) -> None:
         """Initialize surface from nodes given inside the given boundaries
 
         Args:
-            nodes (Iterable[ASCIINode], optional): nodes to render onto surface. Defaults to an empty list.
+            nodes (Iterable[AsciiNode], optional): nodes to render onto surface. Defaults to an empty list.
             width (int, optional): width of surface. Defaults to 16.
             height (int, optional): height of surface. Defaults to 8.
         """
@@ -59,7 +60,7 @@ class ASCIISurface:
         """
         self.texture = [[self.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
 
-        camera: ASCIICamera = ASCIICamera.current # should never be None
+        camera: AsciiCamera = AsciiCamera.current # should never be None
         half_size = Vec2i(self._width // 2, self._height // 2)
         camera_rotation = camera.global_rotation
         cos_rotation_camera = math.cos(-camera_rotation)
@@ -81,11 +82,11 @@ class ASCIISurface:
             # if rotation != 0: # TODO: rotate around center if flagged
             #     position = rotate(position, rotation)
 
-            if camera.mode == ASCIICamera.CENTERED:
+            if camera.mode == AsciiCamera.CENTERED:
                 position += half_size
-            elif camera.mode == ASCIICamera.INCLUDE_SIZE:
+            elif camera.mode == AsciiCamera.INCLUDE_SIZE:
                 position -= Vec2(longest, lines) // 2
-            elif camera.mode == ASCIICamera.CENTERED_AND_INCLUDE_SIZE:
+            elif camera.mode == AsciiCamera.CENTERED_AND_INCLUDE_SIZE:
                 position += half_size
                 position -= Vec2(longest, lines) // 2
 
@@ -156,15 +157,15 @@ class ASCIISurface:
                             self.texture[y_position][x_position] = char
 
     def clear(self) -> None:
-        """Clears the surface. Sets its texture to `ASCIISurface.cell_transparant`
+        """Clears the surface. Sets its texture to `AsciiSurface.cell_transparant`
         """
         self.texture = [[self.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
     
-    def blit(self, surface: ASCIISurface, position: Vec2 = Vec2(0, 0), transparent: bool = False) -> None:
+    def blit(self, surface: AsciiSurface, position: Vec2 = Vec2(0, 0), transparent: bool = False) -> None:
         """Blits the texture of this surface onto the other surface
 
         Args:
-            surface (ASCIISurface): surface to blit onto
+            surface (AsciiSurface): surface to blit onto
             position (Vec2, optional): starting point of blit. Defaults to Vec2(0, 0).
             transparent (bool, optional): whether to override blank areas. Defaults to False.
         """

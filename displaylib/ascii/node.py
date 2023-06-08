@@ -6,24 +6,24 @@ from ..template import Node, Node2D
 
 if TYPE_CHECKING:
     from ..math import Vec2i
-    from .engine import ASCIIEngine
-    from .surface import ASCIISurface
+    from .engine import AsciiEngine
+    from .surface import AsciiSurface
 
 
-class ASCII: # mode class with common hooks
-    """`ASCII` class that enables common hooks for the `ascii` mode
+class Ascii: # mode class with common hooks
+    """`Ascii` class that enables common hooks for the `ascii` mode
 
     Hooks:
-        - `_render(self, surface: ASCIISurface) -> None`
+        - `_render(self, surface: AsciiSurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
-    root: ASCIIEngine
+    root: AsciiEngine
 
-    def _render(self, surface: ASCIISurface) -> None:
+    def _render(self, surface: AsciiSurface) -> None:
         """Override for custom functionality
 
         Args:
-            surface (ASCIISurface): surface to blit other surfaces onto
+            surface (AsciiSurface): surface to blit other surfaces onto
         """
         ...
     
@@ -36,19 +36,19 @@ class ASCII: # mode class with common hooks
         ...
 
 
-class ASCIINode(ASCII, Node): # a variant of the Node
-    """`ASCIINode` with additional hooks related to `ascii` mode functionality
+class AsciiNode(Ascii, Node): # a variant of the Node
+    """`AsciiNode` with additional hooks related to `ascii` mode functionality
 
     Hooks:
-        - `_render(self, surface: ASCIISurface) -> None`
+        - `_render(self, surface: AsciiSurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
 
 
-class ASCIINode2D(ASCII, Node2D): # a variant of the Node2D
-    """`ASCIINode2D` with additional hooks related to `ascii` mode functionality
+class AsciiNode2D(Ascii, Node2D): # a variant of the Node2D
+    """`AsciiNode2D` with additional hooks related to `ascii` mode functionality
 
     Hooks:
-        - `_render(self, surface: ASCIISurface) -> None`
+        - `_render(self, surface: AsciiSurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """

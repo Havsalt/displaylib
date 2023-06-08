@@ -4,19 +4,19 @@ from typing import TYPE_CHECKING, ClassVar, TypeVar
 
 from ..math import Vec2i
 from ..template import Node
-from .node import ASCIINode2D
+from .node import AsciiNode2D
 
 if TYPE_CHECKING:
-    from .surface import ASCIISurface
+    from .surface import AsciiSurface
 
 Self = TypeVar("Self")
 
 
-class ASCIICamera(ASCIINode2D):
-    """`ASCIICamera` for moving the viewport
+class AsciiCamera(AsciiNode2D):
+    """`AsciiCamera` for moving the viewport
 
     Hooks:
-        - `_render(self, surface: ASCIISurface) -> None`
+        - `_render(self, surface: AsciiSurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     
     ModeFlags for attribute `mode`:
@@ -31,18 +31,18 @@ class ASCIICamera(ASCIINode2D):
     CENTERED = 3
     INCLUDE_SIZE = 5
     CENTERED_AND_INCLUDE_SIZE = 8
-    current: ClassVar[ASCIICamera]
+    current: ClassVar[AsciiCamera]
 
     def __init__(self, parent: Node | None = None, x: int = 0, y: int = 0, *, follow: bool = False, mode: int = FIXED) -> None:
         super().__init__(parent, x=x, y=y, force_sort=True)
         self.mode = mode # `centered` mode only has effect if `parent` is not None
         self.follow = follow # whether to follow the `parent`
     
-    def _render(self, surface: ASCIISurface) -> None:
+    def _render(self, surface: AsciiSurface) -> None:
         """Override for custom functionality
 
         Args:
-            surface (ASCIISurface): surface to blit onto
+            surface (AsciiSurface): surface to blit onto
         """
         ...
 
@@ -57,7 +57,7 @@ class ASCIICamera(ASCIINode2D):
     def set_current(self) -> None:
         """Sets this camera as the currently active one
         """
-        ASCIICamera.current = self
+        AsciiCamera.current = self
     
     def as_current(self: Self) -> Self:
         """Sets this camera as the currently active one,
