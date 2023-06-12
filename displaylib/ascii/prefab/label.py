@@ -10,16 +10,17 @@ if TYPE_CHECKING:
     from ...template import Node
 
 
-@pull("text")
+@pull("text", "delimiter")
 class AsciiLabel(Texture, AsciiNode2D):
     """Prefabricated `Label` node where a new line is created for each `\\n`
     
     Components:
         `Texture`: allows the node to be shown
     """
-    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, text: str = "", z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, text: str = "", delimiter: str = "\n", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.z_index = z_index
+        self.delimiter = delimiter
         self.text = text
     
     @property
@@ -29,7 +30,7 @@ class AsciiLabel(Texture, AsciiNode2D):
         Returns:
             str: content as string
         """
-        return "\n".join("".join(line) for line in self.texture)
+        return self.delimiter.join("".join(line) for line in self.texture)
     
     @text.setter
     def text(self, text: str) -> None:
@@ -38,4 +39,4 @@ class AsciiLabel(Texture, AsciiNode2D):
         Args:
             text (str): string to be converted to content
         """
-        self.texture = [list(line) for line in str(text).split("\n")]
+        self.texture = [list(line) for line in str(text).split(self.delimiter)]
