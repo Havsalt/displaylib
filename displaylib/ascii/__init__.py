@@ -18,7 +18,6 @@ __all__ = [
     "Engine",
     "Camera",
     "Screen",
-    "Surface",
     "Frame",
     "Animation",
     "EmptyAnimation",
@@ -46,7 +45,6 @@ from . import grapheme
 from .node import AsciiNode as Node, AsciiNode2D as Node2D
 from .engine import AsciiEngine as Engine
 from .camera import AsciiCamera as Camera
-from .surface import AsciiSurface as Surface
 from .screen import AsciiScreen as Screen
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .audio import AudioStreamPlayer

@@ -7,7 +7,6 @@ from ..math import Vec2i
 from ..template import Node, Engine
 from .clock import Clock
 from .screen import AsciiScreen
-from .surface import AsciiSurface
 from .camera import AsciiCamera
 from .node import Ascii
 from .texture import Texture
@@ -22,7 +21,6 @@ class AsciiEngine(Engine):
         - `_on_start(self) -> None`
         - `_on_exit(self) -> None`
         - `_update(self, delta: float) -> None`
-        - `_render(self, surface: AsciiSurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
 
@@ -62,14 +60,6 @@ class AsciiEngine(Engine):
                 self.screen.height = int(terminal_size.lines - self.screen_margin.y)
                 os.system("cls")
         super(__class__, self).__init__(**config)
-    
-    def _render(self, surface: AsciiSurface) -> None:
-        """Override for custom functionality
-
-        Args:
-            surface (AsciiSurface): surface to blit onto
-        """
-        ...
     
     def _on_screen_resize(self, size: Vec2i) -> None:
         """Override for custom functionality
@@ -119,19 +109,12 @@ class AsciiEngine(Engine):
                 Texture._instances.sort(key=self.sort_function_for_z_index)
 
             # render content of visible nodes onto a surface
-            self.screen.rebuild(Texture._instances, self.screen.width, self.screen.height)
-            
-            self._render(self.screen)
-            # nodes can render custom data onto the screen using .blit
-            for node in Node.nodes.values():
-                if isinstance(node, Ascii):
-                    node._render(self.screen)
+            self.screen.build(Texture._instances)
             
             self.screen.show()
             clock.tick()
         
         # v exit protocol v
         self._on_exit()
-        surface = AsciiSurface(Texture._instances, self.screen.width, self.screen.height) # create a Surface from all the Nodes
-        self.screen.blit(surface)
+        self.screen.build(Texture._instances)
         self.screen.show()

@@ -4,7 +4,6 @@ import io
 import os
 from typing import ClassVar
 
-from ..surface import AsciiSurface
 from .sprite import AsciiSprite
 
 
@@ -15,7 +14,7 @@ class AsciiImage:
     _cache: ClassVar[dict[str, tuple[list[list[str]], int, int]]] = {}
 
     @classmethod
-    def load(cls, file_path: str, /, *, cache: bool = True) -> AsciiSurface:
+    def load(cls, file_path: str, /, *, cache: bool = True) -> AsciiSprite:
         """Load texture from file path as surface
 
         Args:
@@ -35,10 +34,8 @@ class AsciiImage:
         fpath = os.path.normpath(file_path)
         if fpath in cls._cache and cache: # from cache
             (texture, width, height) = cls._cache[fpath]
-            temp_sprite = AsciiSprite(texture=texture)
-            surface = AsciiSurface(nodes=[temp_sprite], width=width, height=height)
-            temp_sprite.queue_free() # will not have time to be rendered
-            return surface
+            sprite = AsciiSprite(texture=texture)
+            return sprite
         
         if not fpath.endswith(cls.extension):
             raise ValueError("argument 'file_path' needs to end with the current extension of '" + cls.extension + "'")
@@ -50,10 +47,8 @@ class AsciiImage:
         stripped = map(strip_line, lines)
         texture = list(map(list, stripped))
         file.close()
-        sprite = AsciiSprite().where(texture=texture)
+        sprite = AsciiSprite(texture=texture)
         width = len(max(texture, key=len))
         height = len(texture)
         cls._cache[fpath] = (sprite.texture, width, height)
-        surface = AsciiSurface(nodes=[sprite], width=width, height=height)
-        sprite.queue_free()
-        return surface
+        return sprite
