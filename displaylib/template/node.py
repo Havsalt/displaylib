@@ -33,24 +33,31 @@ class Node(metaclass=NodeMixinSortMeta):
     nodes: ClassVar[dict[str, Node]] = {} # all nodes that are alive
     _uid_counter: ClassVar[int] = 0 # is read and increments for each generated uid
     _request_process_priority_sort: ClassVar[bool] = False # requests Engine to sort
-    _queued_nodes: list[str] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
+    _queued_nodes: ClassVar[list[str]] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
     # instance spesific
     uid: str
     parent: Node | None
 
     def __new__(cls: type[Self], *parent_as_positional: Node | None, parent: Node | None = None, force_sort: bool = True) -> Self: # pulling: optional "parent", "force_sort"
-        """In addition to default behaviour, automatically stores the node in a dict.
-        Keeps the object alive by the reference stored
+        """Assigns the node a `unique ID`, stores its `reference` to keep it from being garbage collected and
+        may request the engine to `sort` nodes based on '.process_priority'
 
         Args:
-            cls (type[Node]): class of the node being created
+            cls (type[Self]): original class that will be created
+            parent (Node | None, optional): pulling 'parent' as it is used in Node.__init__. Defaults to None.
+            force_sort (bool, optional): whether to request the engine to sort nodes based on '.process_priority'. Defaults to True.
+
+        Raises:
+            ValueError: passed more than 1 positional argument, meant to be 'parent' argument
+            ValueError: argument 'parent' was passed as both positional and keyword
 
         Returns:
-            Node: node instance that was stored
+            Self: node instance that was stored
         """
-        if len(parent_as_positional) > 1: # if passing anything more than `parent` as positional argument
+        if len(parent_as_positional) > 2: # > 2 because argument 'cls' seems to be caught up in '*parent_as_positional'
+            # if passing anything more than `parent` as positional argument
             raise ValueError(f"expected 0-1 argument for 'parent', was given {len(parent_as_positional)}: {parent_as_positional}")
-        elif parent is not None and parent_as_positional: # conflicting overload
+        elif parent is not None and len(parent_as_positional) > 1: # > 1 because it is 'cls' argument
             raise ValueError(f"parameter 'parent' was supplied both positional only and keyword only argument(s): positional(s) = {parent_as_positional} & keyword = {parent_as_positional}")
         instance = super().__new__(cls)
         uid = cls.generate_uid()
