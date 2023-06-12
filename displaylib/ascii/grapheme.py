@@ -1,4 +1,4 @@
-"""### Graphme cluster utility module
+"""### Grapheme cluster utility module
 
 Provides functions related to alter text
 """
