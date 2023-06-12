@@ -13,10 +13,10 @@ class Texture: # Component (mixin class)
     Requires Components:
         - `Transform2D`: uses position and rotation to place the texture
     """
-    texture: list[list[str]]
-    visible: bool
     _instances: ClassVar[list[Texture]] = [] # references to nodes with Texture component
     _request_z_index_sort: ClassVar[bool] = False # requests Engine to sort
+    texture: list[list[str]]
+    visible: bool
 
     def __new__(cls: type[Self], *args, texture: list[list[str]] = [], z_index: int = 0, force_sort: bool = True, **kwargs) -> Self:
         instance = super().__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
