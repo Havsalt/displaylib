@@ -19,6 +19,9 @@ class AsciiEngine(Engine):
     """`AsciiEngine` for creating a world in Ascii graphics
 
     Hooks:
+        - `_on_start(self) -> None`
+        - `_on_exit(self) -> None`
+        - `_update(self, delta: float) -> None`
         - `_render(self, surface: AsciiSurface) -> None`
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
@@ -119,7 +122,7 @@ class AsciiEngine(Engine):
             self.screen.rebuild(Texture._instances, self.screen.width, self.screen.height)
             
             self._render(self.screen)
-            # nodes can render custom data onto the screen
+            # nodes can render custom data onto the screen using .blit
             for node in Node.nodes.values():
                 if isinstance(node, Ascii):
                     node._render(self.screen)
