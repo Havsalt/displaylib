@@ -1,6 +1,8 @@
 # DisplayLib
 
-### A collection of frameworks used to display `ASCII` or `Pygame` graphics in an `infite world`
+### An `object-oriented` framework for displaying `ASCII` graphics and creating an `infinite world`, aimed at `simplifying the process`
+
+---
 ### Requires Python `version` >= `3.10`
 ---
 
@@ -9,6 +11,54 @@
 - `ascii` (default)
 - `pygame`
 ---
+
+## Example using displaylib
+```python
+import displaylib as dl # using `ascii` mode as default
+
+
+class Square(dl.Node2D, dl.Texture): # using a node class in conjunction with the component `dl.Texture`
+    self.texture = [ # you can use this style to define its visual
+        [*"OO+OO"], # the "+" here represents transparancy
+        [*"O+++O"], # changed through `dl.Node2D.cell_transparancy`
+        [*"OO+OO"]
+    ]
+
+    def _update(self, delta: float) -> None: # called every frame
+        if len(self.texture[1]) == 5: # modifying the middle line
+            self.texture[1].append(")")
+        else:
+            self.texture[1].pop()
+    
+
+class App(dl.Engine):
+    def _on_start(self) -> None: # use this instead of __init__
+        # -- config
+        dl.Screen.cell_transparant = "+" # set what represents transparancy
+        dl.Screen.cell_default = "." # changes background default
+        # -- create nodes
+        self.my_square = Square(x=5, y=3)
+        # nodes are kept alive by `Node.nodes` (dict) by default
+        # this means `del self.my_square` is needed to fully free it
+        self.direction = 1
+    
+    def _update(self, delta: float) -> None: # called every frame
+        if self.direction == 1:
+            self.my_square.position.x += 1
+            if self.my_square.position.x == 22:
+                self.direction = -1
+        elif self.direction == -1:
+            self.my_square.position.x -= 1
+            if self.my_square.position.x == 4:
+                self.direction = 1
+
+if __name__ == "__main__":
+    # autoruns on instance creation
+    app = App(tps=4, width=24, height=8)
+```
+
+---
+
 
 ## Networking support
 DisplayLib provides mixin classes for enabling networking. Networking is available in each submodule through `dl.networking` (when using `import displaylib.[mode] as dl`).
@@ -30,34 +80,30 @@ import displaylib.ascii as dl
 # mode selected   ^^^^^
 
 
-class Square(dl.Node2D, dl.Texture):
-    def __init__(self, parent: dl.Node | None = None, x: int = 0, y: int = 0) -> None:
-        super().__init__(parent, x, y) # the most important arguments to pass down
-        self.texture = [ # you can use this style to define its visual
-            [*"OO+OO"], # the "+" represents transparancy
-            [*"O+++O"], # changed through `dl.Node2D.cell_transparancy`
-            [*"OO+OO"]
-        ]
+class Square(dl.Sprite): # using `dl.Sprite`, as it derives from `dl.Node`, `dl.Transform2D` and `dl.Texture`
+    self.texture = [
+        [*"OO+OO"],
+        [*"O+++O"],
+        [*"OO+OO"]
+    ]
 
-    def _update(self, delta: float) -> None: # called every frame
-        if len(self.texture[1]) == 5: # modifying the middle line
+    def _update(self, delta: float) -> None:
+        if len(self.texture[1]) == 5:
             self.texture[1].append(")")
         else:
             self.texture[1].pop()
     
 
 class App(dl.Engine):
-    def _on_start(self) -> None: # use this instead of __init__
+    def _on_start(self) -> None:
         # -- config
-        dl.Screen.cell_transparant = "+" # represents transparancy
-        dl.Screen.cell_default = "." # changes background default
+        dl.Screen.cell_transparant = "+"
+        dl.Screen.cell_default = "."
         # -- create nodes
         self.my_square = Square(x=5, y=3)
-        # nodes are kept alive by `Node.nodes` (dict) by default
-        # this means `del self.my_square` is needed to fully free it
         self.direction = 1
     
-    def _update(self, delta: float) -> None: # called every frame
+    def _update(self, delta: float) -> None:
         if self.direction == 1:
             self.my_square.position.x += 1
             if self.my_square.position.x == 22:
@@ -68,7 +114,6 @@ class App(dl.Engine):
                 self.direction = 1
 
 if __name__ == "__main__":
-    # autorun on instance creation
     app = App(tps=4, width=24, height=8)
 
 ```
