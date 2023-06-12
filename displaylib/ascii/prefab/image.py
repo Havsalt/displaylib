@@ -35,16 +35,20 @@ class AsciiImage:
         fpath = os.path.normpath(file_path)
         if fpath in cls._cache and cache: # from cache
             (texture, width, height) = cls._cache[fpath]
-            sprite = AsciiSprite().where(texture=texture)
-            surface = AsciiSurface(nodes=[sprite], width=width, height=height)
-            sprite.queue_free()
+            temp_sprite = AsciiSprite(texture=texture)
+            surface = AsciiSurface(nodes=[temp_sprite], width=width, height=height)
+            temp_sprite.queue_free() # will not have time to be rendered
             return surface
         
         if not fpath.endswith(cls.extension):
             raise ValueError("argument 'file_path' needs to end with the current extension of '" + cls.extension + "'")
         
         file: io.TextIOWrapper = open(fpath, "r") # from disk
-        texture = list(map(list, file.readlines()))
+        lines = file.readlines()
+        def strip_line(line: str) -> str:
+            return line.rstrip("\n")
+        stripped = map(strip_line, lines)
+        texture = list(map(list, stripped))
         file.close()
         sprite = AsciiSprite().where(texture=texture)
         width = len(max(texture, key=len))
