@@ -22,7 +22,8 @@ class Texture: # Component (mixin class)
         instance = super().__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
         if not isinstance(instance, Transform2D):
             raise TypeError(f"in class '{instance.__class__.__qualname__}': mixin class '{__class__.__qualname__}' requires to be used in combination with a node class deriving from 'Transform2D'")
-        setattr(instance, "texture", list())
+        if not getattr(instance, "texture", False):
+            setattr(instance, "texture", list())
         setattr(instance, "_z_index", z_index)
         if force_sort:
             Texture._request_z_index_sort = True
