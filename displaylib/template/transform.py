@@ -12,12 +12,14 @@ class Transform2D: # Component (mixin class)
     """
     position: Vec2
     rotation: float
+    visible: bool
 
     def __new__(cls: type[Self], *args, x: int | float = 0, y: int | float = 0, **kwargs) -> Self:
         instance = super().__new__(cls, *args, **kwargs)
         setattr(instance, "position",  Vec2(x, y))
         setattr(instance, "rotation", 0.0)
-        setattr(instance, "_visible", True) # only nodes with Transform2D will have the option to be visible
+        # only nodes with Transform2D will have the option to be visible
+        setattr(instance, "visible", True) # local visibility
         return instance
 
     def __str__(self) -> str:
@@ -52,18 +54,19 @@ class Transform2D: # Component (mixin class)
         self.rotation += diff
     
     @property
-    def visible(self) -> bool: # global visibility
-        if not self._visible:
+    def is_globally_visible(self) -> bool: # global visibility
+        if not self.visible:
             return False
         parent = self.parent
         while parent != None:
             if not isinstance(parent, Transform2D):
                 return True
-            if not parent._visible:
+            if not parent.visible:
                 return False
             parent = parent.parent
         return True
-
-    @visible.setter
-    def visible(self, value: bool) -> None: # local visibility
-        self._visible = value
+    
+    def look_at(self, location: Vec2) -> None:
+        diff = location - self.global_position
+        angle = diff.angle()
+        self.global_rotation = -angle
