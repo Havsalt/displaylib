@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING, ClassVar, Generator
 
 from ..template import Node
 from . import grapheme
@@ -67,9 +67,9 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         - `Transform2D`: uses position and rotation to place the texture
         - `Texture`: changes its texture
     """
-    FIXED = 0
-    DELTATIME = 1 # TODO: add DELTATIME mode
-    mode_default = FIXED
+    FIXED: ClassVar[int] = 0
+    DELTATIME: ClassVar[int] = 1 # TODO: add DELTATIME mode
+    mode_default: ClassVar[int] = FIXED
 
     def __new__(cls, *args, fps: float = 16, mode: int = mode_default, **animations): # pulling: `fps`, `mode`, `**animations`
         return super().__new__(cls, *args)
