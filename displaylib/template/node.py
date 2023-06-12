@@ -29,12 +29,11 @@ class Node(metaclass=NodeMixinSortMeta):
     Hooks:
         - `_update(self, delta: float) -> None`
     """
-    root: Engine # set from a Engine subclass
     nodes: ClassVar[dict[str, Node]] = {} # all nodes that are alive
     _uid_counter: ClassVar[int] = 0 # is read and increments for each generated uid
     _request_process_priority_sort: ClassVar[bool] = False # requests Engine to sort
     _queued_nodes: ClassVar[list[str]] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
-    # instance spesific
+    root: Engine # set from a Engine subclass
     uid: str
     parent: Node | None
 
