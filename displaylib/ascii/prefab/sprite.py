@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TypeVar
 
 from ...math import Vec2i
-from ...util import pull
 from ...template import Node
 from ..node import AsciiNode2D
 from ..texture import Texture
@@ -22,7 +21,7 @@ class AsciiSprite(Texture, AsciiNode2D):
     def __init__(self, parent: Node | None = None, *, x: int | float = 0, y: int | float = 0, texture: list[list[str]] = [], z_index: int = 0, force_sort: bool = True) -> None: # `z_index` pulled in `Texture`
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.z_index = z_index
-        self.texture = texture
+        self.texture = self.texture or texture # uses class texture if set
     
     def size(self) -> Vec2i:
         """Returns the width and height of `.texture` as a vector
