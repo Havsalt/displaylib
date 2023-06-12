@@ -9,7 +9,7 @@ setup(
    name="displaylib",
    version=__version__,
    author=__author__,
-   description="A collection of frameworks used to display ASCII or Pygame graphics in an infinite world",
+   description="An object-oriented framework for displaying ASCII graphics and creating an infinite world, aimed at simplifying the process",
    long_description=markdown_content,
    long_description_content_type="text/markdown",
    url="https://github.com/Floating-Int/displaylib",
