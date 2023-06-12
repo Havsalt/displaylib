@@ -4,9 +4,8 @@ import math
 from typing import TYPE_CHECKING, Iterable
 
 from ..math import Vec2, Vec2i
-from ..template import Node2D
+from ..template import Transform2D
 from . import grapheme
-from .node import AsciiNode
 from .camera import AsciiCamera
 from .texture import Texture
 
@@ -20,11 +19,11 @@ class AsciiSurface:
     cell_transparant: str = " " # symbol used to indicate that a cell is transparent
     cell_default: str = " " # the default look of an empty cell
 
-    def __init__(self, nodes: Iterable[AsciiNode] = [], width: int = 16, height: int = 8) -> None:
+    def __init__(self, nodes: Iterable[Node] = [], width: int = 16, height: int = 8) -> None:
         """Initialize surface from nodes given inside the given boundaries
 
         Args:
-            nodes (Iterable[AsciiNode], optional): nodes to render onto surface. Defaults to an empty list.
+            nodes (Iterable[Node], optional): nodes to render onto surface. Defaults to an empty list.
             width (int, optional): width of surface. Defaults to 16.
             height (int, optional): height of surface. Defaults to 8.
         """
@@ -55,10 +54,12 @@ class AsciiSurface:
 
         Args:
             nodes (Iterable[Node], optional): nodes to render (has to derive from `Texture`). Defaults to [].
-            width (int, optional): surface width. Defaults to 16.
-            height (int, optional): surface height. Defaults to 8.
+            width (int, optional): surface width override. Defaults to 16.
+            height (int, optional): surface height override. Defaults to 8.
         """
-        self.texture = [[self.cell_transparant for _ in range(width)] for _ in range(height)] # 2D array
+        self._height = height
+        self._width = width
+        self.texture = [[self.cell_transparant for _ in range(self._width)] for _ in range(self._height)] # 2D array
 
         camera: AsciiCamera = AsciiCamera.current # should never be None
         half_size = Vec2i(self._width // 2, self._height // 2)
@@ -67,7 +68,7 @@ class AsciiSurface:
         sin_rotation_camera = math.sin(-camera_rotation)
 
         for node in nodes:
-            if not isinstance(node, Texture) or not isinstance(node, Node2D):
+            if not isinstance(node, Texture) or not isinstance(node, Transform2D):
                 continue
             if not node.visible:
                 continue
@@ -105,9 +106,9 @@ class AsciiSurface:
                         y_diff = half_size.y - h
                         x_position = round(half_size.x + x_position + cos_rotation_camera * x_diff - sin_rotation_camera * y_diff)
                         y_position = round(half_size.y + y_position + sin_rotation_camera * x_diff + cos_rotation_camera * y_diff)
-                        if not ((self._height) > position.y >= 0): # out of screen
+                        if not ((self._height) > y_position >= 0): # out of screen
                             continue
-                        if not ((self._width) > position.x >= 0): # out of screen
+                        if not ((self._width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
                             self.texture[y_position][x_position] = grapheme.rotate(char, rotation - camera_rotation)
@@ -123,9 +124,9 @@ class AsciiSurface:
                         y_diff = h - y_offset
                         x_position = round(x_offset + position.x + cos_rotation * x_diff - sin_rotation * y_diff)
                         y_position = round(y_offset + position.y + sin_rotation * x_diff + cos_rotation * y_diff)
-                        if not ((self._height) > position.y >= 0): # out of screen
+                        if not ((self._height) > y_position >= 0): # out of screen
                             continue
-                        if not ((self._width) > position.x >= 0): # out of screen
+                        if not ((self._width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
                             self.texture[y_position][x_position] = grapheme.rotate(char, rotation)
@@ -137,13 +138,13 @@ class AsciiSurface:
                         y_diff = half_size.y - h
                         x_position = round(half_size.x + position.x + cos_rotation_camera * x_diff - sin_rotation_camera * y_diff)
                         y_position = round(half_size.y + position.y + sin_rotation_camera * x_diff + cos_rotation_camera * y_diff)
-                        if not ((self._height) > position.y >= 0): # out of screen
+                        if not ((self._height) > y_position >= 0): # out of screen
                             continue
-                        if not ((self._width) > position.x >= 0): # out of screen
+                        if not ((self._width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
                             self.texture[y_position][x_position] = grapheme.rotate(char, camera_rotation)
-            
+
             else: # no rotation
                 for h, line in enumerate(node.texture):
                     y_position = int(h + position.y)
