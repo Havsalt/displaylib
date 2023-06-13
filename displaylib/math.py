@@ -63,7 +63,7 @@ class Vec2: # TODO: add support for network notify protocol
         Returns:
             str: representation containing the x and y component
         """
-        return f"Vec2({self.x}, {self.y})"
+        return f"{self.__class__.__name__}({self.x}, {self.y})"
     
     def __round__(self, ndigits: int = 0) -> Vec2:
         return Vec2(round(self.x, ndigits),
