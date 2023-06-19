@@ -7,6 +7,7 @@ from ..template import Node, Node2D
 if TYPE_CHECKING:
     from ..math import Vec2i
     from .engine import AsciiEngine
+    from .mouse import MouseEvent
 
 
 class Ascii: # mode class with common hooks
@@ -14,6 +15,9 @@ class Ascii: # mode class with common hooks
 
     Hooks:
         - `_on_screen_resize(self, size: Vec2i) -> None`
+        
+    Optional Hooks:
+        - `_on_mouse_event(self, event: MouseEvent) -> None`
     """
     root: AsciiEngine
 
@@ -24,19 +28,33 @@ class Ascii: # mode class with common hooks
             size (Vec2i): new screen size
         """
         ...
+    
+    def _on_mouse_event(self, event: MouseEvent) -> None:
+        """Override for custom functionality
+
+        Args:
+            event (MouseEvent): mouse event sent
+        """
+        ...
 
 
-class AsciiNode(Ascii, Node): # a variant of the Node
+class AsciiNode(Ascii, Node): # Node with Ascii hooks
     """`AsciiNode` with additional hooks related to `ascii` mode functionality
 
     Hooks:
         - `_on_screen_resize(self, size: Vec2i) -> None`
+        
+    Optional Hooks:
+        - `_on_mouse_event(self, event: MouseEvent) -> None`
     """
 
 
-class AsciiNode2D(Ascii, Node2D): # a variant of the Node2D
+class AsciiNode2D(Ascii, Node2D): # Node2D with Ascii hooks
     """`AsciiNode2D` with additional hooks related to `ascii` mode functionality
 
     Hooks:
         - `_on_screen_resize(self, size: Vec2i) -> None`
+    
+    Optional Hooks:
+        - `_on_mouse_event(self, event: MouseEvent) -> None`
     """
