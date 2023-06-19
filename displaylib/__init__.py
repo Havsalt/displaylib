@@ -48,7 +48,6 @@ __all__ = [ # default mode is used when using the star notation
     "AudioStreamPlayer", # (class)
     "Clock",             # (class)
     # prefabricated
-    "Image",             # (class)
     "Label",             # (class)
     "Line",              # (class)
     "Sprite",            # (class)
@@ -70,7 +69,6 @@ from .ascii import (
     Engine,
     Camera,
     Screen,
-    Image,
     Frame,
     Animation,
     EmptyAnimation,

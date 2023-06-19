@@ -28,7 +28,6 @@ __all__ = [
     "Transform2D",
     "Texture",
     # prefabricated
-    "Image",
     "Label",
     "Line",
     "Sprite",
@@ -53,7 +52,6 @@ from .clock import Clock
 from ..template import Transform2D
 from .texture import Texture
 # prefabricated
-from .prefab.image import AsciiImage as Image
 from .prefab.label import AsciiLabel as Label
 from .prefab.line import AsciiLine as Line
 from .prefab.sprite import AsciiSprite as Sprite
