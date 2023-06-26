@@ -1,6 +1,6 @@
 """## Ascii submodule of DisplayLib
 
-Provides a framework for creating 2D worlds in Ascii
+Provides a framework for creating infinite 2D worlds in Ascii
 """
 
 __all__ = [
@@ -52,9 +52,9 @@ from .clock import Clock
 from ..template import Transform2D
 from .texture import Texture
 # prefabricated
-from .prefab.label import AsciiLabel as Label
-from .prefab.line import AsciiLine as Line
-from .prefab.sprite import AsciiSprite as Sprite
+from .prefabs.label import AsciiLabel as Label
+from .prefabs.line import AsciiLine as Line
+from .prefabs.sprite import AsciiSprite as Sprite
 # networking
 from . import networking
 
