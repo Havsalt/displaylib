@@ -16,7 +16,7 @@ class Transform2D: # Component (mixin class)
 
     def __new__(cls: type[Self], *args, x: int | float = 0, y: int | float = 0, **kwargs) -> Self:
         instance = super().__new__(cls, *args, **kwargs)
-        setattr(instance, "position",  Vec2(x, y))
+        setattr(instance, "position", Vec2(x, y))
         setattr(instance, "rotation", 0.0)
         # only nodes with Transform2D will have the option to be visible
         setattr(instance, "visible", True) # local visibility
@@ -27,20 +27,32 @@ class Transform2D: # Component (mixin class)
     
     @property
     def global_position(self) -> Vec2:
-        position = self.position
+        """Computes the node's global position (world space)
+
+        Returns:
+            Vec2: global position
+        """
+        global_position = self.position
         parent = self.parent
         while parent is not None and isinstance(parent, Transform2D):
-            position += parent.position.rotated(parent.rotation)
+            global_position = parent.position + global_position.rotated(parent.rotation)
             parent = parent.parent
-        return position
+        return global_position
     
     @global_position.setter
     def global_position(self, position: Vec2) -> None:
+        """Sets the node's global position (world space)
+        """
         diff = position - self.global_position
         self.position += diff
     
     @property
     def global_rotation(self) -> float:
+        """Computes the node's global rotation (world space)
+
+        Returns:
+            float: global rotation in radians
+        """
         rotation = self.rotation
         parent = self.parent
         while parent is not None and isinstance(parent, Transform2D):
@@ -50,10 +62,12 @@ class Transform2D: # Component (mixin class)
 
     @global_rotation.setter
     def global_rotation(self, rotation: float) -> None:
+        """Sets the node's global rotation (world space)
+        """
+        
         diff = rotation - self.global_rotation
         self.rotation += diff
     
-    @property
     def is_globally_visible(self) -> bool: # global visibility
         if not self.visible:
             return False
@@ -65,6 +79,12 @@ class Transform2D: # Component (mixin class)
                 return False
             parent = parent.parent
         return True
+
+    def hide(self) -> None:
+        self.visible = False
+    
+    def show(self) -> None:
+        self.visible = True
     
     def look_at(self, location: Vec2) -> None:
         diff = location - self.global_position
