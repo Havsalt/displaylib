@@ -45,7 +45,7 @@ class Vec2: # TODO: add support for network notify protocol
     """
     __slots__ = ("x", "y")
 
-    def __init__(self, x: int | float = 0, y: int | float = 0, /) -> None:
+    def __init__(self, x: float = 0, y: float = 0, /) -> None:
         self.x = x
         self.y = y
 
@@ -64,7 +64,7 @@ class Vec2: # TODO: add support for network notify protocol
             str: representation containing the x and y component
         """
         return f"{self.__class__.__name__}({self.x}, {self.y})"
-    
+
     def __round__(self, ndigits: int = 0) -> Vec2:
         return Vec2(round(self.x, ndigits),
                     round(self.y, ndigits))
@@ -122,9 +122,20 @@ class Vec2: # TODO: add support for network notify protocol
 
     def __le__(self, other: Vec2) -> bool:
         return (self.x <= other.x) and (self.y <= other.y)
+    
+    def __copy__(self) -> Vec2:
+        return __class__(self.x, self.y)
+    
+    def __deepcopy__(self, memo: dict[object, object]) -> Vec2:
+        return __class__(self.x, self.y)
 
-    def __serialize__(self) -> str:
-        return f"{self.__class__.__qualname__}({self.x}, {self.y})"
+    def copy(self) -> Vec2:
+        """Returns a copied Vec2
+
+        Returns:
+            Vec2: a new copy
+        """
+        return self.__copy__()
 
     def length(self) -> float:
         """Returns the length of the vector
@@ -155,11 +166,11 @@ class Vec2: # TODO: add support for network notify protocol
         """
         return atan2(self.y, self.x)
 
-    def lerp(self, target: Vec2, weight: int | float, /) -> Vec2:
+    def lerp(self, target: Vec2, weight: float, /) -> Vec2:
         """Lerp towards vector `target` with `weight` ranging from 0 to 1
 
         Args:
-            target (Vec2): _description_
+            target (Vec2): target to lerp towards
             weight (int | float): percentage to lerp
 
         Returns:
@@ -275,3 +286,17 @@ class Vec2i(Vec2):
                         self.y % other.y)
         return Vec2(self.x % other,
                     self.y % other)
+
+    def __copy__(self) -> Vec2i:
+        return __class__(self.x, self.y)
+    
+    def __deepcopy__(self) -> Vec2i:
+        return __class__(self.x, self.y)
+    
+    def copy(self) -> Vec2i:
+        """Returns a copied Vec2i
+
+        Returns:
+            Vec2i: a new copy
+        """
+        return self.__copy__()
