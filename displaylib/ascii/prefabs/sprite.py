@@ -63,7 +63,7 @@ class AsciiSprite(Texture, AsciiNode2D):
     def __init__(self, parent: Node | None = None, *, x: int | float = 0, y: int | float = 0, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None: # `z_index` pulled in `Texture`
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.texture = self.texture or texture # uses class texture if set
-        self.offset = self.offset or Vec2(offset.x, offset.y)
+        self.offset = self.offset or offset.copy()
         self.centered = centered
         self.z_index = z_index
     
