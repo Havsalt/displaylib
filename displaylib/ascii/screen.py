@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Iterable
+from typing import Iterable
 
 import sys
 
-from ..math import Vec2, Vec2i
-from ..template import Transform2D
+from ..math import Vec2i
+from ..template import Transform2D, Node
 from . import grapheme
 from .camera import AsciiCamera
 from .texture import Texture
 
-if TYPE_CHECKING:
-    from ..template import Node
+class Transform2DTextureNode(Transform2D, Texture, Node):
+    """Type hint for classes deriving from: `Transform2D`, `Texture`, `Node`
+    """
 
 
 class AsciiScreen:
@@ -23,11 +24,10 @@ class AsciiScreen:
     cell_transparant: str = " " # symbol used to indicate that a cell is transparent
     cell_default: str = " " # the default look of an empty cell
 
-    def __init__(self, nodes: Iterable[Texture & Transform2D] = [], *, width: int = 16, height: int = 8) -> None:
+    def __init__(self, width: int = 16, height: int = 8) -> None:
         """Initialize surface from nodes given inside the given boundaries
 
         Args:
-            nodes (Iterable[Node], optional): nodes to render onto surface. Defaults to an empty list.
             width (int, optional): width of surface. Defaults to 16.
             height (int, optional): height of surface. Defaults to 8.
         """
@@ -35,11 +35,11 @@ class AsciiScreen:
         self.height = height
         self.texture = [[self.cell_transparant for _ in range(self.width)] for _ in range(self.height)] # 2D array
 
-    def build(self, textures: Iterable[Texture & Transform2D] = []) -> None:
-        """Rebuilds the surface from the texture of the nodes
+    def build(self, textured_nodes: Iterable[Transform2DTextureNode] = [], /) -> None:
+        """Builds the screen from the texturse of the `nodes with Texture` component
 
         Args:
-            nodes (Iterable[Node], optional): nodes to render (has to derive from `Texture`). Defaults to [].
+            textured_nodes (Iterable[Transform2D & Texture & Node], optional): nodes to render (`textured_nodes` has to derive from `Transform2D`, `Texture` and `Node`). Defaults to [].
             width (int, optional): surface width override. Defaults to 16.
             height (int, optional): surface height override. Defaults to 8.
         """
@@ -48,46 +48,47 @@ class AsciiScreen:
         camera: AsciiCamera = AsciiCamera.current # should never be None
         half_size = Vec2i(self.width // 2, self.height // 2)
         camera_rotation = camera.global_rotation
-        cos_rotation_camera = math.cos(-camera_rotation)
-        sin_rotation_camera = math.sin(-camera_rotation)
+        cos_camera_rotation = math.cos(-camera_rotation)
+        sin_camera_rotation = math.sin(-camera_rotation)
+        viewport_global_position = camera.global_position
+        # include size of camera parent when including size
+        if camera.parent is not None and isinstance(camera.parent, Texture):
+            if camera.mode & AsciiCamera.INCLUDE_SIZE:
+                camera_parent_lines = len(camera.parent.texture)
+                camera_parent_longest = len(max(camera.parent.texture, key=len))
+                viewport_global_position.x += camera_parent_longest
+                viewport_global_position.y += camera_parent_lines
 
-        for textured in textures:
-            if not textured.visible:
+        for textured in textured_nodes:
+            if not textured.is_globally_visible():
                 continue
             if not textured.texture:
                 continue
             if not textured.texture[0]: # check if has first row
                 continue
-            lines = len(textured.texture)
-            longest = len(max(textured.texture, key=len))
-            position = textured.global_position - camera.global_position
-            rotation = textured.global_rotation # FIXME: implement camera rotation the right way
+            
+            # compute screen space transform
+            position = textured.get_texture_global_position() - viewport_global_position
+            rotation = textured.global_rotation
+            # FIXME: implement camera rotation the right way
+            # NOTE: camera rotation is experimental
             # if rotation != 0: # TODO: rotate around center if flagged
             #     position = rotate(position, rotation)
 
-            if camera.mode == AsciiCamera.CENTERED:
+            if camera.mode & AsciiCamera.CENTERED:
                 position += half_size
-            elif camera.mode == AsciiCamera.INCLUDE_SIZE:
-                position -= Vec2(longest, lines) // 2
-            elif camera.mode == AsciiCamera.CENTERED_AND_INCLUDE_SIZE:
-                position += half_size
-                position -= Vec2(longest, lines) // 2
 
             if rotation != 0 and camera_rotation != 0: # node and camera rotation
-                x_offset = longest / 2
-                y_offset = lines / 2
                 cos_rotation = math.cos(-rotation)
                 sin_rotation = math.sin(-rotation)
                 for h, line in enumerate(textured.texture):
                     for w, char in enumerate(line):
-                        x_diff = w - x_offset
-                        y_diff = h - y_offset
-                        x_position = x_offset + position.x + cos_rotation * x_diff - sin_rotation * y_diff
-                        y_position = y_offset + position.y + sin_rotation * x_diff + cos_rotation * y_diff
+                        x_position = position.x + cos_rotation * w - sin_rotation * h
+                        y_position = position.y + sin_rotation * w + cos_rotation * h
                         x_diff = half_size.x - w
                         y_diff = half_size.y - h
-                        x_position = round(half_size.x + x_position + cos_rotation_camera * x_diff - sin_rotation_camera * y_diff)
-                        y_position = round(half_size.y + y_position + sin_rotation_camera * x_diff + cos_rotation_camera * y_diff)
+                        x_position = round(half_size.x + x_position + cos_camera_rotation * x_diff - sin_camera_rotation * y_diff)
+                        y_position = round(half_size.y + y_position + sin_camera_rotation * x_diff + cos_camera_rotation * y_diff)
                         if not ((self.height) > y_position >= 0): # out of screen
                             continue
                         if not ((self.width) > x_position >= 0): # out of screen
@@ -96,10 +97,10 @@ class AsciiScreen:
                             self.texture[y_position][x_position] = grapheme.rotate(char, rotation - camera_rotation)
 
             elif rotation != 0: # node rotation
-                x_offset = longest / 2
-                y_offset = lines / 2
                 cos_rotation = math.cos(-rotation)
                 sin_rotation = math.sin(-rotation)
+                y_offset = len(textured.texture) // 2 if textured.centered else 0 - textured.offset.y
+                x_offset = len(max(textured.texture, key=len)) // 2 if textured.centered else 0 - textured.offset.x
                 for h, line in enumerate(textured.texture):
                     for w, char in enumerate(line):
                         x_diff = w - x_offset
@@ -118,8 +119,8 @@ class AsciiScreen:
                     for w, char in enumerate(line):
                         x_diff = half_size.x - w
                         y_diff = half_size.y - h
-                        x_position = round(half_size.x + position.x + cos_rotation_camera * x_diff - sin_rotation_camera * y_diff)
-                        y_position = round(half_size.y + position.y + sin_rotation_camera * x_diff + cos_rotation_camera * y_diff)
+                        x_position = round(half_size.x + position.x + cos_camera_rotation * x_diff - sin_camera_rotation * y_diff)
+                        y_position = round(half_size.y + position.y + sin_camera_rotation * x_diff + cos_camera_rotation * y_diff)
                         if not ((self.height) > y_position >= 0): # out of screen
                             continue
                         if not ((self.width) > x_position >= 0): # out of screen
