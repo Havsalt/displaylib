@@ -35,7 +35,7 @@ class Node(metaclass=NodeMixinSortMeta):
     _queued_nodes: ClassVar[list[str]] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
     root: Engine # set from a Engine subclass
     uid: str
-    parent: Node | None
+    parent: Node | None = None
 
     def __new__(cls: type[Self], *parent_as_positional: Node | None, parent: Node | None = None, force_sort: bool = True) -> Self: # pulling: optional "parent", "force_sort"
         """Assigns the node a `unique ID`, stores its `reference` to keep it from being garbage collected and
@@ -60,7 +60,8 @@ class Node(metaclass=NodeMixinSortMeta):
             raise ValueError(f"parameter 'parent' was supplied both positional only and keyword only argument(s): positional(s) = {parent_as_positional} & keyword = {parent_as_positional}")
         instance = super().__new__(cls)
         uid = cls.generate_uid()
-        instance.uid = uid
+        setattr(instance, "uid", uid)
+        setattr(instance, "_process_priority", 0)
         Node.nodes[uid] = instance
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_process_priority_sort = True # otherwise, depend on a `process_priority` change
@@ -79,7 +80,6 @@ class Node(metaclass=NodeMixinSortMeta):
 
     def __init__(self, parent: Node | None = None, *, force_sort: bool = True) -> None:
         self.parent = parent
-        self._process_priority = 0
         if force_sort: # may sort `process_priority` and `z_index`
             Node._request_process_priority_sort = True # otherwise, depent on a `process_priority` change
 
