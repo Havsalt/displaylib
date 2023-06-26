@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import os
-from typing import TypeVar
+import types
 
 from ..math import Vec2i
 from ..template import Node, Engine
 from .clock import Clock
+from .extensions.mouse import MouseEvent, MouseMotionEvent, get_mouse_position
 from .screen import AsciiScreen
 from .camera import AsciiCamera
 from .node import Ascii
 from .texture import Texture
 
-EngineLike = TypeVar("EngineLike")
+class TextureNode(Texture, Node):
+    """Type hint for classes deriving from: `Texture`, `Node`
+    """
 
 
 class AsciiEngine(Engine):
@@ -24,7 +27,7 @@ class AsciiEngine(Engine):
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
 
-    def __new__(cls: type[EngineLike], *args, **kwargs) -> EngineLike:
+    def __new__(cls: type[AsciiEngine], *args, **kwargs) -> AsciiEngine:
         """Sets `Node.root` when an Engine instance is created. Initializes default `AsciiCamera`
 
         Args:
@@ -37,9 +40,24 @@ class AsciiEngine(Engine):
         if not hasattr(AsciiCamera, "current"):
             camera = AsciiCamera()
             setattr(AsciiCamera, "current", camera) # initialize default camera
+        # # enable mouse events
+        # if getattr(instance, "mouse", False) or instance.__annotations__.get("mouse", False):
+        #     # setup a handler for updating the mouse
+        #     def _update_mouse(self) -> None:
+        #         mouse_events = []
+        #         mouse_position = MouseMotionEvent(position=get_mouse_position())
+        #         mouse_events.append(mouse_position)
+        #         for event in mouse_events:
+        #             self._on_mouse_event(event)
+        #         for node in tuple(Node.nodes.values()):
+        #             if isinstance(node, Ascii):
+        #                 for mouse_event in mouse_events:
+        #                     node._on_mouse_event(mouse_event)
+        #     setattr(instance, "_update_mouse", types.MethodType(_update_mouse, instance))
+        #     instance.per_frame_tasks.append(getattr(instance, "_update_mouse"))
         return instance
 
-    def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> None:
+    def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), initial_clear: bool = False, **config) -> None:
         """Initializes and starts the engine (only 1 instance should exist)
 
         Args:
@@ -58,7 +76,10 @@ class AsciiEngine(Engine):
             if terminal_size.columns != self.screen.width or terminal_size.lines != self.screen.height:
                 self.screen.width = int(terminal_size.columns - self.screen_margin.x)
                 self.screen.height = int(terminal_size.lines - self.screen_margin.y)
-                os.system("cls")
+                if not initial_clear: # only clear once, so wait a bit to do it anyways
+                    os.system("cls")
+        if initial_clear:
+            os.system("cls")
         super(__class__, self).__init__(**config)
     
     def _on_screen_resize(self, size: Vec2i) -> None:
@@ -70,7 +91,7 @@ class AsciiEngine(Engine):
         ...
     
     @staticmethod
-    def sort_function_for_z_index(element: Texture & Node) -> tuple[int, int]:
+    def sort_function_for_z_index(element: TextureNode) -> tuple[int, int]:
         return element.z_index, element.process_priority
     
     def _main_loop(self) -> None:
