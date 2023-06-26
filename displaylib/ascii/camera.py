@@ -23,17 +23,13 @@ class AsciiCamera(AsciiNode2D):
         - `_on_mouse_event(self, event: MouseEvent) -> None`
     
     ModeFlags for attribute `mode`:
-        - 1 `FIXED` (Default)
-        - 3 `CENTERED`
-        - 5 `INCLUDE_SIZE`
-        - 8 `CENTERED_AND_INCLUDE_SIZE` (`CENTERED + INCLUDE_SIZE`)
-    
-    Any invalid flag combination will be treated as `FIXED` (1)
+        - 0x0 `FIXED` (Default)
+        - 0x1 `CENTERED`
+        - 0x2 `INCLUDE_SIZE`
     """
-    FIXED: ClassVar[int] = 1
-    CENTERED: ClassVar[int] = 3
-    INCLUDE_SIZE: ClassVar[int] = 5
-    CENTERED_AND_INCLUDE_SIZE: ClassVar[int] = 8
+    FIXED: ClassVar[int] = 0x0
+    CENTERED: ClassVar[int] = 0x1
+    INCLUDE_SIZE: ClassVar[int] = 0x2
     current: ClassVar[AsciiCamera]
 
     def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, follow: bool = True, mode: int = FIXED) -> None:
