@@ -3,9 +3,9 @@ from __future__ import annotations
 import ctypes # TODO: add system spesific implementations for Linux and macOS
 from ctypes import wintypes
 
-from ..math import Vec2i
-from .camera import AsciiCamera
-from .prefab.sprite import AsciiSprite
+from ...math import Vec2i
+from ..camera import AsciiCamera
+from ..prefabs.sprite import AsciiSprite
 
 
 class MouseEvent:
