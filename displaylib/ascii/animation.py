@@ -1,28 +1,17 @@
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, ClassVar, Generator
+from typing import ClassVar, Generator
 
 from ..template import Node
 from . import grapheme
 from .texture import Texture
 
-if TYPE_CHECKING:
-    from .surface import AsciiSurface
-
-
-__all__ = [
-    "Frame",
-    "Animation",
-    "EmptyAnimation",
-    "AnimationPlayer"
-]
-
 
 class Frame:
     """`Frame` used to create animations
 
-    Loaded from files
+    Loaded at runtime from files
     """
     __slots__ = ("texture")
 
@@ -67,8 +56,8 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         - `Transform2D`: uses position and rotation to place the texture
         - `Texture`: changes its texture
     """
-    FIXED: ClassVar[int] = 0
-    DELTATIME: ClassVar[int] = 1 # TODO: add DELTATIME mode
+    FIXED: ClassVar[int] = 1
+    DELTATIME: ClassVar[int] = 2 # TODO: add DELTATIME mode
     mode_default: ClassVar[int] = FIXED
 
     def __new__(cls, *args, fps: float = 16, mode: int = mode_default, **animations): # pulling: `fps`, `mode`, `**animations`
@@ -233,9 +222,6 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         """Stops the animation from playing
         """
         self.is_playing = False
-
-    def _render(self, surface: AsciiSurface) -> None: # dummy method
-        return
 
     def _update(self, _delta: float) -> None:
         if self.is_playing and self._has_updated:
