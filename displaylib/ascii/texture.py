@@ -27,11 +27,9 @@ class Texture: # Component (mixin class)
             raise TypeError(f"class '{__class__.__qualname__}' is required to derive from 'Transform2D' as it derives from 'Texture'")
         # set if not defined in class
         if not getattr(instance, "texture", False):
-            setattr(instance, "texture", list())
+            setattr(instance, "texture", texture)
         # set anyway
-        setattr(instance, "offset", Vec2())
-        setattr(getattr(instance, "offset"), "x", offset.x)
-        setattr(getattr(instance, "offset"), "y", offset.y)
+        setattr(instance, "offset", Vec2(offset.x, offset.y))
         setattr(instance, "centered", centered)
         setattr(instance, "_z_index", z_index)
         if force_sort:
@@ -67,8 +65,8 @@ class Texture: # Component (mixin class)
         """
         global_position = self.position + self.offset
         if self.centered:
-            global_position.x += len(max(self.texture, key=len))
-            global_position.y += len(self.texture)
+            global_position.x -= len(max(self.texture, key=len)) // 2
+            global_position.y -= len(self.texture) // 2
         parent = self.parent
         while parent is not None and isinstance(parent, Transform2D):
             global_position = parent.position + global_position.rotated(parent.rotation)
