@@ -47,10 +47,10 @@ class AsciiScreen:
 
         camera: AsciiCamera = AsciiCamera.current # should never be None
         half_size = Vec2i(self.width // 2, self.height // 2)
-        camera_rotation = camera.global_rotation
+        camera_rotation = camera.get_global_rotation()
         cos_camera_rotation = math.cos(-camera_rotation)
         sin_camera_rotation = math.sin(-camera_rotation)
-        viewport_global_position = camera.global_position
+        viewport_global_position = camera.get_global_position()
         # include size of camera parent when including size
         if camera.parent is not None and isinstance(camera.parent, Texture):
             if camera.mode & AsciiCamera.INCLUDE_SIZE:
@@ -62,14 +62,15 @@ class AsciiScreen:
         for textured in textured_nodes:
             if not textured.is_globally_visible():
                 continue
-            if not textured.texture:
+            texture = textured._get_final_texture() # may apply color
+            if not texture: # check if has not empty texture
                 continue
-            if not textured.texture[0]: # check if has first row
+            if not texture[0]: # check if has first row
                 continue
             
             # compute screen space transform
-            position = textured.get_texture_global_position() - viewport_global_position
-            rotation = textured.global_rotation
+            position = textured._get_texture_global_position() - viewport_global_position
+            rotation = textured.get_global_rotation()
             # FIXME: implement camera rotation the right way
             # NOTE: camera rotation is experimental
             # if rotation != 0: # TODO: rotate around center if flagged
@@ -81,7 +82,7 @@ class AsciiScreen:
             if rotation != 0 and camera_rotation != 0: # node and camera rotation
                 cos_rotation = math.cos(-rotation)
                 sin_rotation = math.sin(-rotation)
-                for h, line in enumerate(textured.texture):
+                for h, line in enumerate(texture):
                     for w, char in enumerate(line):
                         x_position = position.x + cos_rotation * w - sin_rotation * h
                         y_position = position.y + sin_rotation * w + cos_rotation * h
@@ -99,9 +100,9 @@ class AsciiScreen:
             elif rotation != 0: # node rotation
                 cos_rotation = math.cos(-rotation)
                 sin_rotation = math.sin(-rotation)
-                y_offset = len(textured.texture) // 2 if textured.centered else 0 - textured.offset.y
-                x_offset = len(max(textured.texture, key=len)) // 2 if textured.centered else 0 - textured.offset.x
-                for h, line in enumerate(textured.texture):
+                y_offset = len(texture) // 2 if textured.centered else 0 - textured.offset.y
+                x_offset = len(max(texture, key=len)) // 2 if textured.centered else 0 - textured.offset.x
+                for h, line in enumerate(texture):
                     for w, char in enumerate(line):
                         x_diff = w - x_offset
                         y_diff = h - y_offset
@@ -115,7 +116,7 @@ class AsciiScreen:
                             self.texture[y_position][x_position] = grapheme.rotate(char, rotation)
             
             elif camera_rotation != 0: # camera rotation
-                for h, line in enumerate(textured.texture):
+                for h, line in enumerate(texture):
                     for w, char in enumerate(line):
                         x_diff = half_size.x - w
                         y_diff = half_size.y - h
@@ -129,7 +130,7 @@ class AsciiScreen:
                             self.texture[y_position][x_position] = grapheme.rotate(char, camera_rotation)
 
             else: # no rotation
-                for h, line in enumerate(textured.texture):
+                for h, line in enumerate(texture):
                     y_position = int(h + position.y)
                     if not ((self.height) > y_position >= 0): # out of screen
                         continue

@@ -10,7 +10,7 @@ Self = TypeVar("Self")
 
 
 class Texture: # Component (mixin class)
-    """`Texture` mixin class for adding `ASCII graphics` to a node class
+    """`Texture` mixin class for adding `ASCII graphics` to a 2D node class
 
     Requires Components:
         - `Transform2D`: uses position and rotation to place the texture
@@ -56,22 +56,6 @@ class Texture: # Component (mixin class)
         if self._z_index != value: # if changed
             self._z_index = value
             Texture._request_z_index_sort = True
-    
-    def get_texture_global_position(self) -> Vec2:
-        """Calculates where the texture starts, after taking `.offset` into consideration (world space)
-
-        Returns:
-            Vec2: global position of the texture
-        """
-        global_position = self.position + self.offset
-        if self.centered:
-            global_position.x -= len(max(self.texture, key=len)) // 2
-            global_position.y -= len(self.texture) // 2
-        parent = self.parent
-        while parent is not None and isinstance(parent, Transform2D):
-            global_position = parent.position + global_position.rotated(parent.rotation)
-            parent = parent.parent
-        return global_position
 
     def make_unique(self) -> None:
         """Makes a deepcopy of `.texture`, which is then set as the new texture
@@ -95,3 +79,22 @@ class Texture: # Component (mixin class)
         if self in Texture._instances:
             Texture._instances.remove(self)
         super().queue_free() # called on an instance deriving from Node
+    
+    def _get_texture_global_position(self) -> Vec2:
+        """Calculates where the texture starts, after taking `.offset` into consideration (world space)
+
+        Returns:
+            Vec2: global position of the texture
+        """
+        global_position = self.position + self.offset
+        if self.centered:
+            global_position.x -= len(max(self.texture, key=len)) // 2
+            global_position.y -= len(self.texture) // 2
+        parent = self.parent
+        while parent is not None and isinstance(parent, Transform2D): # global position
+            global_position = parent.position + global_position.rotated(parent.rotation)
+            parent = parent.parent
+        return global_position
+
+    def _get_final_texture(self) -> list[list[str]]:
+        return self.texture
