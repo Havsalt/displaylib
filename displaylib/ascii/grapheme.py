@@ -6,7 +6,7 @@ Provides functions related to alter text
 from __future__ import annotations
 
 __all__ = [
-    "Database",
+    "Conversion",
     "lookuph",
     "lookupv",
     "fliph",
@@ -16,11 +16,11 @@ __all__ = [
     "rotate"
 ]
 
-from collections.abc import Iterable
-from math import pi as PI
+from collections.abc import Iterable as _Iterable
+from math import pi as _PI
 
-# -- database
-class Database:
+
+class Conversion: # holds the translate information
     horizontal: dict[str, str] = { # horizontal flip
         "/": "\\",
         "(": ")",
@@ -46,15 +46,15 @@ class Database:
     }
 
 # -- mirror database
-for key, value in tuple(Database.horizontal.items()):
-    Database.horizontal[value] = key
-for key, value in tuple(Database.vertical.items()):
-    Database.vertical[value] = key
-# for key, options in tuple(Database.rotational.items()):
+for key, value in tuple(Conversion.horizontal.items()):
+    Conversion.horizontal[value] = key
+for key, value in tuple(Conversion.vertical.items()):
+    Conversion.vertical[value] = key
+# for key, options in tuple(Conversion.rotational.items()):
 #     for idx, option in enumerate(options):
 #         new_key = options[idx]
 #         new_options = options[idx:] + options[:idx]
-#         Database.rotational[new_key] = new_options
+#         Conversion.rotational[new_key] = new_options
 
 # --- module functions
 def lookuph(symbol: str) -> str:
@@ -66,7 +66,7 @@ def lookuph(symbol: str) -> str:
     Returns:
         str: result or symbol supplied
     """
-    return Database.horizontal.get(symbol, symbol)
+    return Conversion.horizontal.get(symbol, symbol)
 
 
 def lookupv(symbol: str) -> str:
@@ -78,10 +78,10 @@ def lookupv(symbol: str) -> str:
     Returns:
         str: result or symbol supplied
     """
-    return Database.vertical.get(symbol, symbol)
+    return Conversion.vertical.get(symbol, symbol)
 
 
-def fliph(line: str | Iterable[str]) -> str:
+def fliph(line: str | _Iterable[str]) -> str:
     """Flip a line of text `horizontally`
 
     Args:
@@ -90,10 +90,10 @@ def fliph(line: str | Iterable[str]) -> str:
     Returns:
         str: line flipped horizontally
     """
-    return "".join(Database.horizontal.get(letter, letter) for letter in line)[::-1]
+    return "".join(Conversion.horizontal.get(letter, letter) for letter in line)[::-1]
 
 
-def flipv(line: str | Iterable[str]) -> str:
+def flipv(line: str | _Iterable[str]) -> str:
     """Flip a line of text `vertically`
 
     Args:
@@ -102,10 +102,10 @@ def flipv(line: str | Iterable[str]) -> str:
     Returns:
         str: line flipped vertically
     """
-    return "".join(Database.vertical.get(letter, letter) for letter in line)
+    return "".join(Conversion.vertical.get(letter, letter) for letter in line)
 
 
-def mapfliph(content: Iterable[str | Iterable[str]]) -> list[str]:
+def mapfliph(content: _Iterable[str | _Iterable[str]]) -> list[str]:
     """Flip a list with text lines `horizontally`
 
     Args:
@@ -117,7 +117,7 @@ def mapfliph(content: Iterable[str | Iterable[str]]) -> list[str]:
     return [fliph(line) for line in content]
 
 
-def mapflipv(content: Iterable[str | Iterable[str]]) -> list[str]:
+def mapflipv(content: _Iterable[str | _Iterable[str]]) -> list[str]:
     """Flip a list with text lines `vertically`
 
     Args:
@@ -139,19 +139,19 @@ def rotate(symbol: str, angle: float) -> str:
     Returns:
         str: rotated symbol or original symbol
     """
-    if symbol in Database.rotational:
-        options = len(Database.rotational[symbol])
-        index = round(((angle % PI) / (2*PI)) * options)
-        return Database.rotational[symbol][index]
+    if symbol in Conversion.rotational:
+        options = len(Conversion.rotational[symbol])
+        index = round(((angle % _PI) / (2*_PI)) * options)
+        return Conversion.rotational[symbol][index]
     
-    for idx, options in enumerate(Database.rotational.values()):
+    for idx, options in enumerate(Conversion.rotational.values()):
         if symbol in options:
             break
     else: # nobreak
         return symbol
-    key = list(Database.rotational.keys())[idx]
-    options = Database.rotational[key]
+    key = list(Conversion.rotational.keys())[idx]
+    options = Conversion.rotational[key]
     where = options.index(symbol)
     length = len(options)
-    index = round(((angle % PI) / (2*PI)) * length) -where
-    return Database.rotational[key][index]
+    index = round(((angle % _PI) / (2*_PI)) * length) -where
+    return Conversion.rotational[key][index]
