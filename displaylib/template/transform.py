@@ -25,29 +25,26 @@ class Transform2D: # Component (mixin class)
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.position.x}, {self.position.y})"
     
-    @property
-    def global_position(self) -> Vec2:
+    def get_global_position(self) -> Vec2:
         """Computes the node's global position (world space)
 
         Returns:
             Vec2: global position
         """
-        global_position = self.position
+        global_position = self.position.copy()
         parent = self.parent
         while parent is not None and isinstance(parent, Transform2D):
             global_position = parent.position + global_position.rotated(parent.rotation)
             parent = parent.parent
         return global_position
     
-    @global_position.setter
-    def global_position(self, position: Vec2) -> None:
+    def set_global_position(self, position: Vec2) -> None:
         """Sets the node's global position (world space)
         """
-        diff = position - self.global_position
+        diff = position - self.get_global_position()
         self.position += diff
     
-    @property
-    def global_rotation(self) -> float:
+    def get_global_rotation(self) -> float:
         """Computes the node's global rotation (world space)
 
         Returns:
@@ -60,12 +57,10 @@ class Transform2D: # Component (mixin class)
             parent = parent.parent
         return rotation
 
-    @global_rotation.setter
-    def global_rotation(self, rotation: float) -> None:
+    def set_global_rotation(self, rotation: float) -> None:
         """Sets the node's global rotation (world space)
         """
-        
-        diff = rotation - self.global_rotation
+        diff = rotation - self.get_global_rotation()
         self.rotation += diff
     
     def is_globally_visible(self) -> bool: # global visibility
@@ -87,6 +82,11 @@ class Transform2D: # Component (mixin class)
         self.visible = True
     
     def look_at(self, location: Vec2) -> None:
+        """Makes the node look in the direction of the supplied location
+
+        Args:
+            location (Vec2): point in global space
+        """
         diff = location - self.global_position
         angle = diff.angle()
         self.global_rotation = -angle

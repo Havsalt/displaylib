@@ -46,8 +46,7 @@ class AsciiCamera(AsciiNode2D):
         self.mode = mode # `centered` mode only has effect if `parent` is not None
         self.follow = follow # whether to follow the `parent`
     
-    @property
-    def global_position(self) -> Vec2:
+    def get_global_position(self) -> Vec2:
         """Computes the node's global position (world space)
 
         Ignores ancestors' rotation and position if `.follow = False`
@@ -57,10 +56,9 @@ class AsciiCamera(AsciiNode2D):
         """
         if not self.follow and self.parent is not None:
             return self.position
-        return super().global_position
+        return super().get_global_position()
 
-    @property
-    def global_rotation(self) -> float:
+    def get_global_rotation(self) -> float:
         """Computes the node's global rotation (world space)
 
         Ignores ancestors' rotation if `.follow = False`
@@ -70,7 +68,7 @@ class AsciiCamera(AsciiNode2D):
         """
         if not self.follow and self.parent is not None:
             return self.rotation
-        return super().global_rotation
+        return super().get_global_rotation()
     
     def set_current(self) -> None:
         """Sets this camera as the currently active one
