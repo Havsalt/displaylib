@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations as _
 
 import random as _random
 from typing import TypeAlias as _TypeAlias
