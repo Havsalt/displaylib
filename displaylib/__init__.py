@@ -33,8 +33,7 @@ __all__ = [ # default mode is used when using the star notation
     "Vec2",              # (data structure)
     "Vec2i",             # (data structure)
     # utility
-    "pull",              # (decorator)
-    "grapheme",          # (module)
+    "pull",              # (class decorator)
     # core ascii
     "Node",              # (class)
     "Node2D",            # (class)
@@ -47,22 +46,32 @@ __all__ = [ # default mode is used when using the star notation
     "AnimationPlayer",   # (class)
     "AudioStreamPlayer", # (class)
     "Clock",             # (class)
+    # mixin components
+    "Transform2D",       # (component)
+    "Texture",           # (component)
+    "Color",             # (component)
     # prefabricated
     "Label",             # (class)
     "Line",              # (class)
     "Sprite",            # (class)
+    "ColorSprite",       # (class)
+    # generating colors
+    "color",             # (module)
+    # text alteration
+    "grapheme",          # (module)
     # networking
     "networking"         # (module)
 ]
 
-# math
-from .math import lerp, sign, Vec2, Vec2i
-# utility
-from .util import pull
-# standard
+# ascii
 from .ascii import (
+    # math
+    lerp,
+    sign,
+    Vec2,
+    Vec2i,
     # utility
-    grapheme, # (module)
+    pull,
     # core ascii
     Node,
     Node2D,
@@ -75,10 +84,19 @@ from .ascii import (
     AnimationPlayer,
     AudioStreamPlayer,
     Clock,
+    # mixin components
+    Transform2D,
+    Texture,
+    Color,
     # prefabricated
     Label,
     Line,
     Sprite,
+    ColorSprite,
+    # generating colors
+    color,
+    # text alteration
+    grapheme,
     # networking
-    networking # (module)
+    networking
 )

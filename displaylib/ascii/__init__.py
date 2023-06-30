@@ -5,41 +5,45 @@ Provides a framework for creating infinite 2D worlds in Ascii
 
 __all__ = [
     # math
-    "lerp",
-    "sign",
-    "Vec2",
-    "Vec2i",
+    "lerp",              # (function)
+    "sign",              # (function)
+    "Vec2",              # (data structure)
+    "Vec2i",             # (data structure)
     # utility
-    "pull",
-    "grapheme", # (module)
+    "pull",              # (class decorator)
     # core ascii
-    "Node",
-    "Node2D",
-    "Engine",
-    "Camera",
-    "Screen",
-    "Frame",
-    "Animation",
-    "EmptyAnimation",
-    "AnimationPlayer",
-    "AudioStreamPlayer",
-    "Clock",
-    # mixin classes
-    "Transform2D",
-    "Texture",
+    "Node",              # (class)
+    "Node2D",            # (class)
+    "Engine",            # (class)
+    "Camera",            # (class)
+    "Screen",            # (class)
+    "Frame",             # (class)
+    "Animation",         # (class)
+    "EmptyAnimation",    # (class)
+    "AnimationPlayer",   # (class)
+    "AudioStreamPlayer", # (class)
+    "Clock",             # (class)
+    # mixin components
+    "Transform2D",       # (component)
+    "Texture",           # (component)
+    "Color",             # (component)
     # prefabricated
-    "Label",
-    "Line",
-    "Sprite",
-    # networking (module)
-    "networking"
+    "Label",             # (class)
+    "Line",              # (class)
+    "Sprite",            # (class)
+    "ColorSprite",       # (class)
+    # generating colors
+    "color",             # (module)
+    # text alteration
+    "grapheme",          # (module)
+    # networking
+    "networking"         # (module)
 ]
 
 # math
 from ..math import lerp, sign, Vec2, Vec2i
 # utility
 from ..util import pull
-from . import grapheme
 # core ascii
 from .node import AsciiNode as Node, AsciiNode2D as Node2D
 from .engine import AsciiEngine as Engine
@@ -48,13 +52,19 @@ from .screen import AsciiScreen as Screen
 from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
 from .audio import AudioStreamPlayer
 from .clock import Clock
-# mixin classes
+# mixin components
 from ..template import Transform2D
 from .texture import Texture
+from .colored import Color
 # prefabricated
 from .prefabs.label import AsciiLabel as Label
 from .prefabs.line import AsciiLine as Line
 from .prefabs.sprite import AsciiSprite as Sprite
+from .prefabs.color_sprite import AsciiColorSprite as ColorSprite
+# generating colors
+from . import color
+# text alteration
+from . import grapheme
 # networking
 from . import networking
 
