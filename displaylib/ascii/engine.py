@@ -57,13 +57,14 @@ class AsciiEngine(Engine):
         #     instance.per_frame_tasks.append(getattr(instance, "_update_mouse"))
         return instance
 
-    def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), initial_clear: bool = False, **config) -> None:
+    def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, initial_clear: bool = False, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> None:
         """Initializes and starts the engine (only 1 instance should exist)
 
         Args:
             tps (int, optional): ticks per second (fps). Defaults to 16.
             width (int, optional): screen width. Defaults to 16.
             height (int, optional): screen height. Defaults to 8.
+            initial_clear (bool, optional): clear the screen on start. Defaults to False.
             auto_resize_screen (bool, optional): whether to automatically resize the screen to fit. Defaults to False.
             screen_margin (Vec2i, optional): subtracted from os terminal size. Defaults to Vec2i(1, 1).
         """
