@@ -54,7 +54,6 @@ __all__ = [ # default mode is used when using the star notation
     "Label",             # (class)
     "Line",              # (class)
     "Sprite",            # (class)
-    "ColorSprite",       # (class)
     # generating colors
     "color",             # (module)
     # text alteration
@@ -92,7 +91,6 @@ from .ascii import (
     Label,
     Line,
     Sprite,
-    ColorSprite,
     # generating colors
     color,
     # text alteration
