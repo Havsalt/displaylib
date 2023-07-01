@@ -13,8 +13,7 @@ from .node import Ascii
 from .texture import Texture
 
 class TextureNode(Texture, Node):
-    """Type hint for classes deriving from: `Texture`, `Node`
-    """
+    """Type hint for classes deriving from: `Texture`, `Node`"""
 
 
 class AsciiEngine(Engine):

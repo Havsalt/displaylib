@@ -13,8 +13,7 @@ from .camera import AsciiCamera
 from .texture import Texture
 
 class Transform2DTextureNode(Transform2D, Texture, AsciiNode):
-    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`
-    """
+    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`"""
 
 
 class AsciiScreen:
