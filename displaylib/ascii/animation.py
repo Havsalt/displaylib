@@ -70,19 +70,13 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     Known Issues:
         - `If a file's content is changed after a texture has been loaded from that file, the change won't be reflected on next load due to the use of @functools.cache`
     """
-    FIXED: ClassVar[int] = 1
-    DELTATIME: ClassVar[int] = 2 # TODO: add DELTATIME mode
-    mode_default: ClassVar[int] = FIXED
-
-    def __new__(cls, *args, fps: float = 16, mode: int = mode_default, **animations): # pulling: `fps`, `mode`, `**animations`
+    def __new__(cls, *args, **animations): # pulling: `**animations`
         return super().__new__(cls, *args)
 
-    def __init__(self, parent: Transform2DTextureNode | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
+    def __init__(self, parent: Transform2DTextureNode | None = None, **animations) -> None:
         if parent is None or not isinstance(parent, Texture):
             raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}' (requires Texture in MRO)")
         super().__init__(parent, force_sort=False)
-        self.fps: float = fps
-        self.mode: int = mode
         self.animations: dict[str, Animation] = dict(animations)
         self.current_animation: str = ""
         self.is_playing: bool = False
@@ -233,7 +227,6 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self._has_updated = False
         return frame != None # returns true if not stopped
 
-
     def stop(self) -> None:
         """Stops the animation from playing
         """
@@ -241,18 +234,9 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
 
     def _update(self, _delta: float) -> None:
         if self.is_playing and self._has_updated:
-            # if self.mode == AnimationPlayer.FIXED:
             frame = next(self)
             if frame == None or self.parent is None or not isinstance(self.parent, Texture):
                 return
             self.parent.texture = frame.texture
-
-            # elif self.mode == AnimationPlayer.DELTATIME:
-            #     # apply delta time
-            #     self._accumulated_time += delta
-            #     if self._accumulated_time >= self._fps_ratio:
-            #         self._accumulated_time -= self._fps_ratio # does not clear time
-            #         frame = next(self)
-            #         self.owner.texture = frame.texture
         elif not self._has_updated:
             self._has_updated = True
