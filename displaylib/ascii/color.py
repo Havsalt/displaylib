@@ -1,4 +1,4 @@
-from __future__ import annotations as _
+from __future__ import annotations as _annotations
 
 import random as _random
 from typing import TypeAlias as _TypeAlias
@@ -11,6 +11,16 @@ _Color: _TypeAlias = str
 
 
 def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None) -> _Color:
+    """Creates a color from the given color code. Can be given both a foreground color and background color
+
+    Args:
+        fg (_ColorCode, optional): foreground color. Defaults to 7.
+        bg (_OptionalColorCode, optional): background color. Defaults to None.
+
+    Returns:
+        _Color: ANSI color code as str
+    """
+    # NOTE: colors made using this function will not be equivalent to other colors defined in the RGB format
     value = f"\x1b[38;5;{fg}m"
     if bg is not None:
         value += f"\x1b[48;5;{bg}m"
@@ -18,11 +28,33 @@ def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None) -> _Color:
 
 
 def rgb_color(red: int = 0, green: int = 0, blue: int = 0) -> _Color:
+    """Creates a color from the given channels, which is red, green and blue. Can be given both a foreground color and background color.
+
+    Args:
+        red (int, optional): red color channel. Defaults to 0.
+        green (int, optional): green color channel. Defaults to 0.
+        blue (int, optional): blue color channel. Defaults to 0.
+
+    Returns:
+        _Color: ANSI color code as str
+    """
     return "\x1b[38;2;{};{};{}m".format(red, green, blue)
 
 
-def hex_color(fg: _HexCode = "ffffff", bg: _OptionalHexCode = None) -> _Color:
+def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None) -> _Color:
+    """Creates a color from the given hex code. Can be given both a foreground color and background color.
+    The "#" in the hex codes are optional
+
+    Args:
+        fg (_HexCode, optional): foreground hex color. Defaults to "#ffffff".
+        bg (_OptionalHexCode, optional): background hex color. Defaults to None.
+
+    Returns:
+        _Color: ANSI color code as str
+    """
     fg = fg.lower()
+    if fg.startswith("#"):
+        fg = fg.lstrip("#")
     if len(fg) == 3:
         fg = ''.join([c * 2 for c in fg])
     
@@ -35,6 +67,8 @@ def hex_color(fg: _HexCode = "ffffff", bg: _OptionalHexCode = None) -> _Color:
         return value # does not compute background color
 
     bg = bg.lower()
+    if bg.startswith("#"):
+        bg = bg.lstrip("#")
     if len(bg) == 3:
         bg = "".join([c * 2 for c in bg])
     
@@ -45,35 +79,57 @@ def hex_color(fg: _HexCode = "ffffff", bg: _OptionalHexCode = None) -> _Color:
     return value
 
 
-def rand_color() -> _Color:
-    return "\x1b[38;2;{};{};{}m".format(
-        _random.randint(0, 255),
-        _random.randint(0, 255),
-        _random.randint(0, 255))
+def rand_color(fg: bool = True, bg: bool = False) -> _Color:
+    """Creates a random RGB color
+
+    Args:
+        fg (bool, optional): whether to colorize the foreground. Defaults to True.
+        bg (bool, optional): whether to colorize the background. Defaults to False.
+
+    Raises:
+        ValueError: both 'fg' and 'bg' was set to be False
+
+    Returns:
+        _Color: ANSI color code as str
+    """
+    if not fg and not bg:
+        raise ValueError("Either 'foreground' or 'background' has to be True")
+    value = ""
+    if fg:
+        value += "\x1b[38;2;{};{};{}m".format(
+            _random.randint(0, 255),
+            _random.randint(0, 255),
+            _random.randint(0, 255))
+    if bg:
+        value += "\x1b[48;2;{};{};{}m".format(
+            _random.randint(0, 255),
+            _random.randint(0, 255),
+            _random.randint(0, 255))
+    return value
 
 
 # Reset code
 RESET = "\x1b[0m"
 
 # standard colors:
-BLACK   = "\x1b[30m"
-RED     = "\x1b[31m"
-GREEN   = "\x1b[32m"
-YELLOW  = "\x1b[33m"
-BLUE    = "\x1b[34m"
-MAGENTA = "\x1b[35m"
-CYAN    = "\x1b[36m"
-WHITE   = "\x1b[37m"
+BLACK   = "\x1b[38;2;0;0;0m"
+RED     = "\x1b[38;2;255;0;0m"
+GREEN   = "\x1b[38;2;0;255;0m"
+YELLOW  = "\x1b[38;2;255;255;0m"
+BLUE    = "\x1b[38;2;0;0;255m"
+MAGENTA = "\x1b[38;2;255;0;255m"
+CYAN    = "\x1b[38;2;0;255;255m"
+WHITE   = "\x1b[38;2;255;255;255m"
 
 # bright standard colors:
-BRIGHT_BLACK   = "\x1b[30;1m"
-BRIGHT_RED     = "\x1b[31;1m"
-BRIGHT_GREEN   = "\x1b[32;1m"
-BRIGHT_YELLOW  = "\x1b[33;1m"
-BRIGHT_BLUE    = "\x1b[34;1m"
-BRIGHT_MAGENTA = "\x1b[35;1m"
-BRIGHT_CYAN    = "\x1b[36;1m"
-BRIGHT_WHITE   = "\x1b[37;1m"
+BRIGHT_BLACK   = "\x1b[38;2;0;0;0m"
+BRIGHT_RED     = "\x1b[38;2;255;0;0m"
+BRIGHT_GREEN   = "\x1b[38;2;0;255;0m"
+BRIGHT_YELLOW  = "\x1b[38;2;255;255;0m"
+BRIGHT_BLUE    = "\x1b[38;2;0;0;255m"
+BRIGHT_MAGENTA = "\x1b[38;2;255;0;255m"
+BRIGHT_CYAN    = "\x1b[38;2;0;255;255m"
+BRIGHT_WHITE   = "\x1b[38;2;255;255;255m"
 
 # html/css colors:
 ALICE_BLUE = "\x1b[38;2;240;248;255m"
