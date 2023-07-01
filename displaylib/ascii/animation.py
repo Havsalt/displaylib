@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import io
 import os
+import functools
 from typing import ClassVar, Generator
 
 from ..template import Node, Transform2D
@@ -9,8 +11,20 @@ from .node import AsciiNode
 from .texture import Texture
 
 class Transform2DTextureNode(Transform2D, Texture, AsciiNode):
-    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`
-    """
+    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`"""
+
+
+@functools.cache
+def load_frame_texture(file_path: str, /, *, fliph: bool = False, flipv: bool = False) -> list[list[str]]:
+    file: io.TextIOWrapper = open(file_path, "r") # from disk
+    texture = [list(line.rstrip("\n")) for line in file.readlines()]
+    if fliph:
+        texture = text.mapfliph(texture)
+    if flipv:
+        texture = text.mapfliph(texture)
+    file.close()
+    return texture
+
 
 class Frame:
     """`Frame` used to create animations
@@ -19,16 +33,9 @@ class Frame:
     """
     __slots__ = ("texture")
 
-    def __init__(self, fpath: str, fliph: bool = False, flipv: bool = False) -> None:
-        self.texture = []
-        f = open(fpath)
-        for line in f.readlines():
-            self.texture.append(list(line.rstrip("\n")))
-        if fliph:
-            self.texture = text.mapfliph(self.texture)
-        if flipv:
-            self.texture = text.mapfliph(self.texture)
-        f.close()
+    def __init__(self, file_path: str, /, *, fliph: bool = False, flipv: bool = False) -> None:
+        fpath = os.path.normpath(file_path)
+        self.texture = load_frame_texture(fpath, fliph=fliph, flipv=flipv)
 
 
 class Animation:
@@ -38,10 +45,10 @@ class Animation:
     """
     __slots__ = ("frames")
 
-    def __init__(self, path: str, reverse: bool = False, fliph: bool = False, flipv: bool = False) -> None:
-        fnames = os.listdir(os.path.join(os.getcwd(), path))
+    def __init__(self, folder_path: str, /, *, reverse: bool = False, fliph: bool = False, flipv: bool = False) -> None:
+        fnames = os.listdir(os.path.join(os.getcwd(), folder_path))
         step = 1 if not reverse else -1
-        self.frames = [Frame(os.path.join(os.getcwd(), path, fname), fliph=fliph, flipv=flipv) for fname in fnames][::step]
+        self.frames = [Frame(os.path.join(os.getcwd(), folder_path, fname), fliph=fliph, flipv=flipv) for fname in fnames][::step]
 
 
 class EmptyAnimation(Animation):
@@ -59,6 +66,9 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     Parent Requires Components:
         - `Transform2D`: uses position and rotation to place the texture
         - `Texture`: changes its texture
+    
+    Known Issues:
+        - `If a file's content is changed after a texture has been loaded from that file, the change won't be reflected on next load due to the use of @functools.cache`
     """
     FIXED: ClassVar[int] = 1
     DELTATIME: ClassVar[int] = 2 # TODO: add DELTATIME mode
