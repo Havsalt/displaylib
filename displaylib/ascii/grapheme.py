@@ -3,7 +3,7 @@
 Provides functions related to alter text
 """
 
-from __future__ import annotations as _
+from __future__ import annotations as _annotations
 
 __all__ = [
     "Conversion",
