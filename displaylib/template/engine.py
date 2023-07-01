@@ -58,7 +58,7 @@ class Engine(metaclass=EngineMixinSortMeta):
         self._on_exit()
 
     def _on_start(self) -> None:
-        """Called when the after the engine has been created
+        """Called after the engine has been created
 
         Override for custom functionality
         """
