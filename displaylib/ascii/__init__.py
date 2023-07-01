@@ -31,7 +31,6 @@ __all__ = [
     "Label",             # (class)
     "Line",              # (class)
     "Sprite",            # (class)
-    "ColorSprite",       # (class)
     # generating colors
     "color",             # (module)
     # text alteration
@@ -60,7 +59,6 @@ from .colored import Color
 from .prefabs.label import AsciiLabel as Label
 from .prefabs.line import AsciiLine as Line
 from .prefabs.sprite import AsciiSprite as Sprite
-from .prefabs.color_sprite import AsciiColorSprite as ColorSprite
 # generating colors
 from . import color
 # text alteration

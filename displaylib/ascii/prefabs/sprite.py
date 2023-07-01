@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, TypeVar
 from ...math import Vec2, Vec2i
 from ..node import AsciiNode2D
 from ..texture import Texture
+from ..colored import Color
+from ..color import WHITE, _Color
 
 if TYPE_CHECKING:
     from ...template import Node
@@ -25,7 +27,7 @@ def load_texture(file_path: str, /) -> list[list[str]]:
     return texture
 
 
-class AsciiSprite(Texture, AsciiNode2D):
+class AsciiSprite(Color, Texture, AsciiNode2D):
     """Prefabricated `AsciiSprite`
 
     Components:
@@ -55,7 +57,7 @@ class AsciiSprite(Texture, AsciiNode2D):
         texture = load_texture(fpath)
         return AsciiSprite(texture=texture)
 
-    def __init__(self, parent: Node | None = None, *, x: int | float = 0, y: int | float = 0, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None: # `z_index` pulled in `Texture`
+    def __init__(self, parent: Node | None = None, *, x: int | float = 0, y: int | float = 0, texture: list[list[str]] = [], color: _Color = WHITE, offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None: # `z_index` pulled in `Texture`
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.texture = self.texture or texture # uses class texture if set
         self.offset = self.offset or offset.copy()
