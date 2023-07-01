@@ -40,11 +40,7 @@ class AsciiLine(AsciiNode2D):
         self.start = start
         self.end = end
         self.texture = texture
-        global_position = self.get_global_position()
-        self.points: list[AsciiPoint2D] = [
-            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=force_sort).where(position=global_position+start),
-            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=force_sort).where(position=global_position+end)
-        ]
+        self.points: list[AsciiPoint2D] = []
         self._update(0) # simulate initial frame locally
 
     def _update(self, delta: float) -> None:
@@ -53,14 +49,13 @@ class AsciiLine(AsciiNode2D):
             point.queue_free()
         self.points.clear()
         
-        if not self.visible:
-            return
+        if not self.is_globally_visible():
+            return # do not create points
 
-        global_position = self.get_global_position()
         # creating new ends of line
         self.points: list[AsciiPoint2D] = [
-            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=self.force_sort).where(position=global_position+self.start),
-            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=self.force_sort).where(position=global_position+self.end)
+            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=self.force_sort).where(position=self.start),
+            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=self.force_sort).where(position=self.end)
         ]
         # create points along the current/new line
         diff = (self.end - self.start)
@@ -68,8 +63,7 @@ class AsciiLine(AsciiNode2D):
         length = diff.length() # distance determined by difference
         steps = round(length)
         for idx in range(steps):
-            offset = self.start + (direction * idx)
-            position = global_position + offset
+            position = self.start + (direction * idx)
             point = AsciiPoint2D(self, x=int(position.x), y=int(position.y), texture=self.texture, z_index=self.z_index, force_sort=self.force_sort)
             self.points.append(point)
     
