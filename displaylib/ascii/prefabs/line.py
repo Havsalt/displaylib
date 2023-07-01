@@ -27,7 +27,7 @@ class AsciiPoint2D(Color, Texture, AsciiNode2D):
         self.z_index = z_index
 
 
-@pull("start", "end")
+@pull("color", "start", "end")
 class AsciiLine(AsciiNode2D):
     """Prefabricated `AsciiLine` node
 
@@ -37,13 +37,14 @@ class AsciiLine(AsciiNode2D):
     texture_default: ClassVar[list[list[str]]] = [["#"]] # only used when creating a line node
     points: list[AsciiPoint2D]
 
-    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: list[list[str]] = texture_default, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, color: _Color = WHITE, texture: list[list[str]] = texture_default, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
-        self.z_index = z_index
-        self.force_sort = force_sort
+        self.texture = texture
+        self.color = color
         self.start = start
         self.end = end
-        self.texture = texture
+        self.z_index = z_index
+        self.force_sort = force_sort
         self.points: list[AsciiPoint2D] = []
         self._update(0) # simulate initial frame locally
 
@@ -58,8 +59,8 @@ class AsciiLine(AsciiNode2D):
 
         # creating new ends of line
         self.points: list[AsciiPoint2D] = [
-            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=self.force_sort).where(position=self.start),
-            AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=self.force_sort).where(position=self.end)
+            AsciiPoint2D(self, texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort).where(position=self.start),
+            AsciiPoint2D(self, texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort).where(position=self.end)
         ]
         # create points along the current/new line
         diff = (self.end - self.start)
@@ -68,7 +69,7 @@ class AsciiLine(AsciiNode2D):
         steps = round(length)
         for idx in range(steps):
             position = self.start + (direction * idx)
-            point = AsciiPoint2D(self, x=int(position.x), y=int(position.y), texture=self.texture, z_index=self.z_index, force_sort=self.force_sort)
+            point = AsciiPoint2D(self, x=int(position.x), y=int(position.y), texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort)
             self.points.append(point)
     
     def queue_free(self) -> None:
