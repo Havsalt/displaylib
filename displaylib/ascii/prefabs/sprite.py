@@ -32,6 +32,7 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
 
     Components:
         - `Texture`: allows the node to be displayed
+        - `Color`: applies color to the texture
     
     Known Issues:
         - `If a file's content is changed after a texture has been loaded from that file, the change won't be reflected on next load due to the use of @functools.cache`

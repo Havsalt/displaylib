@@ -17,13 +17,14 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
     """Prefabricated `Label` node where a new line is created for each `\\n`
     
     Components:
-        `Texture`: allows the node to be shown
+        - `Texture`: allows the node to be shown
+        - `Color`: applies color to the texture
     """
     def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, text: str = "", color: _Color = WHITE, delimiter: str = "\n", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
+        self.delimiter = delimiter # has to be set before '.delimiter' is set and defined
+        self.text = text
         self.color = color
-        self.delimiter = delimiter
-        self.text = text # has to be set after delimiter is set and defined
         self.z_index = z_index
     
     @property
