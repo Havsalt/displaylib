@@ -3,7 +3,7 @@ from __future__ import annotations
 import io
 import os
 import functools
-from typing import ClassVar, Generator
+from typing import Generator
 
 from ..template import Node, Transform2D
 from . import text
