@@ -45,18 +45,18 @@ class Conversion: # holds the translate information
         ".": [".", "'"]
     }
 
-# -- mirror database
-for key, value in tuple(Conversion.horizontal.items()):
-    Conversion.horizontal[value] = key
-for key, value in tuple(Conversion.vertical.items()):
-    Conversion.vertical[value] = key
+# mirror database
+for _key, _value in tuple(Conversion.horizontal.items()):
+    Conversion.horizontal[_value] = _key
+for _key, _value in tuple(Conversion.vertical.items()):
+    Conversion.vertical[_value] = _key
 # for key, options in tuple(Conversion.rotational.items()):
 #     for idx, option in enumerate(options):
 #         new_key = options[idx]
 #         new_options = options[idx:] + options[:idx]
 #         Conversion.rotational[new_key] = new_options
 
-# --- module functions
+# module functions
 def lookuph(symbol: str) -> str:
     """Lookup a symbol from the `horizontal` database
 

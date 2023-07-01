@@ -4,7 +4,7 @@ import os
 from typing import ClassVar, Generator
 
 from ..template import Node
-from . import grapheme
+from . import text
 from .texture import Texture
 
 
@@ -21,9 +21,9 @@ class Frame:
         for line in f.readlines():
             self.texture.append(list(line.rstrip("\n")))
         if fliph:
-            self.texture = grapheme.mapfliph(self.texture)
+            self.texture = text.mapfliph(self.texture)
         if flipv:
-            self.texture = grapheme.mapfliph(self.texture)
+            self.texture = text.mapfliph(self.texture)
         f.close()
 
 

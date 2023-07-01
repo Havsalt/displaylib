@@ -7,7 +7,7 @@ import sys
 
 from ..math import Vec2i
 from ..template import Transform2D, Node
-from . import grapheme
+from . import text
 from .camera import AsciiCamera
 from .texture import Texture
 
@@ -95,7 +95,7 @@ class AsciiScreen:
                         if not ((self.width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
-                            self.texture[y_position][x_position] = grapheme.rotate(char, rotation - camera_rotation)
+                            self.texture[y_position][x_position] = text.rotate(char, rotation - camera_rotation)
 
             elif rotation != 0: # node rotation
                 cos_rotation = math.cos(-rotation)
@@ -113,7 +113,7 @@ class AsciiScreen:
                         if not ((self.width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
-                            self.texture[y_position][x_position] = grapheme.rotate(char, rotation)
+                            self.texture[y_position][x_position] = text.rotate(char, rotation)
             
             elif camera_rotation != 0: # camera rotation
                 for h, line in enumerate(texture):
@@ -127,7 +127,7 @@ class AsciiScreen:
                         if not ((self.width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
-                            self.texture[y_position][x_position] = grapheme.rotate(char, camera_rotation)
+                            self.texture[y_position][x_position] = text.rotate(char, camera_rotation)
 
             else: # no rotation
                 for h, line in enumerate(texture):

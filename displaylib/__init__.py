@@ -57,7 +57,7 @@ __all__ = [ # default mode is used when using the star notation
     # generating colors
     "color",             # (module)
     # text alteration
-    "grapheme",          # (module)
+    "text",              # (module)
     # networking
     "networking"         # (module)
 ]
@@ -94,7 +94,7 @@ from .ascii import (
     # generating colors
     color,
     # text alteration
-    grapheme,
+    text,
     # networking
     networking
 )

@@ -34,7 +34,7 @@ __all__ = [
     # generating colors
     "color",             # (module)
     # text alteration
-    "grapheme",          # (module)
+    "text",              # (module)
     # networking
     "networking"         # (module)
 ]
@@ -62,7 +62,7 @@ from .prefabs.sprite import AsciiSprite as Sprite
 # generating colors
 from . import color
 # text alteration
-from . import grapheme
+from . import text
 # networking
 from . import networking
 
