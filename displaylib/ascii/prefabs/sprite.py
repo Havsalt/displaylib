@@ -6,6 +6,7 @@ import functools
 from typing import TYPE_CHECKING, TypeVar
 
 from ...math import Vec2, Vec2i
+from .. import text
 from ..node import AsciiNode2D
 from ..texture import Texture
 from ..colored import Color
@@ -18,11 +19,13 @@ Self = TypeVar("Self")
 
 
 @functools.cache
-def load_texture(file_path: str, /) -> list[list[str]]:
+def load_texture(file_path: str, /, *, fliph: bool = False, flipv: bool = False) -> list[list[str]]:
     file: io.TextIOWrapper = open(file_path, "r") # from disk
-    lines = file.readlines()
-    stripped = map(lambda line: line.rstrip("\n"), lines)
-    texture = list(map(list, stripped))
+    texture = [list(line.rstrip("\n")) for line in file.readlines()]
+    if fliph:
+        texture = text.mapfliph(texture)
+    if flipv:
+        texture = text.mapfliph(texture)
     file.close()
     return texture
 
