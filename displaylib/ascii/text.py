@@ -1,6 +1,6 @@
-"""### Grapheme cluster utility module
+"""### Text utility module
 
-Provides functions related to alter text
+Provides functions related to alter text (Grapheme cluster manipulation)
 """
 
 from __future__ import annotations as _annotations
