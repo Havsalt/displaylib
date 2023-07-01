@@ -50,6 +50,7 @@ for _key, _value in tuple(Conversion.horizontal.items()):
     Conversion.horizontal[_value] = _key
 for _key, _value in tuple(Conversion.vertical.items()):
     Conversion.vertical[_value] = _key
+# FIXME: implement mirror-like for Conversion.rotational
 # for key, options in tuple(Conversion.rotational.items()):
 #     for idx, option in enumerate(options):
 #         new_key = options[idx]
@@ -105,28 +106,28 @@ def flipv(line: str | _Iterable[str]) -> str:
     return "".join(Conversion.vertical.get(letter, letter) for letter in line)
 
 
-def mapfliph(content: _Iterable[str | _Iterable[str]]) -> list[str]:
+def mapfliph(content: _Iterable[str | _Iterable[str]]) -> list[list[str]]:
     """Flip a list with text lines `horizontally`
 
     Args:
         line (content: Iterable[str | Iterable[str]]): list with: text lines | list with iterables of strings with string length of 1
 
     Returns:
-        str: list with lines flipped horizontally
+        list[list[str]]: lists with lines flipped horizontally
     """
-    return [fliph(line) for line in content]
+    return [[Conversion.horizontal.get(letter, letter) for letter in line][::-1] for line in content]
 
 
-def mapflipv(content: _Iterable[str | _Iterable[str]]) -> list[str]:
+def mapflipv(content: _Iterable[str | _Iterable[str]]) -> list[list[str]]:
     """Flip a list with text lines `vertically`
 
     Args:
         line (content: Iterable[str | Iterable[str]]): list with: text lines | list with iterables of strings with string length of 1
 
     Returns:
-        str: list with lines flipped vertically
+        list[list[str]]: lists with lines flipped vertically
     """
-    return [flipv(line) for line in content][::-1]
+    return [[Conversion.vertical.get(letter, letter) for letter in line] for line in content]
 
 
 def rotate(symbol: str, angle: float) -> str:
@@ -134,7 +135,7 @@ def rotate(symbol: str, angle: float) -> str:
 
     Args:
         symbol (str): symbol to rotate
-        angle (float): counter clockwise rotation
+        angle (float): counter clockwise rotation in radians
 
     Returns:
         str: rotated symbol or original symbol

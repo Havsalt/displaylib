@@ -19,7 +19,7 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
     Components:
         `Texture`: allows the node to be shown
     """
-    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, text: str = "", color: _Color = WHITE, delimiter: str = "\n", z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, text: str = "", color: _Color = WHITE, delimiter: str = "\n", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.color = color
         self.delimiter = delimiter

@@ -6,13 +6,14 @@ from typing import Iterable
 import sys
 
 from ..math import Vec2i
-from ..template import Transform2D, Node
+from ..template import Transform2D
 from . import text
+from .node import AsciiNode
 from .camera import AsciiCamera
 from .texture import Texture
 
-class Transform2DTextureNode(Transform2D, Texture, Node):
-    """Type hint for classes deriving from: `Transform2D`, `Texture`, `Node`
+class Transform2DTextureNode(Transform2D, Texture, AsciiNode):
+    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`
     """
 
 

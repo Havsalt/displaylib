@@ -14,7 +14,7 @@ class Transform2D: # Component (mixin class)
     rotation: float
     visible: bool
 
-    def __new__(cls: type[Self], *args, x: int | float = 0, y: int | float = 0, **kwargs) -> Self:
+    def __new__(cls: type[Self], *args, x: float = 0, y: float = 0, **kwargs) -> Self:
         instance = super().__new__(cls, *args, **kwargs)
         setattr(instance, "position", Vec2(x, y))
         setattr(instance, "rotation", 0.0)

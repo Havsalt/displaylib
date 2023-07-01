@@ -32,7 +32,7 @@ class AsciiCamera(AsciiNode2D):
     INCLUDE_SIZE: ClassVar[int] = 0x2
     current: ClassVar[AsciiCamera]
 
-    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, follow: bool = True, mode: int = FIXED) -> None:
+    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, follow: bool = True, mode: int = FIXED) -> None:
         """Creates a new camera (initially inactive), which can be set active using `.set_current()` or `.as_current()`
 
         Args:

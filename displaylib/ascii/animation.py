@@ -3,10 +3,14 @@ from __future__ import annotations
 import os
 from typing import ClassVar, Generator
 
-from ..template import Node
+from ..template import Node, Transform2D
 from . import text
+from .node import AsciiNode
 from .texture import Texture
 
+class Transform2DTextureNode(Transform2D, Texture, AsciiNode):
+    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`
+    """
 
 class Frame:
     """`Frame` used to create animations
@@ -63,8 +67,8 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
     def __new__(cls, *args, fps: float = 16, mode: int = mode_default, **animations): # pulling: `fps`, `mode`, `**animations`
         return super().__new__(cls, *args)
 
-    def __init__(self, parent: Texture | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
-        if not isinstance(parent, Texture) or parent == None:
+    def __init__(self, parent: Transform2DTextureNode | None = None, fps: float = 16, mode: int = mode_default, **animations) -> None:
+        if parent is None or not isinstance(parent, Texture):
             raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}' (requires Texture in MRO)")
         super().__init__(parent, force_sort=False)
         self.fps: float = fps
@@ -73,7 +77,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         self.current_animation: str = ""
         self.is_playing: bool = False
         self._current_frames: Generator[Frame, None, None] | None = None
-        self._next: None | Frame = None
+        self._next: Frame | None = None
         self._has_updated: bool = False # indicates if the first frame (per animation) has been displayed
         self._accumulated_time: float = 0.0
     
@@ -85,13 +89,15 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         """
         return self
 
-    def __next__(self) -> Frame:
+    def __next__(self) -> Frame | None:
         """Returns the next frame from the current frames (a generator)
 
         Returns:
             Frame: the next frame
         """
         try:
+            if self._current_frames is None:
+                return None
             self._next = next(self._current_frames) # next of generator
             return self._next
         except StopIteration:
@@ -164,12 +170,12 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         self.current_animation = animation
         self._current_frames = (frame for frame in self.animations[animation].frames)
         try:
-            self._next: Frame = next(self._current_frames)
+            self._next = next(self._current_frames)
         except StopIteration:
             self.is_playing = False
             self._current_frames = None
-            self._next: Frame = None
-        if self._next != None:
+            self._next = None
+        if self._next is not None and self.parent is not None and isinstance(self.parent, Texture):
             self.parent.texture = self._next.texture
             self._has_updated = False
     
@@ -184,12 +190,12 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         # reverse order frames
         self._current_frames = (frame for frame in reversed(self.animations[animation].frames))
         try:
-            self._next: Frame = next(self._current_frames)
+            self._next = next(self._current_frames)
         except StopIteration:
             self.is_playing = False
             self._current_frames = None
-            self._next: Frame = None
-        if self._next != None:
+            self._next = None
+        if self._next is not None and self.parent is not None and isinstance(self.parent, Texture):
             self.parent.texture = self._next.texture
             self._has_updated = False
         
@@ -212,7 +218,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
             self.is_playing = False
             self._current_frames = None
             self._next = None
-        if frame != None:
+        if frame is not None and self.parent is not None and isinstance(self.parent, Texture):
             self.parent.texture = frame.texture
             self._has_updated = False
         return frame != None # returns true if not stopped
@@ -227,7 +233,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         if self.is_playing and self._has_updated:
             # if self.mode == AnimationPlayer.FIXED:
             frame = next(self)
-            if frame == None:
+            if frame == None or self.parent is None or not isinstance(self.parent, Texture):
                 return
             self.parent.texture = frame.texture
 

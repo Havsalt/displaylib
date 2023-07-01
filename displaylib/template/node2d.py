@@ -11,6 +11,6 @@ class Node2D(Transform2D, Node):
     Components:
         `Transform2D`: provides transform attributes
     """
-    def __init__(self, parent: Node | None = None, *, x: int | float = 0, y: int | float = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, force_sort: bool = True) -> None:
         super().__init__(parent, force_sort=force_sort) # parameters `x` and `y` is set in `Transform`
         self.position = Vec2(x, y)

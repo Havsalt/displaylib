@@ -17,7 +17,7 @@ class AsciiPoint2D(Texture, AsciiNode2D):
     Components:
         `Texture`: allows the node to be shown
     """
-    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, texture: list[list[str]] = [["#"]], z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = [["#"]], z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.texture = texture
         self.z_index = z_index
@@ -28,19 +28,19 @@ class AsciiLine(AsciiNode2D):
     """Prefabricated `AsciiLine` node
 
     Known Issues:
-        - `Does not work well when changing '.rotation' or '.global_rotation'`
+        - `Does not work well when changing '.rotation' or using '.set_global_rotation()'`
     """
     texture_default: ClassVar[list[list[str]]] = [["#"]] # only used when creating a line node
     points: list[AsciiPoint2D]
 
-    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: list[list[str]] = texture_default, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), texture: list[list[str]] = texture_default, z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
         self.z_index = z_index
         self.force_sort = force_sort
         self.start = start
         self.end = end
         self.texture = texture
-        global_position = self.global_position
+        global_position = self.get_global_position()
         self.points: list[AsciiPoint2D] = [
             AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=force_sort).where(position=global_position+start),
             AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=force_sort).where(position=global_position+end)
@@ -56,7 +56,7 @@ class AsciiLine(AsciiNode2D):
         if not self.visible:
             return
 
-        global_position = self.global_position
+        global_position = self.get_global_position()
         # creating new ends of line
         self.points: list[AsciiPoint2D] = [
             AsciiPoint2D(self, texture=self.texture, z_index=self.z_index, force_sort=self.force_sort).where(position=global_position+self.start),
