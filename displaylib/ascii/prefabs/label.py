@@ -5,23 +5,26 @@ from typing import TYPE_CHECKING
 from ...util import pull
 from ..node import AsciiNode2D
 from ..texture import Texture
+from ..colored import Color
+from ..color import WHITE, _Color
 
 if TYPE_CHECKING:
     from ...template import Node
 
 
 @pull("text", "delimiter")
-class AsciiLabel(Texture, AsciiNode2D):
+class AsciiLabel(Color, Texture, AsciiNode2D):
     """Prefabricated `Label` node where a new line is created for each `\\n`
     
     Components:
         `Texture`: allows the node to be shown
     """
-    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, text: str = "", delimiter: str = "\n", z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: Node | None = None, *, x: int = 0, y: int = 0, text: str = "", color: _Color = WHITE, delimiter: str = "\n", z_index: int = 0, force_sort: bool = True) -> None:
         super().__init__(parent, x=x, y=y, force_sort=force_sort)
-        self.z_index = z_index
+        self.color = color
         self.delimiter = delimiter
-        self.text = text
+        self.text = text # has to be set after delimiter is set and defined
+        self.z_index = z_index
     
     @property
     def text(self) -> str:
