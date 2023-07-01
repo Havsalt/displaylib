@@ -25,7 +25,8 @@ class Color: # Component (mixin class)
         return instance
 
     def _get_final_texture(self) -> list[list[str]]:
+        transparent = getattr(self, "root").screen.cell_transparant
         return [
-            [self.color + char + RESET for char in line]
+            [self.color + char + RESET if char != transparent else char for char in line]
             for line in getattr(self, "texture")
-        ]
+        ] if self.color != WHITE else getattr(self, "texture")
