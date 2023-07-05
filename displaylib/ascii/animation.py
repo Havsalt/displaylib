@@ -29,7 +29,7 @@ def load_frame_texture(file_path: str, /, *, fliph: bool = False, flipv: bool = 
 class Frame:
     """`Frame` used to create animations
 
-    Loaded at runtime from files
+    Loaded at runtime from files or from cache
     """
     __slots__ = ("texture")
 
