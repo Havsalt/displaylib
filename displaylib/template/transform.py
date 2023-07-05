@@ -64,6 +64,11 @@ class Transform2D: # Component (mixin class)
         self.rotation += diff
     
     def is_globally_visible(self) -> bool: # global visibility
+        """Checks whether the node and its ancestors are visible
+
+        Returns:
+            bool: global visibility
+        """
         if not self.visible:
             return False
         parent = self.parent
