@@ -14,10 +14,22 @@ class Transform2DTextureNode(Transform2D, Texture, AsciiNode):
     """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`"""
 
 
+EMPTY = " " # filler when load_frame_texture(..., fill=True)
+
 @functools.cache
-def load_frame_texture(file_path: str, /, *, fliph: bool = False, flipv: bool = False) -> list[list[str]]:
+def load_frame_texture(file_path: str, /, *, fill: bool = True, fliph: bool = False, flipv: bool = False) -> list[list[str]]:
     file: io.TextIOWrapper = open(file_path, "r") # from disk
     texture = [list(line.rstrip("\n")) for line in file.readlines()]
+    if fill:
+        longest = len(max(texture, key=len))
+        lines = len(texture)
+        for line in texture:
+            if len(line) < longest:
+                diff = longest - len(line)
+                line.extend(list(EMPTY*diff))
+        if len(texture) < lines:
+            diff = lines - len(texture)
+            texture.extend(list(EMPTY*longest) for _ in range(diff))
     if fliph:
         texture = text.mapfliph(texture)
     if flipv:
@@ -33,22 +45,22 @@ class Frame:
     """
     __slots__ = ("texture")
 
-    def __init__(self, file_path: str, /, *, fliph: bool = False, flipv: bool = False) -> None:
+    def __init__(self, file_path: str, /, *, fill: bool = True, fliph: bool = False, flipv: bool = False) -> None:
         fpath = os.path.normpath(file_path)
-        self.texture = load_frame_texture(fpath, fliph=fliph, flipv=flipv)
+        self.texture = load_frame_texture(fpath, fill=fill, fliph=fliph, flipv=flipv)
 
 
 class Animation:
     """`Animation` containing frames
 
-    Frames are loaded from files
+    Frames are loaded from files or partially from cache
     """
     __slots__ = ("frames")
 
-    def __init__(self, folder_path: str, /, *, reverse: bool = False, fliph: bool = False, flipv: bool = False) -> None:
+    def __init__(self, folder_path: str, /, *, reverse: bool = False, fill: bool = True, fliph: bool = False, flipv: bool = False) -> None:
         fnames = os.listdir(os.path.join(os.getcwd(), folder_path))
         step = 1 if not reverse else -1
-        self.frames = [Frame(os.path.join(os.getcwd(), folder_path, fname), fliph=fliph, flipv=flipv) for fname in fnames][::step]
+        self.frames = [Frame(os.path.join(os.getcwd(), folder_path, fname), fill=fill, fliph=fliph, flipv=flipv) for fname in fnames][::step]
 
 
 class EmptyAnimation(Animation):

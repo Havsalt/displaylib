@@ -18,13 +18,25 @@ if TYPE_CHECKING:
 Self = TypeVar("Self")
 
 
+EMPTY = " " # filler when load_texture(..., fill=True)
+
 @functools.cache
-def load_texture(file_path: str, /, *, transparent: str = " ", default: str = " ", fliph: bool = False, flipv: bool = False) -> list[list[str]]:
+def load_texture(file_path: str, /, *, fill: bool = True, transparent: str = " ", default: str = " ", fliph: bool = False, flipv: bool = False) -> list[list[str]]:
     file: io.TextIOWrapper = open(file_path, "r") # from disk
     if transparent == default:
         texture = [list(line.rstrip("\n")) for line in file.readlines()]
     else:
         texture = [list(line.rstrip("\n").replace(transparent, default)) for line in file.readlines()]
+    if fill:
+        longest = len(max(texture, key=len))
+        lines = len(texture)
+        for line in texture:
+            if len(line) < longest:
+                diff = longest - len(line)
+                line.extend(list(EMPTY*diff))
+        if len(texture) < lines:
+            diff = lines - len(texture)
+            texture.extend(list(EMPTY*longest) for _ in range(diff))
     if fliph:
         texture = text.mapfliph(texture)
     if flipv:
@@ -46,7 +58,7 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
     texture: list[list[str]] # NOTE: class texture is shared lists across instances unless .make_unique() or .as_unique()
 
     @classmethod
-    def load(cls, file_path: str, /, *, transparent: str = " ", default: str = " ") -> AsciiSprite:
+    def load(cls, file_path: str, /, *, fill: bool = True, transparent: str = " ", default: str = " ") -> AsciiSprite:
         """Load texture from file path as sprite
 
         Args:
@@ -63,7 +75,7 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
         if not isinstance(file_path, str):
             TypeError(f"argument 'file_path' is required to be of type 'str'. '{type(file_path).__name__}' found")
         fpath = os.path.normpath(file_path)
-        texture = load_texture(fpath, transparent=transparent, default=default)
+        texture = load_texture(fpath, fill=fill, transparent=transparent, default=default)
         return AsciiSprite(texture=texture)
 
     def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = [], color: _Color = WHITE, offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None: # `z_index` pulled in `Texture`
