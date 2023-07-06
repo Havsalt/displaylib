@@ -5,7 +5,7 @@ import os
 import functools
 from typing import TYPE_CHECKING, TypeVar
 
-from ...math import Vec2, Vec2i
+from ...math import Vec2
 from .. import text
 from ..node import AsciiNode2D
 from ..texture import Texture
@@ -19,13 +19,16 @@ Self = TypeVar("Self")
 
 
 @functools.cache
-def load_texture(file_path: str, /, *, fliph: bool = False, flipv: bool = False) -> list[list[str]]:
+def load_texture(file_path: str, /, *, transparent: str = " ", default: str = " ", fliph: bool = False, flipv: bool = False) -> list[list[str]]:
     file: io.TextIOWrapper = open(file_path, "r") # from disk
-    texture = [list(line.rstrip("\n")) for line in file.readlines()]
+    if transparent == default:
+        texture = [list(line.rstrip("\n")) for line in file.readlines()]
+    else:
+        texture = [list(line.rstrip("\n").replace(transparent, default)) for line in file.readlines()]
     if fliph:
         texture = text.mapfliph(texture)
     if flipv:
-        texture = text.mapfliph(texture)
+        texture = text.mapflipv(texture)
     file.close()
     return texture
 
@@ -43,11 +46,13 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
     texture: list[list[str]] # NOTE: class texture is shared lists across instances unless .make_unique() or .as_unique()
 
     @classmethod
-    def load(cls, file_path: str, /) -> AsciiSprite:
-        """Load texture from file path as surface
+    def load(cls, file_path: str, /, *, transparent: str = " ", default: str = " ") -> AsciiSprite:
+        """Load texture from file path as sprite
 
         Args:
             file_path (str): file path to load from
+            transparent (optional, str): file path to load from. Defaults to " "
+            default (optional, str): file path to load from. Defaults to " "
 
         Raises:
             TypeError: file_path was not a string
@@ -58,7 +63,7 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
         if not isinstance(file_path, str):
             TypeError(f"argument 'file_path' is required to be of type 'str'. '{type(file_path).__name__}' found")
         fpath = os.path.normpath(file_path)
-        texture = load_texture(fpath)
+        texture = load_texture(fpath, transparent=transparent, default=default)
         return AsciiSprite(texture=texture)
 
     def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = [], color: _Color = WHITE, offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None: # `z_index` pulled in `Texture`
@@ -68,13 +73,3 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
         self.offset = self.offset or offset.copy() # TODO: check if this has any effect
         self.centered = centered
         self.z_index = z_index
-    
-    def size(self) -> Vec2i:
-        """Returns the width and height of `.texture` as a vector
-
-        Returns:
-            Vec2i: size of the content
-        """
-        longest = len(max(self.texture, key=len))
-        lines = len(self.texture)
-        return Vec2i(longest, lines)
