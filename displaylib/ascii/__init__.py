@@ -36,7 +36,9 @@ __all__ = [
     # text alteration
     "text",              # (module)
     # networking
-    "networking"         # (module)
+    "networking",        # (module)
+    # typing support
+    "_Color"             # (type alias)
 ]
 
 # math
@@ -65,6 +67,8 @@ from . import color
 from . import text
 # networking
 from . import networking
+# typing support
+from .color import _Color
 
 
 # -- activate ANSI escape codes

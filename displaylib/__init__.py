@@ -59,7 +59,9 @@ __all__ = [ # default mode is used when using the star notation
     # text alteration
     "text",              # (module)
     # networking
-    "networking"         # (module)
+    "networking",        # (module)
+    # typing support
+    "_Color"             # (type alias)
 ]
 
 # ascii
@@ -96,5 +98,7 @@ from .ascii import (
     # text alteration
     text,
     # networking
-    networking
+    networking,
+    # typing support
+    _Color
 )
