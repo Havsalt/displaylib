@@ -36,7 +36,7 @@ else:
 
 
     class AudioStreamPlayer:
-        """`AudioStreamPlayer` for playing sounds from disk. Can play multiple instances of the sound simultaneously
+        """Standard Windows `AudioStreamPlayer` for playing sounds from disk. Can only play one sound at once
 
         Known Issues:
             - `Globally, only one sound can be played at the same time, the rest is queued for when the current sound finishes`
