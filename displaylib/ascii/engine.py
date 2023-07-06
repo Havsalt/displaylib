@@ -117,9 +117,9 @@ class AsciiEngine(Engine):
             for task in self.per_frame_tasks:
                 task()
             
-            self._update(clock.get_delta())
+            self._update(clock.delta_time)
             for node in tuple(Node.nodes.values()): # tuple, because removing a ref in lets say an list will free the node during iteration
-                node._update(clock.get_delta())
+                node._update(clock.delta_time)
 
             if Node._request_process_priority_sort: # only sort once per frame if needed
                 for uid in Node._queued_nodes:
