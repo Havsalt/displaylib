@@ -10,44 +10,70 @@ _OptionalHexCode: _TypeAlias = str | None
 _Color: _TypeAlias = str
 
 
-def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None) -> _Color:
+def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
     """Creates a color from the given color code. Can be given both a foreground color and background color
 
     Args:
         fg (_ColorCode, optional): foreground color. Defaults to 7.
         bg (_OptionalColorCode, optional): background color. Defaults to None.
+        bold (bool, optional): applies bold style. Defaults to False.
+        reverse (bool, optional): swap fg and bg. Defaults to False.
+        underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
         _Color: ANSI color code as str
     """
     # NOTE: colors made using this function will not be equivalent to other colors defined in the RGB format
     value = f"\x1b[38;5;{fg}m"
+    if not (bold or reverse or underline):
+        return value
     if bg is not None:
         value += f"\x1b[48;5;{bg}m"
+    if bold:
+        value += f"\x1b[1m"
+    if underline:
+        value += f"\x1b[4m"
+    if reverse:
+        value += f"\x1b[7m"
     return value
 
 
-def rgb_color(red: int = 0, green: int = 0, blue: int = 0) -> _Color:
+def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
     """Creates a color from the given channels, which is red, green and blue. Can be given both a foreground color and background color.
 
     Args:
         red (int, optional): red color channel. Defaults to 0.
         green (int, optional): green color channel. Defaults to 0.
         blue (int, optional): blue color channel. Defaults to 0.
+        bold (bool, optional): applies bold style. Defaults to False.
+        reverse (bool, optional): swap fg and bg. Defaults to False.
+        underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
         _Color: ANSI color code as str
     """
-    return "\x1b[38;2;{};{};{}m".format(red, green, blue)
+    value = "\x1b[38;2;{};{};{}m".format(red, green, blue)
+    if not (bold or reverse or underline):
+        return value
+    if bold:
+        value += f"\x1b[1m"
+    if underline:
+        value += f"\x1b[4m"
+    if reverse:
+        value += f"\x1b[7m"
+    return value
 
 
-def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None) -> _Color:
+def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
     """Creates a color from the given hex code. Can be given both a foreground color and background color.
     The "#" in the hex codes are optional
 
     Args:
         fg (_HexCode, optional): foreground hex color. Defaults to "#ffffff".
         bg (_OptionalHexCode, optional): background hex color. Defaults to None.
+        bold (bool, optional): applies bold style. Defaults to False.
+        reverse (bool, optional): swap fg and bg. Defaults to False.
+        underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
         _Color: ANSI color code as str
@@ -64,7 +90,16 @@ def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None) -> _Color:
     value = "\x1b[38;2;{};{};{}m".format(red, green, blue)
 
     if bg is None:
-        return value # does not compute background color
+        # does not compute background color
+        if not (bold or reverse or underline):
+            return value
+        if bold:
+            value += f"\x1b[1m"
+        if underline:
+            value += f"\x1b[4m"
+        if reverse:
+            value += f"\x1b[7m"
+        return value
 
     bg = bg.lower()
     if bg.startswith("#"):
@@ -76,15 +111,26 @@ def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None) -> _Color:
     green = int(bg[2:4], 16)
     blue = int(bg[4:6], 16)
     value += "\x1b[48;2;{};{};{}m".format(red, green, blue)
+    if not (bold or reverse or underline):
+        return value
+    if bold:
+        value += f"\x1b[1m"
+    if underline:
+        value += f"\x1b[4m"
+    if reverse:
+        value += f"\x1b[7m"
     return value
 
 
-def rand_color(fg: bool = True, bg: bool = False) -> _Color:
-    """Creates a random RGB color
+def rand_color(fg: bool = True, bg: bool = False, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
+    """Creates a random RGB color. Random background color is optional
 
     Args:
-        fg (bool, optional): whether to colorize the foreground. Defaults to True.
-        bg (bool, optional): whether to colorize the background. Defaults to False.
+        fg (bool, optional): whether to colorize the foreground with a random color. Defaults to True.
+        bg (bool, optional): whether to colorize the background with a random color. Defaults to False.
+        bold (bool, optional): applies bold style. Defaults to False.
+        reverse (bool, optional): swap fg and bg. Defaults to False.
+        underline (bool, optional): adds an underline. Defaults to False.
 
     Raises:
         ValueError: both 'fg' and 'bg' was set to be False
@@ -105,6 +151,14 @@ def rand_color(fg: bool = True, bg: bool = False) -> _Color:
             _random.randint(0, 255),
             _random.randint(0, 255),
             _random.randint(0, 255))
+    if not (bold or reverse or underline):
+        return value
+    if bold:
+        value += f"\x1b[1m"
+    if underline:
+        value += f"\x1b[4m"
+    if reverse:
+        value += f"\x1b[7m"
     return value
 
 
