@@ -75,7 +75,7 @@ def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None) -> _Color:
     red = int(bg[0:2], 16)
     green = int(bg[2:4], 16)
     blue = int(bg[4:6], 16)
-    value += "\x1b[38;2;{};{};{}m".format(red, green, blue)
+    value += "\x1b[48;2;{};{};{}m".format(red, green, blue)
     return value
 
 
