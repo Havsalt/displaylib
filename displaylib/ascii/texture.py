@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 from typing import TypeVar, ClassVar
 
-from ..math import Vec2
+from ..math import Vec2, Vec2i
 from ..template import Transform2D
 
 Self = TypeVar("Self")
@@ -21,7 +21,7 @@ class Texture: # Component (mixin class)
     offset: Vec2
     centered: bool
 
-    def __new__(cls: type[Self], *args, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True, **kwargs) -> Self:
+    def __new__(cls: type[Self], *args, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True, **kwargs) -> Self: # borrowing: `force_sort`
         instance = super().__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
         if not isinstance(instance, Transform2D):
             raise TypeError(f"class '{__class__.__qualname__}' is required to derive from 'Transform2D' as it derives from 'Texture'")
@@ -72,6 +72,16 @@ class Texture: # Component (mixin class)
         getattr(self, "make_unique")()
         return self
 
+    def size(self) -> Vec2i:
+        """Returns the width and height of `.texture` as a Vec2i, where x=width and y=height
+
+        Returns:
+            Vec2i: size of the content
+        """
+        longest = len(max(self.texture, key=len))
+        lines = len(self.texture)
+        return Vec2i(longest, lines)
+
     def queue_free(self) -> None:
         """Decrements the reference of the node by removing it from `Texture._instances`
         and then adds it to the deletion queue of the engine
@@ -87,7 +97,7 @@ class Texture: # Component (mixin class)
             Vec2: global position of the texture
         """
         global_position = self.position + self.offset
-        if self.centered:
+        if self.centered: # subtract hald size of the texture
             global_position.x -= len(max(self.texture, key=len)) // 2
             global_position.y -= len(self.texture) // 2
         parent = self.parent
@@ -97,4 +107,12 @@ class Texture: # Component (mixin class)
         return global_position
 
     def _get_final_texture(self) -> list[list[str]]:
+        """Some components may override this implementation, for example colorizing the texture
+
+        Returns:
+            list[list[str]]: here, it is just the original texture
+        """
+        super_implementation = getattr(super(), "_get_final_texture", None)
+        if super_implementation is not None:
+            return super_implementation()
         return self.texture
