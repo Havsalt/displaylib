@@ -5,7 +5,7 @@ from typing import Iterable
 
 import sys
 
-from ..math import Vec2i
+from ..math import Vec2
 from ..template import Transform2D
 from . import text
 from .node import AsciiNode
@@ -46,7 +46,7 @@ class AsciiScreen:
         self.texture = [[self.cell_transparant for _ in range(self.width)] for _ in range(self.height)] # 2D array
 
         camera: AsciiCamera = AsciiCamera.current # should never be None
-        half_size = Vec2i(self.width // 2, self.height // 2)
+        half_size = Vec2(self.width / 2, self.height / 2)
         camera_rotation = camera.get_global_rotation()
         cos_camera_rotation = math.cos(-camera_rotation)
         sin_camera_rotation = math.sin(-camera_rotation)
@@ -100,8 +100,8 @@ class AsciiScreen:
             elif rotation != 0: # node rotation
                 cos_rotation = math.cos(-rotation)
                 sin_rotation = math.sin(-rotation)
-                y_offset = len(texture) // 2 if textured.centered else 0 - textured.offset.y
-                x_offset = len(max(texture, key=len)) // 2 if textured.centered else 0 - textured.offset.x
+                y_offset = (len(texture) // 2 if textured.centered else 0) - textured.offset.y
+                x_offset = (len(max(texture, key=len)) // 2 if textured.centered else 0) - textured.offset.x
                 for h, line in enumerate(texture):
                     for w, char in enumerate(line):
                         x_diff = w - x_offset
