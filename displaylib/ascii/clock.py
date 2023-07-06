@@ -32,23 +32,16 @@ class Clock:
         Returns:
             float: time since last tick
         """
-        return self._target_delta
-        return max(0.0, time.perf_counter() - self._last_tick)
+        return max(0, time.perf_counter() - self._last_tick)
     
-    def tick(self) -> float:
+    def tick(self) -> None:
         """Pauses the clock temporay to achieve the desired framerate (tps)
-
-        Returns:
-            float: delta time since last tick
         """
-        time.sleep(self._target_delta)
-        return self._target_delta
-        now = time.perf_counter()
-        diff = now - self._last_tick
-        remaining = self._target_delta - diff
-        if remaining <= 0:
-            self._last_tick = now
-            return 0.0
-        time.sleep(remaining)
-        self._last_tick = time.perf_counter()
-        return diff
+        current_time = time.perf_counter()
+        elapsed_time = current_time - self._last_tick
+        sleep_time = self._target_delta - elapsed_time
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+            self._last_tick = time.perf_counter()
+        else:
+            self._last_tick = current_time
