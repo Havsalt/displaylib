@@ -66,7 +66,7 @@ from . import color
 # text alteration
 from . import text
 # networking
-from . import networking
+from ..template import networking
 # typing support
 from .color import _Color
 
