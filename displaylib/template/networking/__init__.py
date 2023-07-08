@@ -1,4 +1,4 @@
-"""## Networking submodule of DisplayLib.template
+"""## Networking submodule of DisplayLib
 """
 
 __all__ = [

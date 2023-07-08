@@ -43,7 +43,7 @@ class Node(metaclass=NodeMixinSortMeta):
 
         Args:
             cls (type[Self]): original class that will be created
-            parent (Node | None, optional): pulling 'parent' as it is used in Node.__init__. Defaults to None.
+            parent_as_positional (Node | None, optional): pulling 'parent' as it is used in Node.__init__. Defaults to None.
             force_sort (bool, optional): whether to request the engine to sort nodes based on '.process_priority'. Defaults to True.
 
         Raises:
@@ -59,10 +59,10 @@ class Node(metaclass=NodeMixinSortMeta):
         elif parent is not None and len(parent_as_positional) > 1: # > 1 because it is 'cls' argument
             raise ValueError(f"parameter 'parent' was supplied both positional only and keyword only argument(s): positional(s) = {parent_as_positional} & keyword = {parent_as_positional}")
         instance = super().__new__(cls)
-        uid = cls.generate_uid()
+        uid = getattr(cls, "generate_uid")()
         setattr(instance, "uid", uid)
         setattr(instance, "_process_priority", 0)
-        Node.nodes[uid] = instance
+        getattr(Node, "nodes")[uid] = instance # mutate list
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_process_priority_sort = True # otherwise, depend on a `process_priority` change
         return instance
@@ -79,6 +79,12 @@ class Node(metaclass=NodeMixinSortMeta):
         return str(uid)
 
     def __init__(self, parent: Node | None = None, *, force_sort: bool = True) -> None:
+        """Initializes the base node
+
+        Args:
+            parent (Node | None, optional): parent node. Defaults to None.
+            force_sort (bool, optional): whether to sort based on 'z_index' and 'process_priority'. Defaults to True.
+        """
         self.parent = parent
         if force_sort: # may sort `process_priority` and `z_index`
             Node._request_process_priority_sort = True # otherwise, depent on a `process_priority` change
