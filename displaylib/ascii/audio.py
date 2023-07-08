@@ -28,7 +28,6 @@ if sys.platform != "win32": # if not on Windows, implement a skeleton, which rai
         #     raise NotImplemented("AudioStreamPlayer only implemented for Windows (win32)")
 else:
     import threading
-    # import atexit
     from winsound import PlaySound as play_sound, SND_FILENAME, SND_PURGE
     from typing import TypeVar, ClassVar
 
@@ -40,19 +39,23 @@ else:
 
         Known Issues:
             - `Globally, only one sound can be played at the same time, the rest is queued for when the current sound finishes`
+            - `Only the '.wav' format is tested`
         """
         max_sound_count_default: ClassVar[int] = 1 # number of sounds this AudioStreamPlayer can play at the same time
 
         def __init__(self, file_path: str, /, *, max_sound_count: int = max_sound_count_default, force_sort: bool = True) -> None:
+            """Initializes the audio stream player
+
+            Args:
+                file_path (str): file path to the audio file (should be .wav)
+                max_sound_count (int, optional): basically how many sounds that can be queued. Defaults to max_sound_count_default.
+                force_sort (bool, optional): whether to sort based on 'z_index' and 'process_priority's. Defaults to True.
+            """
             self.file_path = file_path
             self.max_sound_count = max_sound_count
             self._active_sound_count = 0 # read only
             self._sound_threads: list[threading.Thread] = []
             self._terminate_event = threading.Event()
-            # atexit.register(self.stop)
-        
-        # def __del__(self) -> None:
-        #     atexit.unregister(self.stop)
         
         @property
         def is_playing(self) -> bool:

@@ -25,6 +25,11 @@ class Color: # Component (mixin class)
         return instance
 
     def _get_final_texture(self) -> list[list[str]]:
+        """Applies color to the texture right before rendering. WHITE color just returns the uncolorized texture
+
+        Returns:
+            list[list[str]]: colorized texture
+        """
         transparent = getattr(self, "root").screen.cell_transparant
         return [
             [self.color + char + RESET if char != transparent else char for char in line]

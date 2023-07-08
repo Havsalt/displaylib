@@ -46,6 +46,14 @@ class Frame:
     __slots__ = ("texture")
 
     def __init__(self, file_path: str, /, *, fill: bool = True, fliph: bool = False, flipv: bool = False) -> None:
+        """Loads the texture for the frame from either a file or from cache
+
+        Args:
+            file_path (str): file path to load from
+            fill (optional, bool): fill in creeks with spaces. Defaults to True
+            fliph (optional, bool): flips the texture horizontally. Defaults to False
+            flipv (optional, bool): flips the texture vertically. Defaults to False
+        """
         fpath = os.path.normpath(file_path)
         self.texture = load_frame_texture(fpath, fill=fill, fliph=fliph, flipv=flipv)
 
@@ -58,6 +66,15 @@ class Animation:
     __slots__ = ("frames")
 
     def __init__(self, folder_path: str, /, *, reverse: bool = False, fill: bool = True, fliph: bool = False, flipv: bool = False) -> None:
+        """Loads and animation with frames from either files or partially from cache
+
+        Args:
+            folder_path (str): folder path where the frames are (usually folder with .txt files)
+            reverse (bool, optional): reverses the order of frames. Defaults to False.
+            fill (optional, bool): fill in creeks with spaces. Defaults to True
+            fliph (optional, bool): flips the texture horizontally. Defaults to False
+            flipv (optional, bool): flips the texture vertically. Defaults to False
+        """
         fnames = os.listdir(os.path.join(os.getcwd(), folder_path))
         step = 1 if not reverse else -1
         self.frames = [Frame(os.path.join(os.getcwd(), folder_path, fname), fill=fill, fliph=fliph, flipv=flipv) for fname in fnames][::step]
@@ -69,10 +86,12 @@ class EmptyAnimation(Animation):
     __slots__ = ("frames")
 
     def __init__(self) -> None:
+        """Initializes the empty animation with no frames
+        """
         self.frames = []
 
 
-class AnimationPlayer(Node): # TODO: add buffered animations on load
+class AnimationPlayer(Node):
     """`AnimationPlayer` that plays animations, changing the `.texture` attribute of the parent
 
     Parent Requires Components:
@@ -83,9 +102,18 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         - `If a file's content is changed after a texture has been loaded from that file, the change won't be reflected on next load due to the use of @functools.cache`
     """
     def __new__(cls, *args, **animations): # pulling: `**animations`
-        return super().__new__(cls, *args)
+        return super().__new__(cls, *args, force_sort=False) # because this cannot be passed as an argument, force_sort is set to False
 
-    def __init__(self, parent: Transform2DTextureNode | None = None, **animations) -> None:
+    def __init__(self, parent: Transform2DTextureNode | None = None, **animations: Animation) -> None:
+        """Initializes the animation player
+
+        Args:
+            parent (Transform2DTextureNode | None, optional): parent node with Texture and Transform2D components. Defaults to None.
+            **animations (Animation): animations are stored as {str: Animation, ...} pairs
+
+        Raises:
+            TypeError: 'parent' missing component Texture
+        """
         if parent is None or not isinstance(parent, Texture):
             raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}' (requires Texture in MRO)")
         super().__init__(parent, force_sort=False)
@@ -184,6 +212,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         """
         self.is_playing = True
         self.current_animation = animation
+        # make generator
         self._current_frames = (frame for frame in self.animations[animation].frames)
         try:
             self._next = next(self._current_frames)
@@ -203,7 +232,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         """
         self.is_playing = True
         self.current_animation = animation
-        # reverse order frames
+        # reverse order frames generator
         self._current_frames = (frame for frame in reversed(self.animations[animation].frames))
         try:
             self._next = next(self._current_frames)
@@ -214,7 +243,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         if self._next is not None and self.parent is not None and isinstance(self.parent, Texture):
             self.parent.texture = self._next.texture
             self._has_updated = False
-        
+    
     def advance(self) -> bool:
         """Advances 1 frame
 
@@ -223,7 +252,7 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         >>>     ... # do stuff each frame
 
         Returns:
-            bool: whether it was NOT stopped
+            bool: whether it continues the animation (was NOT stopped)
         """
         if self._current_frames == None:
             return False
@@ -243,8 +272,10 @@ class AnimationPlayer(Node): # TODO: add buffered animations on load
         """Stops the animation from playing
         """
         self.is_playing = False
-
+    
     def _update(self, _delta: float) -> None:
+        """Handles updating the parent's texture if an animation is playing
+        """
         if self.is_playing and self._has_updated:
             frame = next(self)
             if frame == None or self.parent is None or not isinstance(self.parent, Texture):

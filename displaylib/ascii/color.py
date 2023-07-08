@@ -17,7 +17,7 @@ def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = Fal
         fg (_ColorCode, optional): foreground color. Defaults to 7.
         bg (_OptionalColorCode, optional): background color. Defaults to None.
         bold (bool, optional): applies bold style. Defaults to False.
-        reverse (bool, optional): swap fg and bg. Defaults to False.
+        reverse (bool, optional): swaps fg and bg. Defaults to False.
         underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
@@ -46,7 +46,7 @@ def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False
         green (int, optional): green color channel. Defaults to 0.
         blue (int, optional): blue color channel. Defaults to 0.
         bold (bool, optional): applies bold style. Defaults to False.
-        reverse (bool, optional): swap fg and bg. Defaults to False.
+        reverse (bool, optional): swaps fg and bg. Defaults to False.
         underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
@@ -72,7 +72,7 @@ def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None, *, bold: bo
         fg (_HexCode, optional): foreground hex color. Defaults to "#ffffff".
         bg (_OptionalHexCode, optional): background hex color. Defaults to None.
         bold (bool, optional): applies bold style. Defaults to False.
-        reverse (bool, optional): swap fg and bg. Defaults to False.
+        reverse (bool, optional): swaps fg and bg. Defaults to False.
         underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
@@ -129,7 +129,7 @@ def rand_color(fg: bool = True, bg: bool = False, *, bold: bool = False, reverse
         fg (bool, optional): whether to colorize the foreground with a random color. Defaults to True.
         bg (bool, optional): whether to colorize the background with a random color. Defaults to False.
         bold (bool, optional): applies bold style. Defaults to False.
-        reverse (bool, optional): swap fg and bg. Defaults to False.
+        reverse (bool, optional): swaps fg and bg. Defaults to False.
         underline (bool, optional): adds an underline. Defaults to False.
 
     Raises:

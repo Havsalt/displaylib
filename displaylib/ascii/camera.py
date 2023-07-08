@@ -19,10 +19,7 @@ class AsciiCamera(AsciiNode2D):
     Hooks:
         - `_on_screen_resize(self, size: Vec2i) -> None`
     
-    Optional Hooks:
-        - `_on_mouse_event(self, event: MouseEvent) -> None`
-    
-    ModeFlags for attribute `mode`:
+    ModeFlags for attribute `mode`: (combined using '|')
         - 0x0 `FIXED` (Default)
         - 0x1 `CENTERED`
         - 0x2 `INCLUDE_SIZE`
@@ -40,7 +37,7 @@ class AsciiCamera(AsciiNode2D):
             x (int, optional): local x position. Defaults to 0.
             y (int, optional): local y position. Defaults to 0.
             follow (bool, optional): whether to follow parent. Defaults to True.
-            mode (int, optional): camera rendering mode. Defaults to FIXED.
+            mode (int, optional): camera rendering mode (ored together using '|'). Defaults to FIXED.
         """
         super().__init__(parent, x=x, y=y, force_sort=True)
         self.mode = mode # `centered` mode only has effect if `parent` is not None

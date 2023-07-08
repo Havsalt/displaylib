@@ -130,12 +130,12 @@ class AsciiEngine(Engine):
                 Texture._instances.sort(key=self.sort_function_for_z_index)
 
             # render content of visible nodes onto a surface
-            self.screen.build(Texture._instances)
+            self.screen.render(Texture._instances)
             
             self.screen.show()
             clock.tick()
         
         # v exit protocol v
         self._on_exit()
-        self.screen.build(Texture._instances)
+        self.screen.render(Texture._instances)
         self.screen.show()

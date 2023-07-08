@@ -4,11 +4,11 @@ import time
 
 
 class Clock:
-    """`Clock` that pauses the program with adjusted `deltatime` based on execution time of a timeframe
+    """`Clock` that pauses the program with adjusted `delta time` based on execution time of a timeframe
     """
     
     def __init__(self, tps: int) -> None:
-        """Initilizes the clock
+        """Initilizes the clock with a given tps
 
         Args:
             tps (int): ticks per second

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TypeVar, ClassVar
+from typing import TypeVar, ClassVar, Protocol
 
 from ..math import Vec2, Vec2i
 from ..template import Transform2D

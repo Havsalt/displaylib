@@ -83,7 +83,7 @@ def lookupv(symbol: str) -> str:
 
 
 def fliph(line: str | _Iterable[str]) -> str:
-    """Flip a line of text `horizontally`
+    """Flips a line of text `horizontally`
 
     Args:
         line (str | Iterable[str]): text line or iterable of strings with string length of 1
@@ -95,7 +95,7 @@ def fliph(line: str | _Iterable[str]) -> str:
 
 
 def flipv(line: str | _Iterable[str]) -> str:
-    """Flip a line of text `vertically`
+    """Flips a line of text `vertically`
 
     Args:
         line (str | Iterable[str]): text line or iterable of strings with string length of 1
@@ -107,7 +107,7 @@ def flipv(line: str | _Iterable[str]) -> str:
 
 
 def mapfliph(content: _Iterable[str | _Iterable[str]]) -> list[list[str]]:
-    """Flip a list with text lines `horizontally`
+    """Flips a list with text lines `horizontally`
 
     Args:
         line (content: Iterable[str | Iterable[str]]): list with: text lines | list with iterables of strings with string length of 1
@@ -119,7 +119,7 @@ def mapfliph(content: _Iterable[str | _Iterable[str]]) -> list[list[str]]:
 
 
 def mapflipv(content: _Iterable[str | _Iterable[str]]) -> list[list[str]]:
-    """Flip a list with text lines `vertically`
+    """Flips a list with text lines `vertically`
 
     Args:
         line (content: Iterable[str | Iterable[str]]): list with: text lines | list with iterables of strings with string length of 1
