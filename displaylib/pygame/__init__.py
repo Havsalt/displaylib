@@ -37,4 +37,4 @@ from ..template import Transform2D
 from .node import PygameNode as Node, PygameNode2D as Node2D
 from .engine import PygameEngine as Engine
 # networking
-from . import networking
+from ..template import networking
