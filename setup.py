@@ -20,9 +20,7 @@ setup(
       "displaylib.template",
       "displaylib.template.networking",
       "displaylib.ascii",
-      "displaylib.ascii.prefab",
-      "displaylib.ascii.networking",
+      "displaylib.ascii.prefabs",
       "displaylib.pygame",
-      "displaylib.pygame.networking"
    ]
 )
