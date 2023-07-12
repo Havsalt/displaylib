@@ -28,8 +28,8 @@ class AsciiScreen:
         """Initialize surface from nodes given inside the given boundaries
 
         Args:
-            width (int, optional): width of screen. Defaults to 16.
-            height (int, optional): height of screen. Defaults to 8.
+            width (int, optional): width of screen. Defaults to 16 letters.
+            height (int, optional): height of screen. Defaults to 8 letters.
         """
         self.width = width
         self.height = height
