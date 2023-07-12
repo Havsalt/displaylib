@@ -107,6 +107,7 @@ class AsciiEngine(Engine):
                 if ((terminal_size.columns - self.screen_margin.x) != self.screen.width) or ((terminal_size.lines - self.screen_margin.y) != self.screen.height):
                     self.screen.width = int(terminal_size.columns - self.screen_margin.x)
                     self.screen.height = int(terminal_size.lines - self.screen_margin.y)
+                    self.screen.clear() # used to resize its `.texture`
                     size = Vec2i(terminal_size.columns, terminal_size.lines)
                     self._on_screen_resize(size)
                     for node in Node.nodes.values():
