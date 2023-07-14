@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import TypeVar
+from typing import cast
 
-from .texture import Texture
+from ..template.type_hints import MroNext, Self
 from .color import RESET, WHITE, _Color
-
-Self = TypeVar("Self")
+from .type_hints import ColorMixin, ValidColorNode
 
 
 class Color: # Component (mixin class)
@@ -18,11 +17,10 @@ class Color: # Component (mixin class)
     color: _Color
     
     def __new__(cls: type[Self], *args, color: _Color = WHITE, **kwargs) -> Self:
-        instance = super().__new__(cls, *args, **kwargs)
-        if not isinstance(instance, Texture):
-            raise TypeError(f"class '{__class__.__qualname__}' is required to derive from 'Texture' as it derives from 'Color'")
-        setattr(instance, "color", color)
-        return instance
+        mro_next = cast(MroNext[ValidColorNode], super())
+        instance = mro_next.__new__(cast(type[ColorMixin], cls), *args, **kwargs)
+        instance.color = color
+        return cast(Self, instance)
 
     def _get_final_texture(self) -> list[list[str]]:
         """Applies color to the texture right before rendering. WHITE color just returns the uncolorized texture

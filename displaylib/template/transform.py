@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TypeVar
+from typing import cast
 
 from ..math import Vec2
-
-Self = TypeVar("Self")
+from .type_hints import MroNext, ValidTransform2DNode, Transform2DMixin, Self
 
 
 class Transform2D: # Component (mixin class)
@@ -15,17 +14,18 @@ class Transform2D: # Component (mixin class)
     visible: bool
 
     def __new__(cls: type[Self], *args, x: float = 0, y: float = 0, **kwargs) -> Self:
-        instance = super().__new__(cls, *args, **kwargs)
-        setattr(instance, "position", Vec2(x, y))
-        setattr(instance, "rotation", 0.0)
-        # only nodes with Transform2D will have the option to be visible
-        setattr(instance, "visible", True) # local visibility
-        return instance
+        mro_next = cast(MroNext[ValidTransform2DNode], super())
+        instance = mro_next.__new__(cast(type[Transform2DMixin], cls), *args, **kwargs)
+        instance.position = Vec2(x, y)
+        instance.rotation = 0.0
+        # only nodes with Transform2D component will have the option to be visible
+        instance.visible = True # local visibility
+        return cast(Self, instance)
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.position.x}, {self.position.y})"
     
-    def get_global_position(self) -> Vec2:
+    def get_global_position(self: ValidTransform2DNode) -> Vec2:
         """Computes the node's global position (world space)
 
         Returns:
@@ -38,13 +38,13 @@ class Transform2D: # Component (mixin class)
             parent = parent.parent
         return global_position
     
-    def set_global_position(self, position: Vec2) -> None:
+    def set_global_position(self: ValidTransform2DNode, position: Vec2) -> None:
         """Sets the node's global position (world space)
         """
         diff = position - self.get_global_position()
         self.position += diff
     
-    def get_global_rotation(self) -> float:
+    def get_global_rotation(self: ValidTransform2DNode) -> float:
         """Computes the node's global rotation (world space)
 
         Returns:
@@ -57,13 +57,13 @@ class Transform2D: # Component (mixin class)
             parent = parent.parent
         return rotation
 
-    def set_global_rotation(self, rotation: float) -> None:
+    def set_global_rotation(self: ValidTransform2DNode, rotation: float) -> None:
         """Sets the node's global rotation (world space)
         """
         diff = rotation - self.get_global_rotation()
         self.rotation += diff
     
-    def is_globally_visible(self) -> bool: # global visibility
+    def is_globally_visible(self: ValidTransform2DNode) -> bool: # global visibility
         """Checks whether the node and its ancestors are visible
 
         Returns:
@@ -86,12 +86,12 @@ class Transform2D: # Component (mixin class)
     def show(self) -> None:
         self.visible = True
     
-    def look_at(self, location: Vec2) -> None:
+    def look_at(self: ValidTransform2DNode, location: Vec2) -> None:
         """Makes the node look in the direction of the supplied location
 
         Args:
             location (Vec2): point in global space
         """
-        diff = location - self.global_position
+        diff = location - self.get_global_position()
         angle = diff.angle()
-        self.global_rotation = -angle
+        self.set_global_rotation(-angle)

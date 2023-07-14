@@ -1,20 +1,22 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from ...math import Vec2
 from ...util import pull
+from ...template.type_hints import NodeMixin
 from ..node import AsciiNode2D
 from ..texture import Texture
 from ..colored import Color
 from ..color import WHITE, _Color
+from ..type_hints import AsciiLineProtocol, AsciiPoint2DProtocol
 
 if TYPE_CHECKING:
     from ...template import Node
 
 
 class AsciiPoint2D(Color, Texture, AsciiNode2D):
-    """Thin wrapper around `AsciiNode2D` capable of displaying a single point
+    """Behaves like an `AsciiSprite`, capable of displaying a single point
     
     Components:
         - `Texture`: allows the node to be shown
@@ -29,10 +31,9 @@ class AsciiPoint2D(Color, Texture, AsciiNode2D):
 
 @pull("color", "start", "end")
 class AsciiLine(AsciiNode2D):
-    """Prefabricated `AsciiLine` node
+    """Prefabricated `AsciiLine` node with local start and end point
     """
     texture_default: ClassVar[list[list[str]]] = [["#"]] # only used when creating a line node
-    points: list[AsciiPoint2D]
 
     def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, color: _Color = WHITE, texture: list[list[str]] = texture_default, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), z_index: int = 0, force_sort: bool = True) -> None:
         """Initializes the line
@@ -56,9 +57,9 @@ class AsciiLine(AsciiNode2D):
         self.z_index = z_index
         self.force_sort = force_sort
         self.points: list[AsciiPoint2D] = []
-        self._update(0) # simulate initial frame locally
+        cast(AsciiLineProtocol, self)._update(0) # simulate initial frame locally
 
-    def _update(self, _delta: float) -> None:
+    def _update(self: AsciiLineProtocol, _delta: float) -> None:
         # clear points
         for point in self.points:
             point.queue_free()
@@ -68,10 +69,10 @@ class AsciiLine(AsciiNode2D):
             return # do not create points
 
         # creating new ends of line
-        self.points: list[AsciiPoint2D] = [
-            AsciiPoint2D(self, texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort).where(position=self.start),
-            AsciiPoint2D(self, texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort).where(position=self.end)
-        ]
+        self.points = cast(list[AsciiPoint2DProtocol], [
+            AsciiPoint2D(cast(AsciiLine, self), texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort).where(position=self.start),
+            AsciiPoint2D(cast(AsciiLine, self), texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort).where(position=self.end)
+        ])
         # create points along the current/new line
         diff = (self.end - self.start)
         direction = diff.normalized()
@@ -79,8 +80,8 @@ class AsciiLine(AsciiNode2D):
         steps = round(length)
         for idx in range(steps):
             position = self.start + (direction * idx)
-            point = AsciiPoint2D(self, x=int(position.x), y=int(position.y), texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort)
-            self.points.append(point)
+            point = AsciiPoint2D(cast(AsciiLine, self), x=int(position.x), y=int(position.y), texture=self.texture, color=self.color, z_index=self.z_index, force_sort=self.force_sort)
+            self.points.append(cast(AsciiPoint2DProtocol, point))
     
     def queue_free(self) -> None:
         """Queues all points for deletion before calling super().queue_free()
@@ -88,4 +89,5 @@ class AsciiLine(AsciiNode2D):
         for point in self.points:
             point.queue_free()
         self.points.clear()
-        super().queue_free()
+        mro_next = cast(NodeMixin, super())
+        mro_next.queue_free()

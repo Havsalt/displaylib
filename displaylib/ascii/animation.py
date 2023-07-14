@@ -3,15 +3,14 @@ from __future__ import annotations
 import io
 import os
 import functools
-from typing import Generator
+from typing import TYPE_CHECKING, Generator, cast
 
-from ..template import Node, Transform2D
+from ..template import Node
 from . import text
-from .node import AsciiNode
 from .texture import Texture
 
-class Transform2DTextureNode(Transform2D, Texture, AsciiNode):
-    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`"""
+if TYPE_CHECKING:
+    from ..template.type_hints import Self
 
 
 EMPTY = " " # filler when load_frame_texture(..., fill=True)
@@ -101,22 +100,22 @@ class AnimationPlayer(Node):
     Known Issues:
         - `If a file's content is changed after a texture has been loaded from that file, the change won't be reflected on next load due to the use of @functools.cache`
     """
-    def __new__(cls, *args, **animations): # pulling: `**animations`
+    def __new__(cls: type[Self], *args, **animations) -> Self: # pulling: `**animations`
         return super().__new__(cls, *args, force_sort=False) # because this cannot be passed as an argument, force_sort is set to False
 
-    def __init__(self, parent: Transform2DTextureNode | None = None, **animations: Animation) -> None:
+    def __init__(self, parent: Node | None = None, **animations: Animation) -> None:
         """Initializes the animation player
 
         Args:
-            parent (Transform2DTextureNode | None, optional): parent node with Texture and Transform2D components. Defaults to None.
+            parent (ValidTextureNode | None, optional): parent node with Texture and Transform2D components. Defaults to None.
             **animations (Animation): animations are stored as {str: Animation, ...} pairs
 
         Raises:
             TypeError: 'parent' missing component Texture
         """
-        if parent is None or not isinstance(parent, Texture):
-            raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}' (requires Texture in MRO)")
-        super().__init__(parent, force_sort=False)
+        # if parent is None or not isinstance(parent, Texture):
+        #     raise TypeError(f"parent in AnimationPlayer cannot be '{type(parent)}' (requires Texture in MRO)")
+        super().__init__(parent=cast(Node | None, parent), force_sort=False)
         self.animations: dict[str, Animation] = dict(animations)
         self.current_animation: str = ""
         self.is_playing: bool = False

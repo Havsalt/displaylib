@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 import os
-import types
+from typing import TYPE_CHECKING
 
 from ..math import Vec2i
 from ..template import Node, Engine
 from .clock import Clock
-from .extensions.mouse import MouseEvent, MouseMotionEvent, get_mouse_position
 from .screen import AsciiScreen
 from .camera import AsciiCamera
 from .node import Ascii
 from .texture import Texture
 
-class TextureNode(Texture, Node):
-    """Type hint for classes deriving from: `Texture`, `Node`"""
+if TYPE_CHECKING:
+    from .type_hints import ValidTextureNode
 
 
 class AsciiEngine(Engine):
@@ -91,7 +90,7 @@ class AsciiEngine(Engine):
         ...
     
     @staticmethod
-    def sort_function_for_z_index(element: TextureNode) -> tuple[int, int]:
+    def sort_function_for_z_index(element: ValidTextureNode) -> tuple[int, int]:
         return element.z_index, element.process_priority
     
     def _main_loop(self) -> None:

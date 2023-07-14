@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, TypeVar
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from ..util import pull
 from ..template import Node
 from .node import AsciiNode2D
 
+from ..template.type_hints import Transform2DMixin
+
 if TYPE_CHECKING:
     from ..math import Vec2
-
-Self = TypeVar("Self")
+    from ..template.type_hints import Self
 
 
 @pull("follow", "mode")
@@ -53,7 +54,8 @@ class AsciiCamera(AsciiNode2D):
         """
         if not self.follow and self.parent is not None:
             return self.position
-        return super().get_global_position()
+        mro_next = cast(Transform2DMixin, super())
+        return mro_next.get_global_position()
 
     def get_global_rotation(self) -> float:
         """Computes the node's global rotation (world space)
@@ -65,7 +67,8 @@ class AsciiCamera(AsciiNode2D):
         """
         if not self.follow and self.parent is not None:
             return self.rotation
-        return super().get_global_rotation()
+        mro_next = cast(Transform2DMixin, super())
+        return mro_next.get_global_rotation()
     
     def set_current(self) -> None:
         """Sets this camera as the currently active one

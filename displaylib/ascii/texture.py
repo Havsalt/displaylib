@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import copy
-from typing import TypeVar, ClassVar, Protocol
+from typing import TYPE_CHECKING, ClassVar, cast
 
 from ..math import Vec2, Vec2i
 from ..template import Transform2D
+from ..template.type_hints import MroNext, Self
+from .type_hints import NodeMixin, TextureMixin, ValidTextureNode, TextureSelf
 
-Self = TypeVar("Self")
+if TYPE_CHECKING:
+    from .type_hints import TextureSelf
 
 
 class Texture: # Component (mixin class)
@@ -15,27 +18,26 @@ class Texture: # Component (mixin class)
     Requires Components:
         - `Transform2D`: uses position and rotation to place the texture
     """
-    _instances: ClassVar[list[Texture]] = [] # references to nodes with Texture component
+    _instances: ClassVar[list[ValidTextureNode]] = [] # references to nodes with Texture component
     _request_z_index_sort: ClassVar[bool] = False # requests Engine to sort
     texture: list[list[str]]
     offset: Vec2
     centered: bool
 
     def __new__(cls: type[Self], *args, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True, **kwargs) -> Self: # borrowing: `force_sort`
-        instance = super().__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
-        if not isinstance(instance, Transform2D):
-            raise TypeError(f"class '{__class__.__qualname__}' is required to derive from 'Transform2D' as it derives from 'Texture'")
+        mro_next = cast(MroNext[ValidTextureNode], super())
+        instance = mro_next.__new__(cast(type[TextureMixin], cls), *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
         # set if not defined in class
         if not getattr(instance, "texture", False):
-            setattr(instance, "texture", texture)
+            instance.texture = texture
         # set anyway
-        setattr(instance, "offset", Vec2(offset.x, offset.y))
-        setattr(instance, "centered", centered)
-        setattr(instance, "_z_index", z_index)
+        instance.offset = Vec2(offset.x, offset.y)
+        instance.centered = centered
+        instance._z_index = z_index
         if force_sort:
             Texture._request_z_index_sort = True
         Texture._instances.append(instance)
-        return instance
+        return cast(Self, instance)
     
     @property
     def z_index(self) -> int:
@@ -62,14 +64,14 @@ class Texture: # Component (mixin class)
         """
         self.texture = copy.deepcopy(self.texture) # from class var to instance var (if class var defined)
     
-    def as_unique(self: Self) -> Self:
+    def as_unique(self: TextureSelf) -> TextureSelf:
         """Makes a deepcopy of `.texture`, which is then set as the new texture,
         along returning itself
 
         Returns:
-            Self: itself after texture is made unique
+            TextureSelf: itself after texture is made unique
         """
-        getattr(self, "make_unique")()
+        self.make_unique()
         return self
 
     def size(self) -> Vec2i:
@@ -88,9 +90,10 @@ class Texture: # Component (mixin class)
         """
         if self in Texture._instances:
             Texture._instances.remove(self)
-        super().queue_free() # called on an instance deriving from Node
+        mro_next = cast(NodeMixin, super())
+        mro_next.queue_free()
     
-    def _get_texture_global_position(self) -> Vec2:
+    def _get_texture_global_position(self: ValidTextureNode) -> Vec2:
         """Calculates where the texture starts, after taking `.offset` into consideration (world space)
 
         Returns:
@@ -114,5 +117,5 @@ class Texture: # Component (mixin class)
         """
         super_implementation = getattr(super(), "_get_final_texture", None)
         if super_implementation is not None:
-            return super_implementation()
+            return super_implementation() # usually the Color component implementation
         return self.texture

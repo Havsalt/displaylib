@@ -1,19 +1,17 @@
 from __future__ import annotations
 
 import math
-from typing import Iterable
+from typing import TYPE_CHECKING, Iterable
 
 import sys
 
 from ..math import Vec2
-from ..template import Transform2D
 from . import text
-from .node import AsciiNode
 from .camera import AsciiCamera
 from .texture import Texture
 
-class Transform2DTextureNode(Transform2D, Texture, AsciiNode):
-    """Type hint for classes deriving from: `Transform2D`, `Texture`, `AsciiNode`"""
+if TYPE_CHECKING:
+    from .type_hints import ValidTextureNode
 
 
 class AsciiScreen:
@@ -35,11 +33,11 @@ class AsciiScreen:
         self.height = height
         self._texture = [[self.cell_transparant for _ in range(self.width)] for _ in range(self.height)] # 2D array
 
-    def render(self, textured_nodes: Iterable[Transform2DTextureNode] = [], /) -> None:
+    def render(self, textured_nodes: Iterable[ValidTextureNode] = [], /) -> None:
         """Renders the textured nodes onto the screen (they have the `Texture` component)
 
         Args:
-            textured_nodes (Iterable[Transform2D & Texture & Node], optional): nodes to render (`textured_nodes` has to derive from `Transform2D`, `Texture` and `Node`). Defaults to [].
+            textured_nodes (Iterable[ValidTextureNode], optional): nodes to render (`textured_nodes` elements has to derive from `Transform2D`, `Texture` and `Node`). Defaults to [].
         """
         camera: AsciiCamera = AsciiCamera.current # NOTE: should never be None
         half_size = Vec2(self.width, self.height) / 2
