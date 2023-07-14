@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, TypeVar
+from typing import TYPE_CHECKING, ClassVar, cast
+
+from .type_hints import MroNext, NodeMixin, ValidNode, Self
 
 if TYPE_CHECKING:
     from .engine import Engine
-
-Self = TypeVar("Self")
 
 
 class NodeMixinSortMeta(type):
@@ -58,14 +58,15 @@ class Node(metaclass=NodeMixinSortMeta):
             raise ValueError(f"expected 0-1 argument for 'parent', was given {len(parent_as_positional)}: {parent_as_positional}")
         elif parent is not None and len(parent_as_positional) > 1: # > 1 because it is 'cls' argument
             raise ValueError(f"parameter 'parent' was supplied both positional only and keyword only argument(s): positional(s) = {parent_as_positional} & keyword = {parent_as_positional}")
-        instance = super().__new__(cls)
-        uid = getattr(cls, "generate_uid")()
-        setattr(instance, "uid", uid)
-        setattr(instance, "_process_priority", 0)
-        getattr(Node, "nodes")[uid] = instance # mutate list
+        mro_next = cast(MroNext[ValidNode], super())
+        instance = mro_next.__new__(cast(type[NodeMixin], cls))
+        uid = cast(Node, cls).generate_uid()
+        instance.uid = uid
+        instance._process_priority = 0
+        Node.nodes[uid] = cast(Node, instance) # mutate list
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_process_priority_sort = True # otherwise, depend on a `process_priority` change
-        return instance
+        return cast(Self, instance)
 
     @classmethod
     def generate_uid(cls) -> str:

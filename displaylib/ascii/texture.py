@@ -93,12 +93,13 @@ class Texture: # Component (mixin class)
         mro_next = cast(NodeMixin, super())
         mro_next.queue_free()
     
-    def _get_texture_global_position(self: ValidTextureNode) -> Vec2:
+    def _get_texture_global_position(self) -> Vec2:
         """Calculates where the texture starts, after taking `.offset` into consideration (world space)
 
         Returns:
             Vec2: global position of the texture
         """
+        self = cast(ValidTextureNode, self) # fixes type hints
         global_position = self.position + self.offset
         if self.centered: # subtract hald size of the texture
             global_position.x -= len(max(self.texture, key=len)) // 2

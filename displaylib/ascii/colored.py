@@ -28,8 +28,9 @@ class Color: # Component (mixin class)
         Returns:
             list[list[str]]: colorized texture
         """
-        transparent = getattr(self, "root").screen.cell_transparant
+        self = cast(ValidColorNode, self) # fixes type hints
+        transparent = self.root.screen.cell_transparant
         return [
             [self.color + char + RESET if char != transparent else char for char in line]
-            for line in getattr(self, "texture")
-        ] if self.color != WHITE else getattr(self, "texture")
+            for line in self.texture
+        ] if self.color != WHITE else self.texture
