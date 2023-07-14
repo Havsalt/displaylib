@@ -6,6 +6,7 @@ from ..template.type_hints import NodeMixin, Transform2DMixin
 
 if TYPE_CHECKING:
     from ..math import Vec2
+    from .engine import AsciiEngine
     from .color import _Color
 
 TextureSelf = TypeVar("TextureSelf", bound="TextureMixin")
@@ -39,6 +40,10 @@ class TextureMixin(Protocol):
 
 class ColorMixin(Protocol):
     def __new__(cls, *args, **kwargs) -> ValidColorNode: ...
+    @property
+    def root(self) -> AsciiEngine: ...
+    @root.setter
+    def root(self, value: AsciiEngine) -> None: ...
     @property
     def color(self) -> _Color: ...
     @color.setter
