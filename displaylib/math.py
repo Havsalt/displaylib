@@ -36,7 +36,7 @@ def sign(number: int | float, /) -> int:
     return 0 if number == 0 else (1 if number > 0 else -1)
 
 
-class Vec2: # TODO: add support for network notify protocol
+class Vec2:
     """`Vector2` data structure
 
     Components: `x`, `y`
@@ -64,6 +64,14 @@ class Vec2: # TODO: add support for network notify protocol
             str: representation containing the x and y component
         """
         return f"{self.__class__.__name__}({self.x}, {self.y})"
+    
+    def __bool__(self) -> bool:
+        """Returns whether x or y is not zero
+
+        Returns:
+            bool: truthiness
+        """
+        return bool(self.x or self.y)
 
     def __round__(self, ndigits: int = 0) -> Vec2:
         return Vec2(round(self.x, ndigits),
@@ -72,10 +80,20 @@ class Vec2: # TODO: add support for network notify protocol
     def __add__(self, other: Vec2) -> Vec2:
         return Vec2(self.x + other.x,
                     self.y + other.y)
+
+    def __iadd__(self, other: Vec2) -> Vec2:
+        self.x += other.x
+        self.y += other.y
+        return self
     
     def __sub__(self, other: Vec2) -> Vec2:
         return Vec2(self.x - other.x,
                     self.y - other.y)
+
+    def __isub__(self, other: Vec2) -> Vec2:
+        self.x -= other.x
+        self.y -= other.y
+        return self
 
     def __mul__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
@@ -84,12 +102,22 @@ class Vec2: # TODO: add support for network notify protocol
         return Vec2(self.x * other,
                     self.y * other)
     
+    def __imul__(self, other: Vec2) -> Vec2:
+        self.x *= other.x
+        self.y *= other.y
+        return self
+    
     def __floordiv__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
             return Vec2(self.x // other.x,
                         self.y // other.y)
         return Vec2(self.x // other,
                     self.y // other)
+    
+    def __ifloordiv__(self, other: Vec2) -> Vec2:
+        self.x //= other.x
+        self.y //= other.y
+        return self
     
     def __truediv__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
@@ -98,12 +126,22 @@ class Vec2: # TODO: add support for network notify protocol
         return Vec2(self.x / other,
                     self.y / other)
     
+    def __itruediv__(self, other: Vec2) -> Vec2:
+        self.x /= other.x
+        self.y /= other.y
+        return self
+    
     def __mod__(self, other: Vec2 | int | float) -> Vec2:
         if isinstance(other, Vec2):
             return Vec2(self.x % other.x,
                         self.y % other.y)
         return Vec2(self.x % other,
                     self.y % other)
+    
+    def __imod__(self, other: Vec2) -> Vec2:
+        self.x %= other.x
+        self.y %= other.y
+        return self
     
     def __eq__(self, other: Vec2) -> bool:
         return (self.x == other.x) and (self.y == other.y)
@@ -126,7 +164,7 @@ class Vec2: # TODO: add support for network notify protocol
     def __copy__(self) -> Vec2:
         return __class__(self.x, self.y)
     
-    def __deepcopy__(self, memo: dict[object, object]) -> Vec2:
+    def __deepcopy__(self, _memo) -> Vec2:
         return __class__(self.x, self.y)
 
     def copy(self) -> Vec2:
@@ -135,7 +173,7 @@ class Vec2: # TODO: add support for network notify protocol
         Returns:
             Vec2: a new copy
         """
-        return self.__copy__()
+        return __class__(self.x, self.y)
 
     def length(self) -> float:
         """Returns the length of the vector
@@ -273,13 +311,23 @@ class Vec2i(Vec2):
         return Vec2(self.x + other.x,
                     self.y + other.y)
     
+    def __iadd__(self, other: Vec2i) -> Vec2i:
+        self.x += other.x
+        self.y += other.y
+        return self
+    
     def __sub__(self, other: Vec2i | Vec2) -> Vec2i | Vec2:
         if isinstance(other, Vec2i):
             return Vec2i(int(self.x - other.x),
                          int(self.y - other.y))
         return Vec2(self.x - other.x,
                     self.y - other.y)
-
+    
+    def __isub__(self, other: Vec2i) -> Vec2i:
+        self.x -= other.x
+        self.y -= other.y
+        return self
+    
     def __mul__(self, other: Vec2i | Vec2 | int | float) -> Vec2i | Vec2:
         if isinstance(other, Vec2i):
             return Vec2i(int(self.x * other.x),
@@ -289,6 +337,11 @@ class Vec2i(Vec2):
                         self.y * other.y)
         return Vec2(self.x * other,
                     self.y * other)
+    
+    def __imul__(self, other: Vec2i) -> Vec2i:
+        self.x *= other.x
+        self.y *= other.y
+        return self
     
     def __floordiv__(self, other: Vec2i | Vec2 | int | float) -> Vec2i | Vec2:
         if isinstance(other, Vec2i):
@@ -300,6 +353,11 @@ class Vec2i(Vec2):
         return Vec2(self.x * other,
                     self.y * other)
     
+    def __ifloordiv__(self, other: Vec2i) -> Vec2i:
+        self.x //= other.x
+        self.y //= other.y
+        return self
+    
     def __truediv__(self, other: Vec2i | Vec2 | int | float) -> Vec2i | Vec2:
         if isinstance(other, Vec2i):
             return Vec2i(int(self.x / other.x),
@@ -310,6 +368,11 @@ class Vec2i(Vec2):
         return Vec2(self.x / other,
                     self.y / other)
     
+    def __itruediv__(self, other: Vec2i) -> Vec2i:
+        self.x /= other.x
+        self.y /= other.y
+        return self
+    
     def __mod__(self, other: Vec2i | Vec2 | int | float) -> Vec2i | Vec2:
         if isinstance(other, Vec2i):
             return Vec2i(int(self.x % other.x),
@@ -319,7 +382,12 @@ class Vec2i(Vec2):
                         self.y % other.y)
         return Vec2(self.x % other,
                     self.y % other)
-
+    
+    def __imod__(self, other: Vec2i) -> Vec2i:
+        self.x %= other.x
+        self.y %= other.y
+        return self
+    
     def __copy__(self) -> Vec2i:
         return __class__(self.x, self.y)
     
@@ -332,4 +400,4 @@ class Vec2i(Vec2):
         Returns:
             Vec2i: a new copy
         """
-        return self.__copy__()
+        return __class__(self.x, self.y)
