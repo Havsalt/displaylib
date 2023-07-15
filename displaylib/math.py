@@ -147,6 +147,17 @@ class Vec2: # TODO: add support for network notify protocol
             return 0.0
         return sqrt(self.x*self.x + self.y*self.y)
     
+    def distance_to(self, other: Vec2) -> float:
+        """Returns the relative distance to the other point
+
+        Args:
+            other (Vec2): other point
+
+        Returns:
+            float: distance
+        """
+        return (other - self).length()
+    
     def normalized(self) -> Vec2:
         """Returns a vector with length of 1, still with same direction
 
@@ -158,6 +169,17 @@ class Vec2: # TODO: add support for network notify protocol
             return Vec2(0, 0)
         return self / self.length()
 
+    def direction_to(self, other: Vec2) -> Vec2:
+        """Returns the direction to the other point
+
+        Args:
+            other (Vec2): other point
+
+        Returns:
+            Vec2: direction
+        """
+        return (other - self).normalized()
+
     def angle(self) -> float:
         """Returns the angle (measured in radians), using atan2
 
@@ -165,6 +187,17 @@ class Vec2: # TODO: add support for network notify protocol
             float: angle given in radians
         """
         return atan2(self.y, self.x)
+
+    def angle_to(self, other: Vec2) -> float:
+        """Returns the angle (measured in radians) to the other point
+
+        Args:
+            other (Vec2): other point
+
+        Returns:
+            float: angle given in radians
+        """
+        return (other - self).angle()
 
     def lerp(self, target: Vec2, weight: float, /) -> Vec2:
         """Lerp towards vector `target` with `weight` ranging from 0 to 1
