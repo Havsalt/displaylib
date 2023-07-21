@@ -37,8 +37,8 @@ def load_frame_texture(file_path: str, /, *, fill: bool = True, fliph: bool = Fa
     return texture
 
 
-class Frame:
-    """`Frame` used to create animations
+class AnimationFrame:
+    """`AnimationFrame` used to create animations
 
     Loaded at runtime from files or from cache
     """
@@ -76,7 +76,7 @@ class Animation:
         """
         fnames = os.listdir(os.path.join(os.getcwd(), folder_path))
         step = 1 if not reverse else -1
-        self.frames = [Frame(os.path.join(os.getcwd(), folder_path, fname), fill=fill, fliph=fliph, flipv=flipv) for fname in fnames][::step]
+        self.frames = [AnimationFrame(os.path.join(os.getcwd(), folder_path, fname), fill=fill, fliph=fliph, flipv=flipv) for fname in fnames][::step]
 
 
 class EmptyAnimation(Animation):
@@ -119,8 +119,8 @@ class AnimationPlayer(Node):
         self.animations: dict[str, Animation] = dict(animations)
         self.current_animation: str = ""
         self.is_playing: bool = False
-        self._current_frames: Generator[Frame, None, None] | None = None
-        self._next: Frame | None = None
+        self._current_frames: Generator[AnimationFrame, None, None] | None = None
+        self._next: AnimationFrame | None = None
         self._has_updated: bool = False # indicates if the first frame (per animation) has been displayed
         self._accumulated_time: float = 0.0
     
@@ -132,11 +132,11 @@ class AnimationPlayer(Node):
         """
         return self
 
-    def __next__(self) -> Frame | None:
+    def __next__(self) -> AnimationFrame | None:
         """Returns the next frame from the current frames (a generator)
 
         Returns:
-            Frame: the next frame
+            AnimationFrame: the next frame
         """
         try:
             if self._current_frames is None:

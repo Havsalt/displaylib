@@ -40,7 +40,7 @@ __all__ = [ # default mode is used when using the star notation
     "Engine",            # (class)
     "Camera",            # (class)
     "Screen",            # (class)
-    "Frame",             # (class)
+    "AnimationFrame",    # (class)
     "Animation",         # (class)
     "EmptyAnimation",    # (class)
     "AnimationPlayer",   # (class)
@@ -79,7 +79,7 @@ from .ascii import (
     Engine,
     Camera,
     Screen,
-    Frame,
+    AnimationFrame,
     Animation,
     EmptyAnimation,
     AnimationPlayer,

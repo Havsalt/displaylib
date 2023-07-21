@@ -17,7 +17,7 @@ __all__ = [
     "Engine",            # (class)
     "Camera",            # (class)
     "Screen",            # (class)
-    "Frame",             # (class)
+    "AnimationFrame",    # (class)
     "Animation",         # (class)
     "EmptyAnimation",    # (class)
     "AnimationPlayer",   # (class)
@@ -50,7 +50,7 @@ from .node import AsciiNode as Node, AsciiNode2D as Node2D
 from .engine import AsciiEngine as Engine
 from .camera import AsciiCamera as Camera
 from .screen import AsciiScreen as Screen
-from .animation import Frame, Animation, EmptyAnimation, AnimationPlayer
+from .animation import AnimationFrame, Animation, EmptyAnimation, AnimationPlayer
 from .audio import AudioStreamPlayer
 from .clock import Clock
 # mixin components
