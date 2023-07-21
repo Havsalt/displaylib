@@ -124,7 +124,7 @@ class AnimationPlayer(Node):
         self._has_updated: bool = False # indicates if the first frame (per animation) has been displayed
         self._accumulated_time: float = 0.0
     
-    def __iter__(self) -> AnimationPlayer:
+    def __iter__(self: Self) -> Self:
         """Use itself as main iterator
 
         Returns:
