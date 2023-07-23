@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ..template import Node, Node2D
+from ..template import Node, Transform2D
 
 if TYPE_CHECKING:
     from ..math import Vec2i
@@ -35,7 +35,7 @@ class AsciiNode(Ascii, Node): # Node with Ascii hooks
     """
 
 
-class AsciiNode2D(Ascii, Node2D): # Node2D with Ascii hooks
+class AsciiNode2D(Ascii, Transform2D, Node): # Node2D with Ascii hooks
     """`AsciiNode2D` with additional hooks related to `ascii` mode functionality
 
     Hooks:
