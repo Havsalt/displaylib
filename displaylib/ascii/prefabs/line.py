@@ -33,10 +33,6 @@ class AsciiPoint2D(Color, Texture, AsciiNode2D):
             z_index (int, optional): _description_. Defaults to 0.
             force_sort (bool, optional): _description_. Defaults to True.
         """
-        # super().__init__(parent, x=x, y=y, force_sort=force_sort)
-        # self.texture = texture
-        # self.color = color
-        # self.z_index = z_index
 
 
 class AsciiLine(AsciiNode2D):

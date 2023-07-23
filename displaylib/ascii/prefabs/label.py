@@ -50,11 +50,6 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
             z_index (int, optional): layer to render on. Defaults to 0.
             force_sort (bool, optional): whether to sort based on 'z_index' and 'process_priority'. Defaults to True.
         """
-        # super().__init__(parent, x=x, y=y, force_sort=force_sort)
-        # self.delimiter = delimiter if (delimiter != "\n") else getattr(self, "delimiter", delimiter)
-        # self.text = text or getattr(self, "text", text) # set after `.delimiter`!
-        # self.color = color if (color != WHITE) else getattr(self, "color", color) # if not defined in class, use default (which may be WHITE)
-        # self.z_index = z_index or getattr(self, "z_index", z_index)
     
     @property
     def text(self) -> str:
