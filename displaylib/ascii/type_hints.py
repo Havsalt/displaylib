@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from .color import _Color
 
 TextureSelf = TypeVar("TextureSelf", bound="TextureMixin")
+AsciiCameraSelf = TypeVar("AsciiCameraSelf", bound="AsciiCameraProtocol")
 
 class TextureMixin(Protocol):
     def __new__(cls, *args, **kwargs) -> ValidTextureNode: ...
@@ -52,6 +53,9 @@ class ColorMixin(Protocol):
 class ValidTextureNode(TextureMixin, Transform2DMixin, NodeMixin, Protocol): ...
 
 class ValidColorNode(ColorMixin, TextureMixin, Transform2DMixin, NodeMixin, Protocol): ...
+
+class AsciiCameraProtocol(Transform2DMixin, NodeMixin, Protocol):
+    def set_current(self) -> None: ...
 
 class AsciiPoint2DProtocol(ColorMixin, TextureMixin, Transform2DMixin, NodeMixin, Protocol): ...
 
