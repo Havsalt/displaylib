@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from types import FunctionType
-from typing import TypeVar
+from typing import TYPE_CHECKING, cast
 
 from .node import Node
 
-EngineLike = TypeVar("EngineLike")
+if TYPE_CHECKING:
+    from types import FunctionType
+    from .type_hints import EngineType, AnyNode
 
 
 class EngineMixinSortMeta(type):
@@ -38,17 +39,17 @@ class Engine(metaclass=EngineMixinSortMeta):
     is_running: bool = False
     per_frame_tasks: list[FunctionType] = []
 
-    def __new__(cls: type[EngineLike], *args, **kwargs) -> EngineLike:
+    def __new__(cls: type[EngineType], *args, **kwargs) -> EngineType:
         """Sets `Node.root` when an `Engine instance` is initialized 
 
         Args:
-            cls (type[Engine]): engine object to be `root`
+            cls (type[EngineType]): engine object to be `root`
 
         Returns:
-            Engine: the engine to be used in the program
+            EngineType: the engine to be used in the program
         """
         instance = super().__new__(cls)
-        setattr(Node, "root", instance)
+        Node.root = cast(Engine, instance)
         return instance
 
     def __init__(self) -> None: # default implementation
@@ -80,7 +81,7 @@ class Engine(metaclass=EngineMixinSortMeta):
         ...
     
     @staticmethod
-    def sort_function_for_process_priority(elements: tuple[str, Node]) -> int:
+    def sort_function_for_process_priority(elements: tuple[str, AnyNode]) -> int:
         return elements[1].process_priority
     
     def _main_loop(self) -> None:
@@ -103,3 +104,4 @@ class Engine(metaclass=EngineMixinSortMeta):
                     del Node.nodes[uid]
                 Node._queued_nodes.clear()
                 Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
+        # _on_exit() is called automatically after this
