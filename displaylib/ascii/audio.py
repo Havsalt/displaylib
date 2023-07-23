@@ -29,9 +29,7 @@ if sys.platform != "win32": # if not on Windows, implement a skeleton, which rai
 else:
     import threading
     from winsound import PlaySound as play_sound, SND_FILENAME, SND_PURGE
-    from typing import TypeVar, ClassVar
-
-    Self = TypeVar("Self")
+    from typing import ClassVar
 
 
     class AudioStreamPlayer:
