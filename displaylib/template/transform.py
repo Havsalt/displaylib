@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import cast
 
 from ..math import Vec2
-from .type_hints import MroNext, ValidTransform2DNode, Transform2DMixin, Self
+from .type_hints import MroNext, ValidTransform2DNode, NodeType
 
 
 class Transform2D: # Component (mixin class)
@@ -13,14 +13,18 @@ class Transform2D: # Component (mixin class)
     rotation: float
     visible: bool
 
-    def __new__(cls: type[Self], *args, x: float = 0, y: float = 0, **kwargs) -> Self:
+    def __new__(cls: type[NodeType], *args, x: float = 0, y: float = 0, **kwargs) -> NodeType:
         mro_next = cast(MroNext[ValidTransform2DNode], super())
-        instance = mro_next.__new__(cast(type[Transform2DMixin], cls), *args, **kwargs)
-        instance.position = Vec2(x, y)
-        instance.rotation = 0.0
-        # only nodes with Transform2D component will have the option to be visible
-        instance.visible = True # local visibility
-        return cast(Self, instance)
+        instance = mro_next.__new__(cls, *args, **kwargs)
+        # override -> class value -> default
+        if (x or y) or not hasattr(instance, "position"):
+            instance.position = Vec2(x, y)
+        # class value -> default
+        if not hasattr(instance, "rotation"):
+            instance.rotation = 0.0
+        # class value -> default
+        instance.visible = (getattr(instance, "visible", True) != False) # local visibility
+        return cast(NodeType, instance)
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}({self.position.x}, {self.position.y})"
@@ -86,9 +90,13 @@ class Transform2D: # Component (mixin class)
         return True
 
     def hide(self) -> None:
+        """Hides this node and its children. Nodes with their `.parent` (or parent.parent... etc.) being this node is considered children
+        """
         self.visible = False
     
     def show(self) -> None:
+        """Shows this node and its children. Nodes with their `.parent` (or parent.parent... etc.) being this node is considered children
+        """
         self.visible = True
     
     def look_at(self, location: Vec2) -> None:

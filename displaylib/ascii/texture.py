@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, ClassVar, cast
 
 from ..math import Vec2, Vec2i
 from ..template import Transform2D
-from ..template.type_hints import MroNext, Self
-from .type_hints import NodeMixin, TextureMixin, ValidTextureNode, TextureSelf
+from ..template.type_hints import MroNext, NodeType
+from .type_hints import NodeMixin, ValidTextureNode, TextureSelf
 
 if TYPE_CHECKING:
     from .type_hints import TextureSelf
@@ -23,21 +23,29 @@ class Texture: # Component (mixin class)
     texture: list[list[str]]
     offset: Vec2
     centered: bool
+    z_index: int # type: ignore
 
-    def __new__(cls: type[Self], *args, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True, **kwargs) -> Self: # borrowing: `force_sort`
+    def __new__(cls: type[NodeType], *args, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered = None, z_index: int = 0, force_sort: bool = True, **kwargs) -> NodeType: # borrowing: `force_sort`
         mro_next = cast(MroNext[ValidTextureNode], super())
-        instance = mro_next.__new__(cast(type[TextureMixin], cls), *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
-        # set if not defined in class
-        if not getattr(instance, "texture", False):
-            instance.texture = texture
-        # set anyway
-        instance.offset = Vec2(offset.x, offset.y)
-        instance.centered = centered
-        instance._z_index = z_index
+        instance = mro_next.__new__(cls, *args, force_sort=force_sort, **kwargs) # `force_sort` is passed to Node eventually
+        # override -> class value -> default
+        if texture or not hasattr(instance, "texture"):
+            instance.texture = texture # class value is shared texture (use `.make_unique()` or `.as_unique()`)
+        # override -> class value -> default
+        if offset or not hasattr(instance, "offset"):
+            instance.offset = offset.copy() # unique offset
+        # override -> class value -> default
+        if centered is not None:
+            instance.centered = centered
+        elif not hasattr(instance, "centered"):
+            instance.centered = False
+        # override -> class value -> default
+        if z_index or not hasattr(instance, "_z_index"):
+            instance._z_index = z_index
         if force_sort:
             Texture._request_z_index_sort = True
         Texture._instances.append(instance)
-        return cast(Self, instance)
+        return cast(NodeType, instance)
     
     @property
     def z_index(self) -> int:
