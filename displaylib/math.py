@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations as _annotations
 
 from math import sqrt, cos, sin, atan2
 
@@ -21,7 +21,7 @@ def lerp(start: int | float, end: int | float, weight: float, /) -> float:
     Returns:
         float: result of the interpolation
     """
-    return (1 - weight) * start + (weight * end)
+    return (1.0 - weight) * start + (weight * end)
 
 
 def sign(number: int | float, /) -> int:
@@ -102,9 +102,13 @@ class Vec2:
         return Vec2(self.x * other,
                     self.y * other)
     
-    def __imul__(self, other: Vec2) -> Vec2:
-        self.x *= other.x
-        self.y *= other.y
+    def __imul__(self, other: Vec2 | int | float) -> Vec2:
+        if isinstance(other, Vec2):
+            self.x *= other.x
+            self.y *= other.y
+        else:
+            self.x *= other
+            self.y *= other
         return self
     
     def __floordiv__(self, other: Vec2 | int | float) -> Vec2:
@@ -114,9 +118,13 @@ class Vec2:
         return Vec2(self.x // other,
                     self.y // other)
     
-    def __ifloordiv__(self, other: Vec2) -> Vec2:
-        self.x //= other.x
-        self.y //= other.y
+    def __ifloordiv__(self, other: Vec2 | int | float) -> Vec2:
+        if isinstance(other, Vec2):
+            self.x //= other.x
+            self.y //= other.y
+        else:
+            self.x //= other
+            self.y //= other
         return self
     
     def __truediv__(self, other: Vec2 | int | float) -> Vec2:
@@ -126,9 +134,13 @@ class Vec2:
         return Vec2(self.x / other,
                     self.y / other)
     
-    def __itruediv__(self, other: Vec2) -> Vec2:
-        self.x /= other.x
-        self.y /= other.y
+    def __itruediv__(self, other: Vec2 | int | float) -> Vec2:
+        if isinstance(other, Vec2):
+            self.x /= other.x
+            self.y /= other.y
+        else:
+            self.x /= other
+            self.y /= other
         return self
     
     def __mod__(self, other: Vec2 | int | float) -> Vec2:
@@ -138,9 +150,13 @@ class Vec2:
         return Vec2(self.x % other,
                     self.y % other)
     
-    def __imod__(self, other: Vec2) -> Vec2:
-        self.x %= other.x
-        self.y %= other.y
+    def __imod__(self, other: Vec2 | int | float) -> Vec2:
+        if isinstance(other, Vec2):
+            self.x %= other.x
+            self.y %= other.y
+        else:
+            self.x %= other
+            self.y %= other
         return self
     
     def __eq__(self, other: Vec2) -> bool:
@@ -166,6 +182,14 @@ class Vec2:
     
     def __deepcopy__(self, _memo) -> Vec2:
         return __class__(self.x, self.y)
+
+    def to_tuple(self) -> tuple[float, float]:
+        """Converts the vector to a tuple representation
+
+        Returns:
+            tuple[float, float]: x and y as tuple
+        """
+        return (self.x, self.y)
 
     def copy(self) -> Vec2:
         """Returns a copied Vec2
