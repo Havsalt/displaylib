@@ -90,12 +90,12 @@ class Transform2D: # Component (mixin class)
         return True
 
     def hide(self) -> None:
-        """Hides this node and its children. Nodes with their `.parent` (or parent.parent... etc.) being this node is considered children
+        """Hides this node and its children. Nodes with their `.parent` (or parent.parent... etc.) being this node are considered children
         """
         self.visible = False
     
     def show(self) -> None:
-        """Shows this node and its children. Nodes with their `.parent` (or parent.parent... etc.) being this node is considered children
+        """Shows this node and its children. Nodes with their `.parent` (or parent.parent... etc.) being this node are considered children
         """
         self.visible = True
     
