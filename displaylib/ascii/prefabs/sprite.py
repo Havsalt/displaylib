@@ -21,7 +21,7 @@ SPACE = " " # filler when load_texture(..., fill=True)
 
 @functools.cache
 def load_texture(file_path: str, /, *, fill: bool = True, transparent: str = " ", default: str = " ", fliph: bool = False, flipv: bool = False) -> list[list[str]]:
-    file: io.TextIOWrapper = open(file_path, "r") # from disk
+    file: io.TextIOWrapper = open(file_path, "r", encoding="utf-8") # from disk
     if transparent == default:
         texture = [list(line.rstrip("\n")) for line in file.readlines()]
     else:
