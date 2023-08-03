@@ -2,18 +2,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, cast
 
-from ..util import pull
-from ..template import Node
 from .node import AsciiNode2D
-
-from ..template.type_hints import Transform2DMixin
+from ..template.type_hints import MroNext, NodeType
 
 if TYPE_CHECKING:
     from ..math import Vec2
-    from ..template.type_hints import Self
+    from ..template.type_hints import AnyNode
+    from .type_hints import AsciiCameraSelf
 
 
-@pull("follow", "mode")
 class AsciiCamera(AsciiNode2D):
     """`AsciiCamera` for moving the viewport
 
@@ -29,8 +26,23 @@ class AsciiCamera(AsciiNode2D):
     CENTERED: ClassVar[int] = 0x1
     INCLUDE_SIZE: ClassVar[int] = 0x2
     current: ClassVar[AsciiCamera]
+    follow: bool
+    mode: int
 
-    def __init__(self, parent: Node | None = None, *, x: float = 0, y: float = 0, follow: bool = True, mode: int = FIXED) -> None:
+    def __new__(cls: type[NodeType], *args, follow = None, mode: int = 0, **kwargs) -> NodeType:
+        mro_next = cast(MroNext[AsciiCamera], super())
+        instance = mro_next.__new__(cls, *args, **kwargs)
+        # override -> class value -> default
+        if follow is not None:
+            instance.follow = follow
+        elif not hasattr(instance, "follow"):
+            instance.follow = False
+        # override -> class value -> default
+        if mode or not hasattr(instance, "mode"):
+            instance.mode = mode
+        return cast(NodeType, instance)
+
+    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, follow: bool = True, mode: int = FIXED) -> None:
         """Creates a new camera (initially inactive), which can be set active using `.set_current()` or `.as_current()`
 
         Args:
@@ -40,9 +52,6 @@ class AsciiCamera(AsciiNode2D):
             follow (bool, optional): whether to follow parent. Defaults to True.
             mode (int, optional): camera rendering mode (ored together using '|'). Defaults to FIXED.
         """
-        super().__init__(parent, x=x, y=y, force_sort=True)
-        self.mode = mode # `centered` mode only has effect if `parent` is not None
-        self.follow = follow # whether to follow the `parent`
     
     def get_global_position(self) -> Vec2:
         """Computes the node's global position (world space)
@@ -52,10 +61,9 @@ class AsciiCamera(AsciiNode2D):
         Returns:
             Vec2: global position
         """
-        if not self.follow and self.parent is not None:
+        if not self.follow or self.parent is not None:
             return self.position
-        mro_next = cast(Transform2DMixin, super())
-        return mro_next.get_global_position()
+        return super().get_global_position()
 
     def get_global_rotation(self) -> float:
         """Computes the node's global rotation (world space)
@@ -65,22 +73,29 @@ class AsciiCamera(AsciiNode2D):
         Returns:
             float: global rotation in radians
         """
-        if not self.follow and self.parent is not None:
+        if not self.follow or self.parent is not None:
             return self.rotation
-        mro_next = cast(Transform2DMixin, super())
-        return mro_next.get_global_rotation()
+        return super().get_global_rotation()
     
     def set_current(self) -> None:
         """Sets this camera as the currently active one
         """
         AsciiCamera.current = self
     
-    def as_current(self: Self) -> Self:
+    def as_current(self: AsciiCameraSelf) -> AsciiCameraSelf:
         """Sets this camera as the currently active one,
         along returning itself
 
         Returns:
-            Self: itself after set as current camera
+            AsciiCameraSelf: itself after set as current camera
         """
-        getattr(self, "set_current")()
+        self.set_current()
         return self
+    
+    def is_current(self) -> bool:
+        """Returns whether this camera is the currently active camera
+
+        Returns:
+            bool: state
+        """
+        return AsciiCamera.current is self
