@@ -45,7 +45,7 @@ class PygameNode(Pygame, Node): # a variant of the Node
     """
 
 
-class PygameNode2D(Pygame, Transform2D, Node): # a variant of the Node2D
+class PygameNode2D(Transform2D, PygameNode): # a variant of the Node2D
     """`PygameNode2D` with additional hooks related to `pygame` mode functionality
 
     Hooks:

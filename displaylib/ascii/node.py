@@ -37,7 +37,7 @@ class AsciiNode(Ascii, Node): # Node with Ascii hooks
     """
 
 
-class AsciiNode2D(Ascii, Transform2D, Node): # Node2D with Ascii hooks
+class AsciiNode2D(Transform2D, AsciiNode): # Node2D with Ascii hooks
     """`AsciiNode2D` with additional hooks related to `ascii` mode functionality
 
     Hooks:
