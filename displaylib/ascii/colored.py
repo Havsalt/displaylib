@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-from ..template.type_hints import MroNext, Self
-from .color import RESET, WHITE, _Color
-from .type_hints import ColorMixin, ValidColorNode
+from ..template.type_hints import MroNext, NodeType
+from .color import RESET, WHITE
+from .type_hints import ValidColorNode
+
+if TYPE_CHECKING:
+    from .color import _Color
 
 
 class Color: # Component (mixin class)
@@ -16,11 +19,15 @@ class Color: # Component (mixin class)
     """
     color: _Color
     
-    def __new__(cls: type[Self], *args, color: _Color = WHITE, **kwargs) -> Self:
+    def __new__(cls: type[NodeType], *args, color = None, **kwargs) -> NodeType:
         mro_next = cast(MroNext[ValidColorNode], super())
-        instance = mro_next.__new__(cast(type[ColorMixin], cls), *args, **kwargs)
-        instance.color = color
-        return cast(Self, instance)
+        instance = mro_next.__new__(cls, *args, **kwargs)
+        # override -> class value -> default
+        if color is not None:
+            instance.color = color
+        elif not hasattr(instance, "color"):
+            instance.color = WHITE
+        return cast(NodeType, instance)
 
     def _get_final_texture(self) -> list[list[str]]:
         """Applies color to the texture right before rendering. WHITE color just returns the uncolorized texture
