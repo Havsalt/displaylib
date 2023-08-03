@@ -14,7 +14,7 @@ class Clock:
             tps (int): ticks per second
         """
         self.tps = tps
-        self.delta_time = 1.0 / self.tps
+        self.delta_time = 1.0 / self.tps # initial delta time (optimal)
         self._target_delta = 1.0 / self.tps
         self._last_tick = time.perf_counter()
     
