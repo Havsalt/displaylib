@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from displaylib.template.type_hints import AnyNode
+
 from ..template import Node, Transform2D
 
 if TYPE_CHECKING:
@@ -41,3 +43,12 @@ class AsciiNode2D(Ascii, Transform2D, Node): # Node2D with Ascii hooks
     Hooks:
         - `_on_screen_resize(self, size: Vec2i) -> None`
     """
+    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, force_sort: bool = True) -> None:
+        """Initializes the 2D node
+
+        Args:
+            parent (AnyNode | None, optional): parent node. Defaults to None.
+            x (float, optional): local x position. Defaults to 0.
+            y (float, optional): local x position. Defaults to 0.
+            force_sort (bool, optional): whether to sort based on 'z_index' and 'process_priority'. Defaults to True.
+        """
