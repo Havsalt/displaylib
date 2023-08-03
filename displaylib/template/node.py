@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, cast
 
-from .type_hints import MroNext, NodeMixin, ValidNode, Self
+from .type_hints import MroNext, NodeType, AnyNode, Self
 
 if TYPE_CHECKING:
+    from ..template.type_hints import AnyNode
     from .engine import Engine
 
 
@@ -29,21 +30,21 @@ class Node(metaclass=NodeMixinSortMeta):
     Hooks:
         - `_update(self, delta: float) -> None`
     """
-    nodes: ClassVar[dict[str, Node]] = {} # all nodes that are alive
+    nodes: ClassVar[dict[str, AnyNode]] = {} # all nodes that are alive
     _uid_counter: ClassVar[int] = 0 # is read and increments for each generated uid
     _request_process_priority_sort: ClassVar[bool] = False # requests Engine to sort
     _queued_nodes: ClassVar[list[str]] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
     root: Engine # set from a Engine subclass
     uid: str
-    parent: Node | None = None
+    parent: AnyNode | None = None
 
-    def __new__(cls: type[Self], *parent_as_positional: Node | None, parent: Node | None = None, force_sort: bool = True) -> Self: # pulling: optional "parent", "force_sort"
+    def __new__(cls: type[NodeType], *parent_as_positional: AnyNode | None, parent: AnyNode | None = None, force_sort: bool = True, **_overflow) -> NodeType:
         """Assigns the node a `unique ID`, stores its `reference` to keep it from being garbage collected and
         may request the engine to `sort` nodes based on '.process_priority'
 
         Args:
-            cls (type[Self]): original class that will be created
-            parent_as_positional (Node | None, optional): pulling 'parent' as it is used in Node.__init__. Defaults to None.
+            cls (type[NodeType]): original class that will be created
+            parent_as_positional/parent (AnyNode | None, optional): parent of the node. Defaults to None.
             force_sort (bool, optional): whether to request the engine to sort nodes based on '.process_priority'. Defaults to True.
 
         Raises:
@@ -51,22 +52,26 @@ class Node(metaclass=NodeMixinSortMeta):
             ValueError: argument 'parent' was passed as both positional and keyword
 
         Returns:
-            Self: node instance that was stored
+            NodeType: node instance that was stored
         """
-        if len(parent_as_positional) > 2: # > 2 because argument 'cls' seems to be caught up in '*parent_as_positional'
+        if len(parent_as_positional) > 1:
             # if passing anything more than `parent` as positional argument
             raise ValueError(f"expected 0-1 argument for 'parent', was given {len(parent_as_positional)}: {parent_as_positional}")
         elif parent is not None and len(parent_as_positional) > 1: # > 1 because it is 'cls' argument
             raise ValueError(f"parameter 'parent' was supplied both positional only and keyword only argument(s): positional(s) = {parent_as_positional} & keyword = {parent_as_positional}")
-        mro_next = cast(MroNext[ValidNode], super())
-        instance = mro_next.__new__(cast(type[NodeMixin], cls))
+        mro_next = cast(MroNext[AnyNode], super())
+        instance = mro_next.__new__(cls)
         uid = cast(Node, cls).generate_uid()
         instance.uid = uid
-        instance._process_priority = 0
-        Node.nodes[uid] = cast(Node, instance) # mutate list
+        # positional -> keyword/default
+        parent_ref = parent_as_positional[0] if parent_as_positional else parent
+        instance.parent = parent_ref
+        # class value -> default
+        instance._process_priority = getattr(instance, "process_priority", 0)
+        Node.nodes[uid] = instance # store reference
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_process_priority_sort = True # otherwise, depend on a `process_priority` change
-        return cast(Self, instance)
+        return cast(NodeType, instance)
 
     @classmethod
     def generate_uid(cls) -> str:
@@ -79,16 +84,13 @@ class Node(metaclass=NodeMixinSortMeta):
         Node._uid_counter += 1
         return str(uid)
 
-    def __init__(self, parent: Node | None = None, *, force_sort: bool = True) -> None:
+    def __init__(self, parent: AnyNode | None = None, *, force_sort: bool = True) -> None:
         """Initializes the base node
 
         Args:
-            parent (Node | None, optional): parent node. Defaults to None.
+            parent (AnyNode | None, optional): parent node. Defaults to None.
             force_sort (bool, optional): whether to sort based on 'z_index' and 'process_priority'. Defaults to True.
         """
-        self.parent = parent
-        if force_sort: # may sort `process_priority` and `z_index`
-            Node._request_process_priority_sort = True # otherwise, depent on a `process_priority` change
 
     def __repr__(self) -> str:
         """Returns a default representation of the Node object
@@ -149,6 +151,6 @@ class Node(metaclass=NodeMixinSortMeta):
         """Tells the Engine to `delete` this node after
         every node has been called `_update` on
         """
-        if not self.uid in Node._queued_nodes:
+        if self.uid not in Node._queued_nodes:
             Node._queued_nodes.append(self.uid)
         Node._request_process_priority_sort = True
