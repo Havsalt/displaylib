@@ -6,18 +6,22 @@ Raises:
 
 __all__ = [
     # math
-    "lerp",
-    "sign",
-    "Vec2",
-    "Vec2i",
-    # standard
-    "Transform2D",
+    "lerp",              # (function)
+    "sign",              # (function)
+    "Vec2",              # (data structure)
+    "Vec2i",             # (data structure)
+    # utility
+    "autorun",           # (class decorator)
     # core pygame
-    "Node",
-    "Node2D",
-    "Engine",
+    "Node",              # (class)
+    "Node2D",            # (class)
+    "Engine",            # (class)
+    # mixin components
+    "Transform2D",       # (component)
     # networking
-    "networking"
+    "networking",        # (module)
+    # typing support
+    "AnyNode",           # (protocol)
 ]
 
 try: # check if pygame is installed
@@ -31,10 +35,14 @@ except ModuleNotFoundError as error:
 
 # math
 from ..math import lerp, sign, Vec2, Vec2i
-# standard
-from ..template import Transform2D
+# utility
+from ..util import autorun
 # core pygame
 from .node import PygameNode as Node, PygameNode2D as Node2D
 from .engine import PygameEngine as Engine
+# mixin components
+from ..template import Transform2D
 # networking
 from ..template import networking
+# typing support
+from ..template.type_hints import AnyNode

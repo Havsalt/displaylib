@@ -10,7 +10,7 @@ __all__ = [
     "Vec2",              # (data structure)
     "Vec2i",             # (data structure)
     # utility
-    "pull",              # (class decorator)
+    "autorun",           # (class decorator)
     # core ascii
     "Node",              # (class)
     "Node2D",            # (class)
@@ -38,13 +38,14 @@ __all__ = [
     # networking
     "networking",        # (module)
     # typing support
+    "AnyNode",           # (protocol)
     "_Color"             # (type alias)
 ]
 
 # math
 from ..math import lerp, sign, Vec2, Vec2i
 # utility
-from ..util import pull
+from ..util import autorun
 # core ascii
 from .node import AsciiNode as Node, AsciiNode2D as Node2D
 from .engine import AsciiEngine as Engine
@@ -68,11 +69,11 @@ from . import text
 # networking
 from ..template import networking
 # typing support
+from ..template.type_hints import AnyNode
 from .color import _Color
 
 
-# -- activate ANSI escape codes
+# activate ANSI escape codes
 import os as _os
 _os.system("")
-# _os.system("cls") # used when developing
 del _os

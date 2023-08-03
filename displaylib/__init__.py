@@ -26,14 +26,14 @@ PygameNode(x, y)
 
 __version__ = "0.0.8"
 __author__ = "Floating-Int"
-__all__ = [ # default mode is used when using the star notation
+__all__ = [ # default mode is used when using the star notation (from displaylib import *)
     # math
     "lerp",              # (function)
     "sign",              # (function)
     "Vec2",              # (data structure)
     "Vec2i",             # (data structure)
     # utility
-    "pull",              # (class decorator)
+    "autorun",           # (class decorator)
     # core ascii
     "Node",              # (class)
     "Node2D",            # (class)
@@ -61,10 +61,11 @@ __all__ = [ # default mode is used when using the star notation
     # networking
     "networking",        # (module)
     # typing support
+    "AnyNode",           # (protocol)
     "_Color"             # (type alias)
 ]
 
-# ascii
+# using ascii mode as default
 from .ascii import (
     # math
     lerp,
@@ -72,7 +73,7 @@ from .ascii import (
     Vec2,
     Vec2i,
     # utility
-    pull,
+    autorun,
     # core ascii
     Node,
     Node2D,
@@ -100,5 +101,6 @@ from .ascii import (
     # networking
     networking,
     # typing support
+    AnyNode,
     _Color
 )
