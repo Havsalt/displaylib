@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from .node import Node
+from .type_hints import MroNext, EngineType
 
 if TYPE_CHECKING:
-    from types import FunctionType
-    from .type_hints import EngineType, AnyNode
+    from functools import partial
+    from .type_hints import AnyNode
 
 
 class EngineMixinSortMeta(type):
@@ -14,7 +15,7 @@ class EngineMixinSortMeta(type):
     """
     @staticmethod
     def _mixin_sort(base: type) -> int:
-        if base == Engine:
+        if base is Engine:
             return 2
         elif issubclass(base, Engine):
             return 1
@@ -35,24 +36,35 @@ class Engine(metaclass=EngineMixinSortMeta):
         - `_on_exit(self) -> None`
         - `_update(self, delta: float) -> None`
     """
-    tps: int = 16
-    is_running: bool = False
-    per_frame_tasks: list[FunctionType] = []
+    tps: int
+    is_running: bool
+    per_frame_tasks: list[function | partial[Any]]
 
-    def __new__(cls: type[EngineType], *args, **kwargs) -> EngineType:
+    def __new__(cls: type[EngineType], *, tps: int = 16, **_overflow) -> EngineType:
         """Sets `Node.root` when an `Engine instance` is initialized 
 
         Args:
-            cls (type[EngineType]): engine object to be `root`
+            cls (type[EngineType]): engine object to be `.root`.
+            tps (int, optional): ticks per second. Defaults to 16.
 
         Returns:
             EngineType: the engine to be used in the program
         """
-        instance = super().__new__(cls)
+        mro_next = cast(MroNext[Engine], super())
+        instance = mro_next.__new__(cls)
         Node.root = cast(Engine, instance)
-        return instance
+        instance.tps = tps
+        instance.is_running = False
+        instance.per_frame_tasks = []
+        return cast(EngineType, instance)
 
-    def __init__(self) -> None: # default implementation
+    def __init__(self, tps: int = 16) -> None:
+        """Base implementation for initializing and running the App instance
+
+        Args:
+            tps (int, optional): ticks per second. Defaults to 16.
+        """
+        self.tps = tps
         self._on_start()
         self.is_running = True
         self._main_loop()
@@ -90,7 +102,7 @@ class Engine(metaclass=EngineMixinSortMeta):
         Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
         while self.is_running:
             for task in self.per_frame_tasks:
-                task()
+                task() # type: ignore
 
             # TODO: add clock with delta, but no sleep
             delta = 1.0 / self.tps # static delta
