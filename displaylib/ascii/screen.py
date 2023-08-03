@@ -31,24 +31,26 @@ class AsciiScreen:
         """
         self.width = width
         self.height = height
-        self._texture = [[self.cell_transparant for _ in range(self.width)] for _ in range(self.height)] # 2D array
+        self.texture = [[self.cell_transparant for _ in range(self.width)] for _ in range(self.height)] # 2D array
 
     def render(self, textured_nodes: Iterable[ValidTextureNode] = [], /) -> None:
         """Renders the textured nodes onto the screen (they have the `Texture` component)
 
         Args:
-            textured_nodes (Iterable[ValidTextureNode], optional): nodes to render (`textured_nodes` elements has to derive from `Transform2D`, `Texture` and `Node`). Defaults to [].
+            textured_nodes (Iterable[ValidTextureNode], optional): nodes to rende. Defaults to [].
         """
-        camera: AsciiCamera = AsciiCamera.current # NOTE: should never be None
+        if AsciiCamera.current is None: # should never be None
+            raise TypeError("'AsciiCamera.current' cannot be of type 'None' while rendering")
+        camera: AsciiCamera = AsciiCamera.current
         half_size = Vec2(self.width, self.height) / 2
-        camera_rotation = camera.get_global_rotation()
+        # camera_rotation = camera.get_global_rotation()
         # cos_camera_rotation = math.cos(-camera_rotation)
         # sin_camera_rotation = math.sin(-camera_rotation)
         viewport_global_position = camera.get_global_position()
         # include half size of camera parent when including size
         if camera.mode & AsciiCamera.INCLUDE_SIZE:
             if camera.parent is not None and isinstance(camera.parent, Texture):
-                viewport_global_position += camera.parent.size() // 2 # adds hald of camera's parent's texture dimensions
+                viewport_global_position += camera.parent.size() // 2 # adds half of camera's parent's texture dimensions
 
         for textured in textured_nodes:
             if not textured.is_globally_visible():
@@ -56,7 +58,7 @@ class AsciiScreen:
             texture = textured._get_final_texture() # may apply color
             if not texture: # check if has not empty texture
                 continue
-            if not texture[0]: # check if has first row
+            if not any(texture): # check if has first row
                 continue
             
             # compute screen space transform
@@ -86,7 +88,7 @@ class AsciiScreen:
             #             if not ((self.width) > x_position >= 0): # out of screen
             #                 continue
             #             if char != self.cell_transparant:
-            #                 self._texture[y_position][x_position] = text.rotate(char, rotation - camera_rotation)
+            #                 self.texture[y_position][x_position] = text.rotate(char, rotation - camera_rotation)
 
             # elif rotation != 0: # node rotation
             if rotation != 0: # node rotation
@@ -105,7 +107,7 @@ class AsciiScreen:
                         if not ((self.width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
-                            self._texture[y_position][x_position] = text.rotate(char, rotation)
+                            self.texture[y_position][x_position] = text.rotate(char, rotation)
             
             # elif camera_rotation != 0: # camera rotation
             #     for h, line in enumerate(texture):
@@ -119,7 +121,7 @@ class AsciiScreen:
             #             if not ((self.width) > x_position >= 0): # out of screen
             #                 continue
             #             if char != self.cell_transparant:
-            #                 self._texture[y_position][x_position] = text.rotate(char, camera_rotation)
+            #                 self.texture[y_position][x_position] = text.rotate(char, camera_rotation)
 
             else: # no rotation
                 for h, line in enumerate(texture):
@@ -131,21 +133,21 @@ class AsciiScreen:
                         if not ((self.width) > x_position >= 0): # out of screen
                             continue
                         if char != self.cell_transparant:
-                            self._texture[y_position][x_position] = char
+                            self.texture[y_position][x_position] = char
 
     def clear(self) -> None:
         """Clears the screen by filling it with `AsciiSurface.cell_transparant`
         """
-        self._texture = [[self.cell_transparant for _ in range(self.width)] for _ in range(self.height)] # 2D array
+        self.texture = [[self.cell_transparant for _ in range(self.width)] for _ in range(self.height)] # 2D array
     
     def show(self) -> None:
         """Prints the screen to the terminal
         """
         out = ""
-        lines = len(self._texture)
-        for idx, line in enumerate(self._texture):
+        lines = len(self.texture)
+        for idx, line in enumerate(self.texture):
             rendered = "".join(letter if letter != self.cell_transparant else self.cell_default for letter in (line))
             out += (rendered + " " + ("\n" if idx != lines else ""))
-        out += ("\u001b[A" * len(self._texture) + "\r") # "\u001b[A" is ANSI code for UP
+        out += ("\u001b[A" * len(self.texture) + "\r") # "\u001b[A" is ANSI code for UP
         sys.stdout.write(out)
         sys.stdout.flush()
