@@ -101,7 +101,7 @@ class PygameEngine(Engine):
         """
         Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
         clock = pygame.time.Clock()
-        delta = 0.0
+        delta = 1.0 / self.tps # initial delta time (optimal)
         # update one time at the very start
         self.screen.fill(self.bg_color)
         pygame.display.flip()
