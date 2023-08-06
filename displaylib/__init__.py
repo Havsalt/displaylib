@@ -63,7 +63,7 @@ __all__ = [ # default mode is used when using the star notation (from displaylib
     "networking",        # (module)
     # typing support
     "AnyNode",           # (protocol)
-    "_Color"             # (type alias)
+    "ColorValue"         # (type alias)
 ]
 
 # using ascii mode as default
@@ -104,5 +104,5 @@ from .ascii import (
     networking,
     # typing support
     AnyNode,
-    _Color
+    ColorValue
 )

@@ -40,7 +40,7 @@ __all__ = [
     "networking",        # (module)
     # typing support
     "AnyNode",           # (protocol)
-    "_Color"             # (type alias)
+    "ColorValue"         # (type alias)
 ]
 
 # math
@@ -72,7 +72,7 @@ from . import text
 from ..template import networking
 # typing support
 from ..template.type_hints import AnyNode
-from .color import _Color
+from .color import ColorValue
 
 
 # activate ANSI escape codes

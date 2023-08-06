@@ -7,7 +7,7 @@ from .color import RESET, WHITE
 from .type_hints import ValidColorNode
 
 if TYPE_CHECKING:
-    from .color import _Color
+    from .color import ColorValue
 
 
 class Color: # Component (mixin class)
@@ -17,7 +17,7 @@ class Color: # Component (mixin class)
         - `Transform2D`: uses position and rotation to place the texture
         - `Texture`: allows the node to be displayed
     """
-    color: _Color
+    color: ColorValue
     
     def __new__(cls: type[NodeType], *args, color = None, **kwargs) -> NodeType:
         mro_next = cast(MroNext[ValidColorNode], super())

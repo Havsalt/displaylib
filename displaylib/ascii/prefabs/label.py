@@ -11,7 +11,7 @@ from ..color import WHITE
 
 if TYPE_CHECKING:
     from ...template.type_hints import AnyNode
-    from ..color import _Color
+    from ..color import ColorValue
 
 
 class AsciiLabel(Color, Texture, AsciiNode2D):
@@ -37,7 +37,7 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
             instance.text = text
         return cast(NodeType, instance)
     
-    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, text: str = "", color: _Color = WHITE, delimiter: str = "\n", offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, text: str = "", color: ColorValue = WHITE, delimiter: str = "\n", offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None:
         """Initializes the label
 
         Args:
@@ -45,7 +45,7 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
             x (float, optional): local x position. Defaults to 0.
             y (float, optional): local y position. Defaults to 0.
             text (str, optional): initial text. Defaults to "".
-            color (_Color, optional): texture color. Defaults to WHITE.
+            color (ColorValue, optional): texture color. Defaults to WHITE.
             delimiter (str, optional): where to split the lines. Defaults to "\n".
             z_index (int, optional): layer to render on. Defaults to 0.
             force_sort (bool, optional): whether to sort based on 'z_index' and 'process_priority'. Defaults to True.

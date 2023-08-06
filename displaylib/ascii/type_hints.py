@@ -7,7 +7,7 @@ from ..template.type_hints import NodeMixin, Transform2DMixin
 if TYPE_CHECKING:
     from ..math import Vec2, Vec2i
     from .engine import AsciiEngine
-    from .color import _Color
+    from .color import ColorValue
 
 TextureSelf = TypeVar("TextureSelf", bound="TextureMixin")
 AsciiCameraSelf = TypeVar("AsciiCameraSelf", bound="AsciiCameraProtocol")
@@ -47,9 +47,9 @@ class TextureMixin(Protocol):
 class ColorMixin(Protocol):
     def __new__(cls, *args, **kwargs) -> ValidColorNode: ...
     @property
-    def color(self) -> _Color: ...
+    def color(self) -> ColorValue: ...
     @color.setter
-    def color(self, value: _Color) -> None: ...
+    def color(self, value: ColorValue) -> None: ...
 
 class ValidTextureNode(TextureMixin, Transform2DMixin, NodeMixin, Protocol): ...
 

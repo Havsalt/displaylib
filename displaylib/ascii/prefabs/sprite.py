@@ -11,7 +11,7 @@ from ..color import WHITE
 
 if TYPE_CHECKING:
     from ...template.type_hints import AnyNode
-    from ..color import _Color
+    from ..color import ColorValue
 
 
 class AsciiSprite(Color, Texture, AsciiNode2D):
@@ -50,7 +50,7 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
         texture = load_texture(fpath, fill=fill, fliph=fliph, flipv=flipv, transparent=transparent, default=default)
         return AsciiSprite(texture=texture)
 
-    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = [], color: _Color = WHITE, offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = [], color: ColorValue = WHITE, offset: Vec2 = Vec2(0, 0), centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None:
         """Initializes the sprite
 
         Args:
@@ -58,7 +58,7 @@ class AsciiSprite(Color, Texture, AsciiNode2D):
             x (float, optional): local x position. Defaults to 0.
             y (float, optional): local y position. Defaults to 0.
             texture (list[list[str]], optional): visible texture. Defaults to [].
-            color (_Color, optional): texture color. Defaults to WHITE.
+            color (ColorValue, optional): texture color. Defaults to WHITE.
             offset (Vec2, optional): texture offset. Defaults to Vec2(0, 0).
             centered (bool, optional): whether the texture is centered. Defaults to False.
             z_index (int, optional): layer to render on. Defaults to 0.

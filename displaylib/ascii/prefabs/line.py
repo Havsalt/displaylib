@@ -11,7 +11,7 @@ from ..color import WHITE
 
 if TYPE_CHECKING:
     from ...template.type_hints import AnyNode
-    from ..color import _Color
+    from ..color import ColorValue
 
 
 class AsciiPoint2D(Color, Texture, AsciiNode2D):
@@ -21,7 +21,7 @@ class AsciiPoint2D(Color, Texture, AsciiNode2D):
         - `Texture`: allows the node to be shown
         - `Color`: applies color to the texture
     """
-    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = [["#"]], color: _Color = WHITE, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = [["#"]], color: ColorValue = WHITE, z_index: int = 0, force_sort: bool = True) -> None:
         """_summary_
 
         Args:
@@ -29,7 +29,7 @@ class AsciiPoint2D(Color, Texture, AsciiNode2D):
             x (float, optional): _description_. Defaults to 0.
             y (float, optional): _description_. Defaults to 0.
             texture (list[list[str]], optional): _description_. Defaults to [["#"]].
-            color (_Color, optional): _description_. Defaults to WHITE.
+            color (ColorValue, optional): _description_. Defaults to WHITE.
             z_index (int, optional): _description_. Defaults to 0.
             force_sort (bool, optional): _description_. Defaults to True.
         """
@@ -40,7 +40,7 @@ class AsciiLine(AsciiNode2D):
     """
     texture_default: ClassVar[list[list[str]]] = [["#"]] # only used when creating a line node
     texture: list[list[str]]
-    color: _Color
+    color: ColorValue
     start: Vec2
     end: Vec2
     z_index: int
@@ -75,7 +75,7 @@ class AsciiLine(AsciiNode2D):
         instance._update(0)
         return cast(NodeType, instance)
 
-    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = texture_default, color: _Color = WHITE, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, texture: list[list[str]] = texture_default, color: ColorValue = WHITE, start: Vec2 = Vec2(0, 0), end: Vec2 = Vec2(0, 0), z_index: int = 0, force_sort: bool = True) -> None:
         """Initializes the line
 
         Args:
@@ -83,7 +83,7 @@ class AsciiLine(AsciiNode2D):
             x (float, optional): local x position. Defaults to 0.
             y (float, optional): local y position. Defaults to 0.
             texture (list[list[str]], optional): visible texture. Defaults to texture_default.
-            color (_Color, optional): texture color. Defaults to WHITE.
+            color (ColorValue, optional): texture color. Defaults to WHITE.
             start (Vec2, optional): start of the line. Defaults to Vec2(0, 0).
             end (Vec2, optional): end of the line. Defaults to Vec2(0, 0).
             z_index (int, optional): layer to render on. Defaults to 0.

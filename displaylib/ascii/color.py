@@ -7,10 +7,10 @@ _ColorCode: _TypeAlias = int | str
 _OptionalColorCode: _TypeAlias = int | str | None
 _HexCode: _TypeAlias = str
 _OptionalHexCode: _TypeAlias = str | None
-_Color: _TypeAlias = str
+ColorValue: _TypeAlias = str
 
 
-def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
+def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> ColorValue:
     """Creates a color from the given color code. Can be given both a foreground color and background color
 
     Args:
@@ -21,7 +21,7 @@ def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = Fal
         underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
-        _Color: ANSI color code as str
+        ColorValue: ANSI color code as str
     """
     # NOTE: colors made using this function will not be equivalent to other colors defined in the RGB format
     value = f"\x1b[38;5;{fg}m"
@@ -38,7 +38,7 @@ def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = Fal
     return value
 
 
-def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
+def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> ColorValue:
     """Creates a color from the given channels, which is red, green and blue. Can be given both a foreground color and background color.
 
     Args:
@@ -50,7 +50,7 @@ def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False
         underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
-        _Color: ANSI color code as str
+        ColorValue: ANSI color code as str
     """
     value = "\x1b[38;2;{};{};{}m".format(red, green, blue)
     if not (bold or reverse or underline):
@@ -64,7 +64,7 @@ def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False
     return value
 
 
-def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
+def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> ColorValue:
     """Creates a color from the given hex code. Can be given both a foreground color and background color.
     The "#" in the hex codes are optional
 
@@ -76,7 +76,7 @@ def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None, *, bold: bo
         underline (bool, optional): adds an underline. Defaults to False.
 
     Returns:
-        _Color: ANSI color code as str
+        ColorValue: ANSI color code as str
     """
     fg = fg.lower()
     if fg.startswith("#"):
@@ -122,7 +122,7 @@ def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None, *, bold: bo
     return value
 
 
-def rand_color(fg: bool = True, bg: bool = False, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> _Color:
+def rand_color(fg: bool = True, bg: bool = False, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> ColorValue:
     """Creates a random RGB color. Random background color is optional
 
     Args:
@@ -136,7 +136,7 @@ def rand_color(fg: bool = True, bg: bool = False, *, bold: bool = False, reverse
         ValueError: both 'fg' and 'bg' was set to be False
 
     Returns:
-        _Color: ANSI color code as str
+        ColorValue: ANSI color code as str
     """
     if not fg and not bg:
         raise ValueError("Either 'foreground' or 'background' has to be True")
