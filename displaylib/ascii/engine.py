@@ -116,8 +116,7 @@ class AsciiEngine(Engine):
 
             if Node._request_process_priority_sort: # only sort once per frame if needed
                 for uid in Node._queued_nodes:
-                    if uid in Node.nodes: # FIXME: temp
-                        del Node.nodes[uid]
+                    del Node.nodes[uid]
                 Node._queued_nodes.clear()
                 Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
             if Texture._request_z_index_sort:
