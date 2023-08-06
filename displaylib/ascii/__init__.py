@@ -12,6 +12,8 @@ __all__ = [
     # utility
     "autorun",           # (class decorator)
     "load_texture",      # (function)
+    # base
+    "BaseNode",          # (class alias)
     # core ascii
     "Node",              # (class)
     "Node2D",            # (class)
@@ -48,6 +50,8 @@ from ..math import lerp, sign, Vec2, Vec2i
 # utility
 from ..util import autorun
 from .texture import load_texture
+# base
+from ..template import Node as BaseNode
 # core ascii
 from .node import AsciiNode as Node, AsciiNode2D as Node2D
 from .engine import AsciiEngine as Engine

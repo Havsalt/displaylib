@@ -12,6 +12,8 @@ __all__ = [
     "Vec2i",             # (data structure)
     # utility
     "autorun",           # (class decorator)
+    # base
+    "BaseNode",          # (class alias)
     # core pygame
     "Node",              # (class)
     "Node2D",            # (class)
@@ -37,6 +39,8 @@ except ModuleNotFoundError as error:
 from ..math import lerp, sign, Vec2, Vec2i
 # utility
 from ..util import autorun
+# base
+from ..template import Node as BaseNode
 # core pygame
 from .node import PygameNode as Node, PygameNode2D as Node2D
 from .engine import PygameEngine as Engine

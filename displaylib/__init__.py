@@ -35,6 +35,8 @@ __all__ = [ # default mode is used when using the star notation (from displaylib
     # utility
     "autorun",           # (class decorator)
     "load_texture",      # (function)
+    # base
+    "BaseNode",          # (class alias)
     # core ascii
     "Node",              # (class)
     "Node2D",            # (class)
@@ -76,6 +78,8 @@ from .ascii import (
     # utility
     autorun,
     load_texture,
+    # base
+    BaseNode,
     # core ascii
     Node,
     Node2D,
