@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, cast
 
-from .type_hints import MroNext, NodeType, NodeMixin, AnyNode, Self
+from .type_hints import MroNext, NodeType, AnyNode, Self
 
 if TYPE_CHECKING:
     from ..template.type_hints import AnyNode
