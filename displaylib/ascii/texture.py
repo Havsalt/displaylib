@@ -46,7 +46,7 @@ class Texture: # Component (mixin class)
         if z_index:
             instance._z_index = z_index
         elif hasattr(instance, "default_z_index"):
-            instance._z_index = cast(TextureMixin, cls).default_z_index
+            instance._z_index = instance.default_z_index
         else:
             instance._z_index = 0
         if force_sort:

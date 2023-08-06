@@ -70,7 +70,7 @@ class Node(metaclass=NodeMixinSortMeta):
         # class value -> default
         instance._process_priority = getattr(instance, "process_priority", 0)
         if hasattr(instance, "default_process_priority"):
-            instance._process_priority = cast(NodeMixin, cls).default_process_priority
+            instance._process_priority = instance.default_process_priority
         else:
             instance._process_priority = 0
         Node.nodes[uid] = instance # store reference
