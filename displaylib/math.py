@@ -46,8 +46,17 @@ class Vec2:
     __slots__ = ("x", "y")
 
     def __init__(self, x: float = 0, y: float = 0, /) -> None:
+        """Initialized the Vec2
+
+        Args:
+            x (float, optional): x component. Defaults to 0.
+            y (float, optional): y component. Defaults to 0.
+        """
         self.x = x
         self.y = y
+    
+    def __reduce__(self) -> tuple[type, tuple[float, float]]:
+        return (self.__class__, (self.x, self.y))
 
     def __repr__(self) -> str:
         """Representation with class name an memory address
@@ -325,6 +334,12 @@ class Vec2i(Vec2):
     __slots__ = ("x", "y")
 
     def __init__(self, x: int = 0, y: int = 0, /) -> None:
+        """Initialized the Vec2
+
+        Args:
+            x (int, optional): x component. Defaults to 0.
+            y (int, optional): y component. Defaults to 0.
+        """
         self.x = x
         self.y = y
     
