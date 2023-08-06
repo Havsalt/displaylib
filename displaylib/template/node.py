@@ -65,7 +65,7 @@ class Node(metaclass=NodeMixinSortMeta):
         uid = cast(Node, cls).generate_uid()
         instance.uid = uid
         # positional -> keyword/default
-        parent_ref = parent_as_positional[0] if parent_as_positional else parent
+        parent_ref = parent_as_positional[0] if parent_as_positional and isinstance(parent_as_positional[0], Node) else parent
         instance.parent = parent_ref
         # class value -> default
         instance._process_priority = getattr(instance, "process_priority", 0)
