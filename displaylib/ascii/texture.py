@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, ClassVar, cast
 from ..math import Vec2, Vec2i
 from . import text
 from ..template import Transform2D
-from ..template.type_hints import MroNext, NodeType
-from .type_hints import NodeMixin, ValidTextureNode, TextureSelf
+from ..template.type_hints import MroNext, NodeType, NodeMixin
+from .type_hints import TextureMixin, ValidTextureNode, TextureSelf
 
 if TYPE_CHECKING:
     import io
@@ -23,10 +23,10 @@ class Texture: # Component (mixin class)
     """
     _instances: ClassVar[list[ValidTextureNode]] = [] # references to nodes with Texture component
     _request_z_index_sort: ClassVar[bool] = False # requests Engine to sort
+    default_z_index: ClassVar[int]
     texture: list[list[str]]
     offset: Vec2
     centered: bool
-    z_index: int # type: ignore
 
     def __new__(cls: type[NodeType], *args, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered = None, z_index: int = 0, force_sort: bool = True, **kwargs) -> NodeType: # borrowing: `force_sort`
         mro_next = cast(MroNext[ValidTextureNode], super())
@@ -43,8 +43,12 @@ class Texture: # Component (mixin class)
         elif not hasattr(instance, "centered"):
             instance.centered = False
         # override -> class value -> default
-        if z_index or not hasattr(instance, "_z_index"):
+        if z_index:
             instance._z_index = z_index
+        elif hasattr(instance, "default_z_index"):
+            instance._z_index = cast(TextureMixin, cls).default_z_index
+        else:
+            instance._z_index = 0
         if force_sort:
             Texture._request_z_index_sort = True
         Texture._instances.append(instance)
@@ -66,6 +70,7 @@ class Texture: # Component (mixin class)
         Args:
             value (int): new z_index
         """
+        print("P:", self._z_index)
         if self._z_index != value: # if changed
             self._z_index = value
             Texture._request_z_index_sort = True

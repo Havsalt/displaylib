@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, cast
 
-from .type_hints import MroNext, NodeType, AnyNode, Self
+from .type_hints import MroNext, NodeType, NodeMixin, AnyNode, Self
 
 if TYPE_CHECKING:
     from ..template.type_hints import AnyNode
@@ -34,6 +34,7 @@ class Node(metaclass=NodeMixinSortMeta):
     _uid_counter: ClassVar[int] = 0 # is read and increments for each generated uid
     _request_process_priority_sort: ClassVar[bool] = False # requests Engine to sort
     _queued_nodes: ClassVar[list[str]] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
+    default_process_priority: ClassVar[int]
     root: Engine # set from a Engine subclass
     uid: str
     parent: AnyNode | None = None
@@ -68,6 +69,10 @@ class Node(metaclass=NodeMixinSortMeta):
         instance.parent = parent_ref
         # class value -> default
         instance._process_priority = getattr(instance, "process_priority", 0)
+        if hasattr(instance, "default_process_priority"):
+            instance._process_priority = cast(NodeMixin, cls).default_process_priority
+        else:
+            instance._process_priority = 0
         Node.nodes[uid] = instance # store reference
         if force_sort: # if True, requests sort every frame a new node is created
             Node._request_process_priority_sort = True # otherwise, depend on a `process_priority` change
