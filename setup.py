@@ -1,8 +1,8 @@
 from setuptools import setup
-from displaylib import __doc__, __version__, __author__
+from displaylib import __version__, __author__
 
 
-with open("README.md", "r") as markdown_file:
+with open("README.md", "r", encoding="utf-8") as markdown_file:
    markdown_content = markdown_file.read()
 
 setup(
