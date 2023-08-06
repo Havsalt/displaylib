@@ -70,7 +70,6 @@ class Texture: # Component (mixin class)
         Args:
             value (int): new z_index
         """
-        print("P:", self._z_index)
         if self._z_index != value: # if changed
             self._z_index = value
             Texture._request_z_index_sort = True
