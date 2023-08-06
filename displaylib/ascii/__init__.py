@@ -11,6 +11,7 @@ __all__ = [
     "Vec2i",             # (data structure)
     # utility
     "autorun",           # (class decorator)
+    "load_texture",      # (function)
     # core ascii
     "Node",              # (class)
     "Node2D",            # (class)
@@ -46,6 +47,7 @@ __all__ = [
 from ..math import lerp, sign, Vec2, Vec2i
 # utility
 from ..util import autorun
+from .texture import load_texture
 # core ascii
 from .node import AsciiNode as Node, AsciiNode2D as Node2D
 from .engine import AsciiEngine as Engine

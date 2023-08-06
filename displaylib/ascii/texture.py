@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import copy
+import functools
 from typing import TYPE_CHECKING, ClassVar, cast
 
 from ..math import Vec2, Vec2i
+from . import text
 from ..template import Transform2D
 from ..template.type_hints import MroNext, NodeType
 from .type_hints import NodeMixin, ValidTextureNode, TextureSelf
 
 if TYPE_CHECKING:
+    import io
     from .type_hints import TextureSelf
 
 
@@ -128,3 +131,46 @@ class Texture: # Component (mixin class)
         if super_implementation is not None:
             return super_implementation() # usually the Color component implementation
         return self.texture
+
+
+@functools.cache
+def _load_texture(file_path: str, /, *, fill: bool = True, filler: str = " ", fliph: bool = False, flipv: bool = False, transparent: str = " ", default: str = " ") -> list[list[str]]:
+    file: io.TextIOWrapper = open(file_path, "r", encoding="utf-8") # from disk
+    if transparent == default:
+        texture = [list(line.rstrip("\n")) for line in file.readlines()]
+    else:
+        texture = [list(line.rstrip("\n").replace(transparent, default)) for line in file.readlines()]
+    if fill:
+        longest = len(max(texture, key=len))
+        lines = len(texture)
+        for line in texture:
+            if len(line) < longest:
+                diff = longest - len(line)
+                line.extend(list(filler*diff))
+        if len(texture) < lines:
+            diff = lines - len(texture)
+            texture.extend(list(filler*longest) for _ in range(diff))
+    if fliph:
+        texture = text.mapfliph(texture)
+    if flipv:
+        texture = text.mapflipv(texture)
+    file.close()
+    return texture
+
+
+def load_texture(file_path: str, /, *, fill: bool = True, filler: str = " ", fliph: bool = False, flipv: bool = False, transparent: str = " ", default: str = " ") -> list[list[str]]:
+    """Loads a texture from either disk or cache. File has to use `UTF-8 encoding`, and should be a `.txt` file
+
+    Args:
+        file_path (str): path to source file
+        fill (bool, optional): whether to fill in gaps. Defaults to True.
+        filler (str, optional): material used to fill with. Defaults to " ".
+        fliph (bool, optional): whether to flip texture horizontally. Defaults to False.
+        flipv (bool, optional): whether to flip texture vertically. Defaults to False.
+        transparent (str, optional): transparancy material. Defaults to " ".
+        default (str, optional): replacement material for transparant cells. Defaults to " ".
+
+    Returns:
+        list[list[str]]: texture loaded (a nested list)
+    """
+    return _load_texture(file_path, fill=fill, filler=filler, fliph=fliph, flipv=flipv, transparent=transparent, default=default)

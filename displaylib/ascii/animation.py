@@ -1,41 +1,14 @@
 from __future__ import annotations
 
-import io
 import os
-import functools
 from typing import TYPE_CHECKING, Generator, cast
 
 from ..template import Node
 from ..template.type_hints import MroNext, NodeType
-from . import text
-from .texture import Texture
+from .texture import Texture, load_texture
 
 if TYPE_CHECKING:
     from ..template.type_hints import AnyNode
-
-
-SPACE = " " # filler when load_frame_texture(..., fill=True)
-
-@functools.cache
-def load_frame_texture(file_path: str, /, *, fill: bool = True, fliph: bool = False, flipv: bool = False) -> list[list[str]]:
-    file: io.TextIOWrapper = open(file_path, "r", encoding="utf-8") # from disk
-    texture = [list(line.rstrip("\n")) for line in file.readlines()]
-    if fill:
-        longest = len(max(texture, key=len))
-        lines = len(texture)
-        for line in texture:
-            if len(line) < longest:
-                diff = longest - len(line)
-                line.extend(list(SPACE*diff))
-        if len(texture) < lines:
-            diff = lines - len(texture)
-            texture.extend(list(SPACE*longest) for _ in range(diff))
-    if fliph:
-        texture = text.mapfliph(texture)
-    if flipv:
-        texture = text.mapfliph(texture)
-    file.close()
-    return texture
 
 
 class AnimationFrame:
@@ -55,7 +28,7 @@ class AnimationFrame:
             flipv (optional, bool): flips the texture vertically. Defaults to False
         """
         fpath = os.path.normpath(file_path)
-        self.texture = load_frame_texture(fpath, fill=fill, fliph=fliph, flipv=flipv)
+        self.texture = load_texture(fpath, fill=fill, fliph=fliph, flipv=flipv)
 
 
 class Animation:

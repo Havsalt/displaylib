@@ -1,47 +1,17 @@
 from __future__ import annotations
 
-import io
 import os
-import functools
 from typing import TYPE_CHECKING
 
 from ...math import Vec2
-from .. import text
 from ..node import AsciiNode2D
-from ..texture import Texture
+from ..texture import Texture, load_texture
 from ..colored import Color
 from ..color import WHITE
 
 if TYPE_CHECKING:
     from ...template.type_hints import AnyNode
     from ..color import _Color
-
-
-SPACE = " " # filler when load_texture(..., fill=True)
-
-@functools.cache
-def load_texture(file_path: str, /, *, fill: bool = True, transparent: str = " ", default: str = " ", fliph: bool = False, flipv: bool = False) -> list[list[str]]:
-    file: io.TextIOWrapper = open(file_path, "r", encoding="utf-8") # from disk
-    if transparent == default:
-        texture = [list(line.rstrip("\n")) for line in file.readlines()]
-    else:
-        texture = [list(line.rstrip("\n").replace(transparent, default)) for line in file.readlines()]
-    if fill:
-        longest = len(max(texture, key=len))
-        lines = len(texture)
-        for line in texture:
-            if len(line) < longest:
-                diff = longest - len(line)
-                line.extend(list(SPACE*diff))
-        if len(texture) < lines:
-            diff = lines - len(texture)
-            texture.extend(list(SPACE*longest) for _ in range(diff))
-    if fliph:
-        texture = text.mapfliph(texture)
-    if flipv:
-        texture = text.mapflipv(texture)
-    file.close()
-    return texture
 
 
 class AsciiSprite(Color, Texture, AsciiNode2D):
