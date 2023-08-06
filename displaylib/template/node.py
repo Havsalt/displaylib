@@ -33,7 +33,7 @@ class Node(metaclass=NodeMixinSortMeta):
     nodes: ClassVar[dict[str, AnyNode]] = {} # all nodes that are alive
     _uid_counter: ClassVar[int] = 0 # is read and increments for each generated uid
     _request_process_priority_sort: ClassVar[bool] = False # requests Engine to sort
-    _queued_nodes: ClassVar[list[str]] = [] # uses <Node>.queue_free() to ask Engine to delete a node based on UID
+    _queued_nodes: ClassVar[set[str]] = set() # uses <Node>.queue_free() to ask Engine to delete a node based on UID
     default_process_priority: ClassVar[int]
     root: Engine # set from a Engine subclass
     uid: str
@@ -156,6 +156,5 @@ class Node(metaclass=NodeMixinSortMeta):
         """Tells the Engine to `delete` this node after
         every node has been called `_update` on
         """
-        if self.uid not in Node._queued_nodes:
-            Node._queued_nodes.append(self.uid)
+        Node._queued_nodes.add(self.uid)
         Node._request_process_priority_sort = True
