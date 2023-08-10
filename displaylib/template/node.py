@@ -151,6 +151,14 @@ class Node(metaclass=NodeMixinSortMeta):
             delta (float): time since last frame
         """
         ...
+    
+    def get_children(self) -> list[AnyNode]:
+        """Returns a list of all nodes of which their parent is this node
+
+        Returns:
+            list[AnyNode]: indirect children nodes
+        """
+        return [node for node in Node.nodes.values() if node.parent is self]
 
     def queue_free(self) -> None:
         """Tells the Engine to `delete` this node after
