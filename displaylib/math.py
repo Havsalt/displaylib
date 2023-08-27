@@ -46,7 +46,7 @@ class Vec2:
     __slots__ = ("x", "y")
 
     def __init__(self, x: float = 0, y: float = 0, /) -> None:
-        """Initialized the Vec2
+        """Initializes the Vec2
 
         Args:
             x (float, optional): x component. Defaults to 0.
@@ -334,7 +334,7 @@ class Vec2i(Vec2):
     __slots__ = ("x", "y")
 
     def __init__(self, x: int = 0, y: int = 0, /) -> None:
-        """Initialized the Vec2
+        """Initializes the Vec2i
 
         Args:
             x (int, optional): x component. Defaults to 0.
