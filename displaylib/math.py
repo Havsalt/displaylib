@@ -239,6 +239,17 @@ class Vec2:
         if length == 0:
             return Vec2(0, 0)
         return self / self.length()
+    
+    def dot(self, other: Vec2) -> float:
+        """Returns the dot product between two 2D vectors
+
+        Args:
+            other (Vec2): other vector
+
+        Returns:
+            float: dot product
+        """
+        return self.x * other.x + self.y * other.y
 
     def direction_to(self, other: Vec2) -> Vec2:
         """Returns the direction to the other point
