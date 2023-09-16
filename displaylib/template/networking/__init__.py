@@ -7,6 +7,9 @@ __all__ = [
     "deserialize",
     "SerializeError",
     "DeserializeError",
+    "Request",
+    "Response",
+    "Peer",
     "Client",
     "Server",
     "BroadcastServer"
@@ -15,6 +18,8 @@ __all__ = [
 from .class_register import register_class
 from .serialize import serialize, SerializeError
 from .deserialize import deserialize, DeserializeError
+from .structs import Request, Response
+from .peer import Peer
 from .client import Client
 from .server import Server
 from .broadcast_server import BroadcastServer
