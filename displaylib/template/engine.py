@@ -6,7 +6,7 @@ from .node import Node
 from .type_hints import MroNext, EngineType
 
 if TYPE_CHECKING:
-    from functools import partial
+    from typing import Callable
     from .type_hints import AnyNode
 
 
@@ -38,7 +38,7 @@ class Engine(metaclass=EngineMixinSortMeta):
     """
     tps: int
     is_running: bool
-    per_frame_tasks: list[function | partial[Any]]
+    per_frame_tasks: list[Callable[..., Any]]
 
     def __new__(cls: type[EngineType], *, tps: int = 16, **_overflow) -> EngineType:
         """Sets `Node.root` when an `Engine instance` is initialized 
@@ -58,13 +58,13 @@ class Engine(metaclass=EngineMixinSortMeta):
         instance.per_frame_tasks = []
         return cast(EngineType, instance)
 
-    def __init__(self, tps: int = 16) -> None:
+    def __init__(self, tps: int = 16, **config) -> None:
         """Base implementation for initializing and running the App instance
 
         Args:
             tps (int, optional): ticks per second. Defaults to 16.
         """
-        self.tps = tps
+        self.tps = tps # NOTE: unused in `template` version
         self._on_start()
         self.is_running = True
         self._main_loop()
