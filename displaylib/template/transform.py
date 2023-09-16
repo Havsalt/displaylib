@@ -19,6 +19,8 @@ class Transform2D: # Component (mixin class)
         # override -> class value -> default
         if (x or y) or not hasattr(instance, "position"):
             instance.position = Vec2(x, y)
+        else:
+            instance.position = instance.position.copy() # class value is made unique
         # class value -> default
         if not hasattr(instance, "rotation"):
             instance.rotation = 0.0
