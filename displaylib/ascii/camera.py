@@ -62,7 +62,7 @@ class AsciiCamera(AsciiNode2D):
             Vec2: global position
         """
         if not self.follow or self.parent is not None:
-            return self.position
+            return self.position.copy()
         return super().get_global_position()
 
     def get_global_rotation(self) -> float:
