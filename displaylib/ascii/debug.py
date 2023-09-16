@@ -18,10 +18,15 @@ class _WeakRef(_Generic[_T], _Protocol):
 
 
 class _DebugInfo:
-    def __init__(self, ref: _WeakRef[_AsciiLabel], *, lifetime: float = 10.0) -> None:
+    def __init__(self, ref: _WeakRef[_DebugLabel], *, lifetime: float = 10.0) -> None:
         self.ref = ref
         self.lifetime = lifetime
         self.life_start = _time.time()
+
+
+class Debug: ... # Component (mixin class)
+
+class _DebugLabel(_AsciiLabel, Debug): ... # include `Debug` to identify
 
 
 _PATTERN = _re.compile(r"debug\((.*)\)")
@@ -39,7 +44,7 @@ def debug(*objects: object, escape: bool = False, label: str | None = None, life
     else:
         name = label
     # modify if exists
-    for key, info in _debug_info.items():
+    for key, info in tuple(_debug_info.items()):
         if (alive_node := info.ref()) is not None:
             if (kinda_alive_node := alive_node) not in _BaseNode.nodes.values():
                 if kinda_alive_node in _debug_info.keys():
@@ -54,7 +59,7 @@ def debug(*objects: object, escape: bool = False, label: str | None = None, life
             del _debug_info[key]
     else: # no break
         # store new weak ref
-        node = _AsciiLabel(text=(text if not escape else repr(text)))
+        node = _DebugLabel(text=(text if not escape else repr(text)))
         if _debug_info:
             info = _DebugInfo(_weakref.ref(node), lifetime=lifetime)
         else:
@@ -66,6 +71,9 @@ def debug(*objects: object, escape: bool = False, label: str | None = None, life
     y = 0
     # TODO: calc pos each time
     origin = _AsciiCamera.current.get_global_position()
+    if _AsciiCamera.current.mode & _AsciiCamera.CENTERED:
+        origin.x -= _AsciiCamera.root.screen.width // 2
+        origin.y -= _AsciiCamera.root.screen.height // 2
     for key, info in tuple(_debug_info.items()):
         if (node := info.ref()) is not None:
             # calculate lifetime
