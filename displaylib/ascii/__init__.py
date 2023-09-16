@@ -7,11 +7,13 @@ __all__ = [
     # math
     "lerp",              # (function)
     "sign",              # (function)
+    "clamp",             # (function)
     "Vec2",              # (data structure)
     "Vec2i",             # (data structure)
     # utility
     "autorun",           # (class decorator)
     "debug",             # (function)
+    "Debug",             # (class)
     "load_texture",      # (function)
     # base
     "BaseNode",          # (class alias)
@@ -47,10 +49,10 @@ __all__ = [
 ]
 
 # math
-from ..math import lerp, sign, Vec2, Vec2i
+from ..math import lerp, sign, clamp, Vec2, Vec2i
 # utility
 from ..util import autorun
-from .debug import debug
+from .debug import debug, Debug
 from .texture import load_texture
 # base
 from ..template import Node as BaseNode
