@@ -8,6 +8,7 @@ __all__ = [
     # math
     "lerp",              # (function)
     "sign",              # (function)
+    "clamp",             # (function)
     "Vec2",              # (data structure)
     "Vec2i",             # (data structure)
     # utility
@@ -23,20 +24,21 @@ __all__ = [
     # networking
     "networking",        # (module)
     # typing support
-    "AnyNode",           # (protocol)
+    "AnyNode"            # (protocol)
 ]
 
 try: # check if pygame is installed
-    import contextlib as _contextlib
-    with _contextlib.redirect_stdout(None):
-        import pygame as _pygame
-    _pygame.init() # init without displaying message
-    del _contextlib, _pygame
+    import os as _os
+    _os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+    import pygame as _pygame
+    if not _pygame.get_init():
+        _pygame.init()
+    del _os, _pygame
 except ModuleNotFoundError as error:
     raise ModuleNotFoundError("missing external module: pygame, which is required to use this submodule") from error
 
 # math
-from ..math import lerp, sign, Vec2, Vec2i
+from ..math import lerp, sign, clamp, Vec2, Vec2i
 # utility
 from ..util import autorun
 # base
