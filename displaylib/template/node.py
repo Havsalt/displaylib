@@ -164,5 +164,7 @@ class Node(metaclass=NodeMixinSortMeta):
         """Tells the Engine to `delete` this node after
         every node has been called `_update` on
         """
-        Node._queued_nodes.add(self.uid)
-        Node._request_process_priority_sort = True
+        if self.uid in Node.nodes:
+            Node._request_process_priority_sort = True
+            if self.uid not in Node._queued_nodes:
+                Node._queued_nodes.add(self.uid)
