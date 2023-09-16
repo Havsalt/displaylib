@@ -8,7 +8,7 @@ from ..math import Vec2, Vec2i
 from . import text
 from ..template import Transform2D
 from ..template.type_hints import MroNext, NodeType, NodeMixin
-from .type_hints import TextureMixin, ValidTextureNode, TextureSelf
+from .type_hints import ValidTextureNode, TextureSelf
 
 if TYPE_CHECKING:
     import io
