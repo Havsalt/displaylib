@@ -30,11 +30,13 @@ __all__ = [ # default mode is used when using the star notation (from displaylib
     # math
     "lerp",              # (function)
     "sign",              # (function)
+    "clamp",             # (function)
     "Vec2",              # (data structure)
     "Vec2i",             # (data structure)
     # utility
     "autorun",           # (class decorator)
     "debug",             # (function)
+    "Debug",             # (class)
     "load_texture",      # (function)
     # base
     "BaseNode",          # (class alias)
@@ -74,11 +76,13 @@ from .ascii import (
     # math
     lerp,
     sign,
+    clamp,
     Vec2,
     Vec2i,
     # utility
     autorun,
     debug,
+    Debug,
     load_texture,
     # base
     BaseNode,
