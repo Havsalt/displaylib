@@ -10,7 +10,8 @@ from .texture import Texture, load_texture
 if TYPE_CHECKING:
     from ..template.type_hints import NodeMixin
     from .type_hints import TextureMixin
-    class AnyTextureNode(TextureMixin, NodeMixin, Protocol): ...
+    class AnyTextureNode(TextureMixin, NodeMixin, Protocol):
+        def __new__(cls, *args, **kwargs) -> AnyTextureNode: ...
 
 
 class AnimationFrame:
@@ -95,7 +96,7 @@ class AnimationPlayer(Node):
         """Initializes the animation player
 
         Args:
-            parent (ValidTextureNode | None, optional): parent node with Texture and Transform2D components. Defaults to None.
+            parent (AnyTextureNode | None, optional): parent node with Texture and Transform2D components. Defaults to None.
             **animations (Animation): animations are stored as {str: Animation, ...} pairs
         """
 
