@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Protocol, cast
 from ..type_hints import MroNext, EngineType, EngineMixin
 
 if TYPE_CHECKING:
-    from type_hints import FunctionType
+    from types import FunctionType
 
 class ServerMixin(Protocol):
     @property
