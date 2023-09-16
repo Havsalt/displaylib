@@ -21,6 +21,7 @@ class AsciiScreen:
     """
     cell_transparant: str = " " # symbol used to indicate that a cell is transparent
     cell_default: str = " " # the default look of an empty cell
+    texture: list[list[str]]
 
     def __init__(self, width: int = 16, height: int = 8) -> None:
         """Initialize surface from nodes given inside the given boundaries
