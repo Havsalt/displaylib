@@ -1,10 +1,14 @@
 from __future__ import annotations as _annotations
 
-from math import sqrt, cos, sin, atan2
+from math import sqrt as _sqrt, cos as _cos, sin as _sin, atan2 as _atan2
+from typing import TypeVar as _TypeVar
+
+_Number = _TypeVar("_Number", int, float)
 
 __all__ = [
     "lerp",
     "sign",
+    "clamp",
     "Vec2",
     "Vec2i"
 ]
@@ -34,6 +38,10 @@ def sign(number: int | float, /) -> int:
         int: sign
     """
     return 0 if number == 0 else (1 if number > 0 else -1)
+
+
+def clamp(number: _Number, smallest: _Number, largest: _Number, /) -> _Number:
+    return max(smallest, min(largest, number))
 
 
 class Vec2:
@@ -216,7 +224,7 @@ class Vec2:
         """
         if self.x == 0 and self.y == 0:
             return 0.0
-        return sqrt(self.x*self.x + self.y*self.y)
+        return _sqrt(self.x*self.x + self.y*self.y)
     
     def distance_to(self, other: Vec2) -> float:
         """Returns the relative distance to the other point
@@ -268,7 +276,7 @@ class Vec2:
         Returns:
             float: angle given in radians
         """
-        return atan2(self.y, self.x)
+        return _atan2(self.y, self.x)
 
     def angle_to(self, other: Vec2) -> float:
         """Returns the angle (measured in radians) to the other point
@@ -311,8 +319,8 @@ class Vec2:
         Returns:
             Vec2: rotated vector
         """
-        cos_rad = cos(angle)
-        sin_rad = sin(angle)
+        cos_rad = _cos(angle)
+        sin_rad = _sin(angle)
         x = cos_rad * self.x + sin_rad * self.y
         y = -sin_rad * self.x + cos_rad * self.y
         return Vec2(x, y)
@@ -328,8 +336,8 @@ class Vec2:
             Vec2: vector rotated around `point`
         """
         diff = self - point
-        cos_rad = cos(angle)
-        sin_rad = sin(angle)
+        cos_rad = _cos(angle)
+        sin_rad = _sin(angle)
         x = point.x + cos_rad * diff.x + sin_rad * diff.y
         y = point.y + -sin_rad * diff.x + cos_rad * diff.y
         return Vec2(x, y)
@@ -354,6 +362,9 @@ class Vec2i(Vec2):
         self.x = x
         self.y = y
     
+    def __reduce__(self) -> tuple[type, tuple[int, int]]:
+        return (self.__class__, (self.x, self.y))
+
     def __add__(self, other: Vec2i | Vec2) -> Vec2i | Vec2:
         if isinstance(other, Vec2i):
             return Vec2i(int(self.x + other.x),
@@ -400,8 +411,8 @@ class Vec2i(Vec2):
         elif isinstance(other, Vec2):
             return Vec2(self.x // other.x,
                         self.y // other.y)
-        return Vec2(self.x * other,
-                    self.y * other)
+        return Vec2(self.x // other,
+                    self.y // other)
     
     def __ifloordiv__(self, other: Vec2i) -> Vec2i:
         self.x //= other.x
