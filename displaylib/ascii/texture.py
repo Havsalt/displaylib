@@ -95,8 +95,9 @@ class Texture: # Component (mixin class)
         Returns:
             Vec2i: size of the content
         """
-        longest = len(max(self.texture, key=len))
-        lines = len(self.texture)
+        final_texture = self._get_final_texture()
+        longest = len(max(final_texture, key=len))
+        lines = len(final_texture)
         return Vec2i(longest, lines)
 
     def queue_free(self) -> None:
