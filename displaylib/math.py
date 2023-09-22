@@ -41,6 +41,16 @@ def sign(number: int | float, /) -> int:
 
 
 def clamp(number: _Number, smallest: _Number, largest: _Number, /) -> _Number:
+    """Returns the number clamped between smallest and largest (inclusive)
+
+    Args:
+        number (_Number): number to clamp
+        smallest (_Number): lower bound
+        largest (_Number): upper bound
+
+    Returns:
+        _Number: clamped number
+    """
     return max(smallest, min(largest, number))
 
 
@@ -309,6 +319,18 @@ class Vec2:
             Vec2: vector with signed components
         """
         return Vec2(sign(self.x), sign(self.y))
+
+    def clamp(self, smallest: Vec2, largest: Vec2, /) -> Vec2:
+        """Returns a new clamped vector
+
+        Args:
+            smallest (Vec2): lower bound for x and y
+            largest (Vec2): upper bound for x and y
+
+        Returns:
+            Vec2: vector clamped
+        """
+        return Vec2(clamp(self.x, smallest.x, largest.x), clamp(self.y, smallest.y, largest.y))
     
     def rotated(self, angle: float, /) -> Vec2:
         """Returns a vector rotated by `angle` given in radians
