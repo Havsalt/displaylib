@@ -3,8 +3,9 @@ from __future__ import annotations
 import time
 import socket
 import selectors
+from typing import ClassVar
 
-from ..type_hints import MroNext, EngineType
+from ..type_hints import EngineType
 from .structs import Request, Response
 
 
@@ -21,23 +22,20 @@ class Peer:
     timeout: float = 0
     request_batch: int = 32
     response_batch: int = 32
-    _queued_requests: list[bytes] = []
-    _queued_responses: list[bytes] = []
+    _queued_requests: ClassVar[list[bytes]] = []
+    _queued_responses: ClassVar[list[bytes]] = []
     _local_address: tuple[str, int]
     _peer_address: tuple[str, int]
     _selector: selectors.DefaultSelector
     _socket: socket.socket
-    _buffer: bytes
 
-    def __new__(cls: type[EngineType], *args, host: str = "localhost", port: int = 8080, peer_host: str = "localhost", peer_port: int = 7979, **kwargs) -> EngineType:
-        mro_next = super() # type: MroNext[Peer] # type: ignore
-        instance = mro_next.__new__(cls, *args, **kwargs)
+    def __new__(cls: type[EngineType], *args, host: str = "localhost", port: int = 8080, peer_host: str = "localhost", peer_port: int = 7979, **config) -> EngineType:
+        instance = super().__new__(cls, *args, **config) # type: Peer  # type: ignore
         instance._local_address = (host, port)
         instance._peer_address = (peer_host, peer_port)
         instance._selector = selectors.DefaultSelector()
         instance._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         instance._selector.register(instance._socket, selectors.EVENT_READ)
-        instance._buffer = bytes()
         instance._socket.setblocking(False)
         instance._socket.bind(instance._local_address)
         instance.per_frame_tasks.append(instance._update_socket) # type: ignore  # Engine task
@@ -85,11 +83,10 @@ class Peer:
         Peer._queued_requests = Peer._queued_requests[self.request_batch:]
         try:
             for data in batch:
-                self._socket.sendto(data, self._peer_address) # send the request
+                self._socket.sendto(data, self._peer_address)
         except OSError:
-            return
+            pass
         # recieve responses
-        # TODO: implement batch request
         for _iteration in range(self.response_batch):
             for _key, mask in self._selector.select(timeout=self.timeout):
                 if mask & selectors.EVENT_READ:
@@ -98,7 +95,7 @@ class Peer:
                     except OSError:
                         continue
                     parts = response_bytes.split(self.request_delimiter.encode(encoding=self.encoding))
-                    response_string = parts[0].decode(self.encoding) # QUICKFIX: implement 'self._buffer'
+                    response_string = parts[0].decode(self.encoding)
                     kind, *data = response_string.split(self.argument_delimiter)
                     response = Response(kind=kind, data=data)
                     if kind == self.PING_REQUEST:
