@@ -68,38 +68,38 @@ class Particle(Color, Texture, AsciiNode2D):
         self.position += self.speed * delta
 
 
-class ParticlesEmitter(AsciiNode2D):
-        def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, force_sort: bool = True) -> None:
-            self.force_sort = force_sort
-            self._particles: list[Particle] = []
-            self._time_elapsed = 0
-            self._spawn_interval = 1.0 / self.amount
-        
-        def _update(self, delta: float) -> None:
-            self._time_elapsed += delta
-            if self._time_elapsed >= self._spawn_interval:
-                self._time_elapsed -= self._spawn_interval
-                # spawn particle
-                if isinstance(self.textures, (list, tuple)):
-                    texture = random.choice(self.textures)
-                else:
-                    texture = self.textures
-                if isinstance(self.colors, (list, tuple)):
-                    albedo = random.choice(self.colors)
-                else:
-                    albedo = self.colors
-                texture = cast(list[list[str]], texture)
-                particle = Particle(texture=texture, color=albedo)
-                particle.set_global_position(self.get_global_position())
-                particle.lifetime = randf(self.lifetime_min, self.lifetime_max)
-                relative_spread = self.spread * random.random()
-                if random.random() < 0.50:
-                    relative_spread = -relative_spread
-                particle.direction = self.direction.rotated(relative_spread)
-                particle.acceleration = self.initial_velocity
-                particle.speed = self.direction * self.initial_velocity
-                particle.gravity = self.gravity # pass by referance so it can be updated smoothly
-                self._particles.append(particle)
+class ParticlesEmitter(AsciiNode2D, ParticlesMaterial):
+    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, force_sort: bool = True) -> None:
+        self.force_sort = force_sort
+        self._particles: list[Particle] = []
+        self._time_elapsed = 0
+        self._spawn_interval = 1.0 / self.amount
+    
+    def _update(self, delta: float) -> None:
+        self._time_elapsed += delta
+        if self._time_elapsed >= self._spawn_interval:
+            self._time_elapsed -= self._spawn_interval
+            # spawn particle
+            if isinstance(self.textures, (list, tuple)):
+                texture = random.choice(self.textures)
+            else:
+                texture = self.textures
+            if isinstance(self.colors, (list, tuple)):
+                albedo = random.choice(self.colors)
+            else:
+                albedo = self.colors
+            texture = cast(list[list[str]], texture)
+            particle = Particle(texture=texture, color=albedo)
+            particle.set_global_position(self.get_global_position())
+            particle.lifetime = randf(self.lifetime_min, self.lifetime_max)
+            relative_spread = self.spread * random.random()
+            if random.random() < 0.50:
+                relative_spread = -relative_spread
+            particle.direction = self.direction.rotated(relative_spread)
+            particle.acceleration = self.initial_velocity
+            particle.speed = self.direction * self.initial_velocity
+            particle.gravity = self.gravity # pass by referance so it can be updated smoothly
+            self._particles.append(particle)
 
 
 
