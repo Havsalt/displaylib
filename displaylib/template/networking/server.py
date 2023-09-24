@@ -2,40 +2,10 @@ from __future__ import annotations
 
 import selectors
 import socket
-from typing import TYPE_CHECKING, Protocol, cast
+from typing import ClassVar
 
-from ..type_hints import MroNext, EngineType, EngineMixin
-
-if TYPE_CHECKING:
-    from types import FunctionType
-
-class ServerMixin(Protocol):
-    @property
-    def _address(self) -> tuple[str | int, int]: ...
-    @_address.setter
-    def _address(self, value: tuple[str | int, int]) -> None: ...
-    @property
-    def _selector(self) -> selectors.DefaultSelector: ...
-    @_selector.setter
-    def _selector(self, value: selectors.DefaultSelector) -> None: ...
-    @property
-    def _socket(self) -> socket.socket: ...
-    @_socket.setter
-    def _socket(self, value: socket.socket) -> None: ...
-    @property
-    def _buffer(self) -> bytes: ...
-    @_buffer.setter
-    def _buffer(self, value: bytes) -> None: ...
-    @property
-    def _update_socket(self) -> FunctionType: ...
-    def _on_connection_refused(self, error: Exception) -> None: ...
-    def _on_client_connected(self, connection: socket.socket, host: str, port: int) -> None: ...
-    def _on_client_disconnected(self, connection: socket.socket, error: Exception) -> None: ...
-    def _on_request_received(self, sender: socket.socket, request: bytes) -> None: ...
-    def _on_system_request(self, request: dict[str, str]) -> None: ...
-    def _on_custom_request(self, request: dict[str, str]) -> None: ...
-
-class ValidServer(ServerMixin, EngineMixin, Protocol): ...
+from ..type_hints import EngineType
+from .structs import Request, Response
 
 
 class Server:
@@ -45,16 +15,21 @@ class Server:
         - `_on_connection_refused(self, error: Exception) -> None`
         - `_on_client_connected(self, connection: socket.socket, host: str, port: int) -> None`
         - `_on_client_disconnected(self, connection: socket.socket, error: Exception) -> None`
-        - `_on_request_received(self, sender: socket.socket, request: bytes) -> None`
-        - `_on_system_request(self, request: dict[str, str]) -> None`
-        - `_on_custom_request(self, request: dict[str, str]) -> None`
+        - `_on_response(self, sender: socket.socket, response: Response) -> None`
     """
     buffer_size: int = 4096
-    timeout: float = 0
+    request_delimiter: str = "$"
+    argument_delimiter: str = ";"
     encoding: str = "utf-8"
-    _socket: socket.socket
+    backlog: int = 5
+    timeout: float = 0
+    request_batch: int = 32
+    response_batch: int = 32
+    _queued_requests: ClassVar[list[tuple[socket.socket, bytes]]] = []
+    _queued_responses: ClassVar[list[tuple[socket.socket, bytes]]] = []
     _address: tuple[str, int]
     _selector: selectors.DefaultSelector
+    _socket: socket.socket
 
     def __new__(cls: type[EngineType], *, host: str = "localhost", port: int = 8080, backlog: int = 4, **config) -> EngineType:
         """Adds `Server` functionality on the `Engine`
@@ -64,27 +39,41 @@ class Server:
             port (int, optional): port number. Defaults to 8080.
             backlog (int, optional): number of connections allowed to connect at once. Defaults to 4.
         """
-        mro_next = cast(MroNext[ValidServer], super())
-        instance = mro_next.__new__(cls, **config)
+        instance = super().__new__(cls, **config) # type: Server  # type: ignore
         # class value -> override -> default
-        host = getattr(instance, "host", host)
+        final_host = getattr(instance, "host", host)
         # class value -> override -> default
-        port = getattr(instance, "port", port)
-        instance._address = (host, port)
+        final_port = getattr(instance, "port", port)
+        instance._address = (final_host, final_port)
         instance._selector = selectors.DefaultSelector()
         instance._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         instance._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         instance._selector.register(instance._socket, selectors.EVENT_READ)
-        instance._buffer = bytes()
         try:
             instance._socket.bind(instance._address)
             instance._socket.listen(backlog)
         except ConnectionRefusedError as error:
             instance._on_connection_refused(error)
-            return cast(EngineType, instance) # does not start the main loop if failed to connect
+            return instance # type: ignore  # does not start the main loop if failed to connect
         instance._socket.setblocking(False)
-        instance.per_frame_tasks.append(instance._update_socket)
-        return cast(EngineType, instance)
+        instance.per_frame_tasks.append(instance._update_socket) # type: ignore  # Engine task
+        return instance # type: ignore
+    
+    @property
+    def connections(self) -> list[socket.socket]:
+        return [key.fileobj # type: ignore
+                for key in self._selector.get_map().values()]
+
+    def send_to(self, request: Request, /, connection: socket.socket) -> None:
+        data = (request.kind + self.argument_delimiter + self.argument_delimiter.join(map(str, request.data)) + self.request_delimiter).encode(self.encoding)
+        data_pair = (connection, data)
+        Server._queued_requests.append(data_pair)
+    
+    def broadcast(self, request: Request, /) -> None:
+        data = (request.kind + self.argument_delimiter + self.argument_delimiter.join(map(str, request.data)) + self.request_delimiter).encode(self.encoding)
+        for connection in self.connections:
+            data_pair = (connection, data) # type: tuple[socket.socket, bytes]  # type: ignore
+            Server._queued_requests.append(data_pair)
 
     def _on_connection_refused(self, error: Exception) -> None:
         """Override for custom functionality
@@ -113,49 +102,55 @@ class Server:
         """
         ...
 
-    def _on_request_received(self, sender: socket.socket, request: bytes) -> None:
-        """Override for custom functionality
-        
-        Args:
-            request (bytes): byte encoded json request recieved
-        """
-        ...
-    
-    def _on_system_request(self, request: dict[str, dict[str, str]]) -> None:
+    def _on_response(self, connection: socket.socket, response: Response) -> None:
         """Override for custom functionality
 
         Args:
-            request (dict[str, dict[str, str]]): dict with string encoded changes for catagory `system`
-        """
-        ...
-    
-    def _on_custom_request(self, request: dict[str, dict[str, str]]) -> None:
-        """Override for custom functionality
-
-        Args:
-            request (dict[str, dict[str, str]]): dict with string encoded changes for catagory `custom`
+            connection (socket.socket): connection the response was sent from
+            response (Response): response received
         """
         ...
     
     def _update_socket(self) -> None:
-        """Updates the socket's I/O and calls `_on_request_received` with the bytes received as argument
+        """Updates the socket's I/O and calls `_on_request` with the bytes received as argument
         """
-        # recieve request
-        for key, mask in self._selector.select(timeout=self.timeout):
-            connection = cast(socket.socket, key.fileobj)
-            if mask & selectors.EVENT_READ:
-                try:
-                    request: bytes = connection.recv(self.buffer_size)
-                except OSError as error:
-                    self._selector.unregister(connection)
-                    self._on_client_disconnected(connection, error)
-                    continue
-                if request:
-                    self._on_request_received(connection, request)
+        # send requests
+        batch = Server._queued_requests[:self.request_batch]
+        Server._queued_requests = Server._queued_requests[self.request_batch:]
+        # try:
+        for connection, data in batch:
+            print(connection, data)
+            connection.send(data)
+        # except OSError:
+        #     pass
+        # recieve responses
+        try:
+            for key, mask in self._selector.select(timeout=self.timeout):
+                connection = key.fileobj # type: socket.socket  # type: ignore
+                if mask & selectors.EVENT_READ:
+                    for _iteration in range(self.response_batch):
+                        try:
+                            response_bytes = connection.recv(self.buffer_size)
+                            if not response_bytes:
+                                reason = ConnectionAbortedError("Client is not responding")
+                                # self._selector.unregister(connection) # FIXME
+                                self._on_client_disconnected(connection, reason)
+                                continue
+                        except OSError as error:
+                            # self._selector.unregister(connection) # FIXME
+                            self._on_client_disconnected(connection, error)
+                            continue
+                        parts = response_bytes.split(self.request_delimiter.encode(encoding=self.encoding))
+                        response_string = parts[0].decode(self.encoding)
+                        kind, *data = response_string.split(self.argument_delimiter)
+                        response = Response(kind=kind, data=data)
+                        self._on_response(connection, response)
+        except OSError:
+            pass
         # accept connection if one is incoming
         try:
             connection, (host, port) = self._socket.accept()
             self._selector.register(connection, selectors.EVENT_READ)
             self._on_client_connected(connection, host, port)
         except BlockingIOError:
-            return
+            pass
