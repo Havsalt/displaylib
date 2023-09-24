@@ -9,8 +9,11 @@ class Request(NamedTuple):
     data: Iterable[Any] = []
 
     @staticmethod
-    def from_response(response: Response) -> Request:
+    def from_response(response: Response, /) -> Request:
         return Request(**response._asdict())
+
+    def to_response(self) -> Response:
+        return Response(**self._asdict())
 
 
 class Response(NamedTuple):
@@ -18,5 +21,8 @@ class Response(NamedTuple):
     data: Iterable[str] = []
 
     @staticmethod
-    def from_request(request: Response) -> Response:
+    def from_request(request: Request, /) -> Response:
         return Response(**request._asdict())
+    
+    def to_request(self) -> Request:
+        return Request(**self._asdict())
