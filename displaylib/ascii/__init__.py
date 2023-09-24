@@ -41,6 +41,10 @@ __all__ = [
     "color",             # (module)
     # text alteration
     "text",              # (module)
+    # keyboard input
+    "keyboard",          # (module)
+    # handling cursor
+    "cursor",            # (module)
     # networking
     "networking",        # (module)
     # typing support
@@ -76,6 +80,10 @@ from .prefabs.sprite import AsciiSprite as Sprite
 from . import color
 # text alteration
 from . import text
+# keyboard input
+from . import keyboard
+# handling cursor
+from . import cursor
 # networking
 from ..template import networking
 # typing support

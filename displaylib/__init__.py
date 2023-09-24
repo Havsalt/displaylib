@@ -64,6 +64,10 @@ __all__ = [ # default mode is used when using the star notation (from displaylib
     "color",             # (module)
     # text alteration
     "text",              # (module)
+    # keyboard input
+    "keyboard",          # (module)
+    # handling cursor
+    "cursor",            # (module)
     # networking
     "networking",        # (module)
     # typing support
@@ -110,6 +114,10 @@ from .ascii import (
     color,
     # text alteration
     text,
+    # keyboard input
+    keyboard,
+    # handling cursor
+    cursor,
     # networking
     networking,
     # typing support
