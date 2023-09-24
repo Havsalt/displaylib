@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-import uuid
-import json
-import selectors
 import socket
-from typing import TypeVar, Any
+from typing import ClassVar
 
-from ...template import Node
-from .serialize import serialize
-
-EngineLike = TypeVar("EngineLike")
+from ..type_hints import EngineType
+from .structs import Request, Response
 
 
 class Client:
@@ -21,74 +16,47 @@ class Client:
         - `_on_response_received(self, response: bytes) -> None`
         - `_on_response(self, response: str) -> None`
     """
-    buffer_size: int = 4096 * 16
-    timeout: float = 0
+    buffer_size: int = 4096
+    request_delimiter: str = "$"
+    argument_delimiter: str = ";"
     encoding: str = "utf-8"
-    uids_buffer_size: int = 1_000
-    _premade_uids: list[str] = [uuid.uuid1().hex for _ in range(uids_buffer_size)]
-    _queued_changes: dict[str, dict[str, dict[str, str]]] = {"system": {},"custom": {}} # TODO: add 'pickle' category
+    timeout: float = 0
+    request_batch: int = 32
+    response_batch: int = 32
+    _queued_requests: ClassVar[list[bytes]] = []
+    _queued_responses: ClassVar[list[bytes]] = []
+    _address: tuple[str, int]
+    _socket: socket.socket
 
-    def __new__(cls: type[EngineLike], *args, **kwargs) -> EngineLike:
-        # DISABLED: auto broadcast attribute changes
-        # def __setattr__(self: Node, name: str, value: object) -> None:
-        #     """Overridden `__setattr__` that automaticlly queues changes to be sent as a network request
-        #     """
-        #     change = {name: serialize(value)}
-        #     object.__setattr__(self, name, value)
-        #     if self.uid not in Client._queued_changes["system"]:
-        #         Client._queued_changes["system"][self.uid] = change
-        #     else:
-        #         Client._queued_changes["system"][self.uid].update(change)
-        # setattr(Node, "__setattr__", __setattr__)
+    def __new__(cls: type[EngineType], *, host: str = "localhost", port: int = 8080, **config) -> EngineType:
+        """Adds `Client` functionality on the `Engine`
 
-        def __serialize__(self) -> str:
-            """Low level implementation for serializing nodes
-
-            Returns:
-                str: serialized data about this node
-            """
-            return f"{self.__class__.__name__}()"
-        setattr(Node, "__serialize__", __serialize__)
-
-        @classmethod
-        def generate_uid(_node_cls) -> str:
-            """Generates a unique ID using uuid.uuid1().hex
-
-            Returns:
-                str: unique ID in the form of uuid.uuid1().hex
-            """
-            uid = cls._premade_uids[Node._uid_counter] # remember that `cls` in this function is from Client
-            Node._uid_counter += 1
-            if Node._uid_counter >= cls.uids_buffer_size:
-                Node._uid_counter = 0
-                cls._premade_uids = [uuid.uuid1().hex for _ in range(cls.uids_buffer_size)]
-            return uid # globally unique (includes across networks)
-
-        setattr(Node, "generate_uid", generate_uid) # updates the method
-
-        instance = super().__new__(cls) # no nodes are made prior to these changes
-        return instance
-
-    def __init__(self, *, host: str = "localhost", port: int = 8080, **kwargs) -> None:
-        """Initializes `Client` functionality on the `Engine`
-
-        Args:
+        Added Args:
             host (str, optional): host name. Defaults to "localhost".
             port (int, optional): port number. Defaults to 8080.
+            backlog (int, optional): number of connections allowed to connect at once. Defaults to 4.
         """
-        self._address = (host, port)
-        self._selector = selectors.DefaultSelector()
-        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._selector.register(self._socket, selectors.EVENT_READ)
-        # self._buffer = bytes()
+        instance = super().__new__(cls, **config) # type: Client  # type: ignore
+        # class value -> class value -> default
+        final_host = getattr(instance, "host", host)
+        # class value -> override -> default
+        final_port = getattr(instance, "port", port)
+        instance._address = (final_host, final_port)
+        instance._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        instance._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
-            self._socket.connect(self._address)
+            instance._socket.connect(instance._address)
+            instance._on_connection_established(final_host, final_port)
         except ConnectionRefusedError as error:
-            self._on_connection_refused(error)
-        self._on_connection_established(host, port)
-        self._socket.setblocking(False)
-        self.per_frame_tasks.append(self._update_socket) # Engine task
-        super(__class__, self).__init__(**kwargs)
+            instance._on_connection_refused(error)
+            return instance # type: ignore  # does not start the main loop if failed to connect
+        instance._socket.setblocking(False)
+        instance.per_frame_tasks.append(instance._update_socket) # type: ignore  # Engine task
+        return instance # type: ignore
+
+    def send(self, request: Request) -> None:
+        data = (request.kind + self.argument_delimiter + self.argument_delimiter.join(map(str, request.data)) + self.request_delimiter).encode(self.encoding)
+        Client._queued_requests.append(data)
     
     def _on_connection_refused(self, error: Exception) -> None:
         """Override for custom functionality
@@ -107,59 +75,68 @@ class Client:
         """
         ...
     
-    def _on_response_received(self, response: bytes) -> None:
-        """Override for more controlled functionality
-
-        Args:
-            response (bytes): raw byte response in json with elements string serialized
-        """
-        self._on_response(response.decode(self.encoding))
-
-    def _on_response(self, response: str) -> None:
+    def _on_response(self, response: Response) -> None:
         """Override for custom functionality
 
         Args:
-            response (str): the processed response after `_on_response`
+            response (Response): response data
         """
         ...
     
-    def _update_socket(self) -> None:
-        """Updates the socket's I/O and calls `_on_response_received` with the bytes received as argument
-        """
-        # -- send request
-        if Client._queued_changes["system"] or Client._queued_changes["custom"]:
-            request = json.dumps(Client._queued_changes).encode(Client.encoding)
-            Client._queued_changes = {"system": {},"custom": {}} # reset dict
-            if request:
-                self._socket.sendall(request) # send the request
-        # -- recieve request
-        for key, mask in self._selector.select(timeout=self.timeout):
-            connection = key.fileobj
-            if mask & selectors.EVENT_READ:
-                try:
-                    response: bytes = connection.recv(self.buffer_size)
-                except (ConnectionAbortedError, ConnectionResetError) as error:
-                    print(f"[!] Disconnected from server: {error}")
-                    self._selector.unregister(connection)
-                    self._socket.shutdown(socket.SHUT_RDWR)
-                    self._socket.close()
-                    return
-                if response:
-                    self._on_response_received(response)
-    
-    def send(self, request: dict[str, dict[str, Any]]) -> None:
-        """Queues the request to be sent
-
-        Format: `{node_id: {attr, value}, ...}`. Treated as "custom" when sent to server (instead of "system")
+    def _on_connection_ended(self, error: Exception) -> None:
+        """Override for custom functionality
 
         Args:
-            request (dict[str, dict[str, Any]]): the changes to be sent
+            error (Exception): reason for the unexpected disconnection
         """
-        # -- serialize each change
-        for uid, changes in request.items():
-            for name, value in changes.items():
-                change = {name: serialize(value)}
-                if uid not in Client._queued_changes["custom"]:
-                    Client._queued_changes["custom"][uid] = change
-                else:
-                    Client._queued_changes["custom"][uid].update(change)
+        raise ConnectionAbortedError("Server ended connection")
+
+    def _update_socket(self) -> None:
+        """Updates the socket's I/O and calls `_on_request` with gathered Request object
+        """
+        """Updates the socket's I/O and calls `_on_request` with the bytes received as argument
+        """
+        # send requests
+        batch = Client._queued_requests[:self.request_batch]
+        Client._queued_requests = Client._queued_requests[self.request_batch:]
+        try:
+            for data in batch:
+                self._socket.send(data)
+        except OSError:
+            pass
+        # recieve responses
+        for _iteration in range(self.response_batch):
+            try:
+                response_bytes = self._socket.recv(self.buffer_size)
+                if not response_bytes:
+                    reason = ConnectionAbortedError("Server is not responding")
+                    self._on_connection_ended(reason)
+                    continue
+            except (BlockingIOError, ConnectionResetError):
+                continue
+            parts = response_bytes.split(self.request_delimiter.encode(encoding=self.encoding))
+            response_string = parts[0].decode(self.encoding)
+            kind, *data = response_string.split(self.argument_delimiter)
+            response = Response(kind=kind, data=data)
+            self._on_response(response)
+
+        # try:
+        #     for _iteration in range(self.response_batch):
+        #         try:
+        #             response_bytes = self._socket.recv(self.buffer_size)
+        #             if not response_bytes:
+        #                 # reason = ConnectionAbortedError("Server is not responding")
+        #                 # self._on_connection_ended(reason)
+        #                 continue
+        #         except OSError as error:
+        #             self._on_connection_ended(error)
+        #             continue
+        #         parts = response_bytes.split(self.request_delimiter.encode(encoding=self.encoding))
+        #         response_string = parts[0].decode(self.encoding)
+        #         kind, *data = response_string.split(self.argument_delimiter)
+        #         response = Response(kind=kind, data=data)
+        #         self._on_response(response)
+        # except OSError as error:
+        #     self._on_connection_ended(error)
+        #     self.is_running = False # type: ignore  # Engine attribute
+        #     return
