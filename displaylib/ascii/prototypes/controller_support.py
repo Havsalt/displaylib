@@ -5,7 +5,7 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
 import math
 from functools import partial
-from typing import TYPE_CHECKING, ClassVar, Protocol, Callable, cast
+from typing import TYPE_CHECKING, ClassVar, Protocol, Callable, Any, cast
 
 from ...math import Vec2
 from ...template.type_hints import MroNext, NodeType
@@ -34,7 +34,7 @@ class ControllerProtocol(Protocol):
     @_update.setter
     def _update(self, value: function) -> None: ...
     @property
-    def bindings(self) -> list[Callable]: ...
+    def bindings(self) -> list[Callable[..., Any]]: ...
     @property
     def joystick(self) -> JoystickType | None: ...
     @joystick.setter
@@ -42,7 +42,7 @@ class ControllerProtocol(Protocol):
 
 
 class ControllerSupport: # Component (mixin class)
-    bindings: ClassVar[list[Callable]] = []
+    bindings: ClassVar[list[Callable[..., Any]]] = []
     treshold: float = 0.3
     joystick: JoystickType | None
 
