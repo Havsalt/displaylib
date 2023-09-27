@@ -433,6 +433,9 @@ class Vec2i(Vec2):
         elif isinstance(other, Vec2):
             return Vec2(self.x // other.x,
                         self.y // other.y)
+        elif isinstance(other, int):
+            return Vec2i(self.x // other,
+                         self.y // other)
         return Vec2(self.x // other,
                     self.y // other)
     
