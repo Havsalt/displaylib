@@ -162,8 +162,13 @@ def rand_color(fg: bool = True, bg: bool = False, *, bold: bool = False, reverse
     return value
 
 
-# Reset code
+# reset code
 RESET = "\x1b[0m"
+
+# modes
+BOLD = f"\x1b[1m"
+UNDERLINE = f"\x1b[4m"
+REVERSE = f"\x1b[7m"
 
 # standard colors:
 BLACK   = "\x1b[38;2;0;0;0m"
