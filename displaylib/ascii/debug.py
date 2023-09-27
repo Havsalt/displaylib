@@ -40,7 +40,11 @@ def debug(*objects: object, escape: bool = False, label: str | None = None, life
         frame = _inspect.currentframe().f_back # type: _FrameType  # type: ignore
         frame_info = _inspect.getframeinfo(frame) # type: _inspect.FrameInfo  # type: ignore
         line = frame_info.code_context[0] # type: str  # type: ignore
-        name = _PATTERN.findall(line)[0] # first match
+        try:
+            name = _PATTERN.findall(line)[0] # first match
+        except IndexError:
+            print("[Info] Debug print error, ignoring")
+            return
     else:
         name = label
     # modify if exists
