@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# NOTE: this prototype requires `pygame` and `keyboard` to be installed
+
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
