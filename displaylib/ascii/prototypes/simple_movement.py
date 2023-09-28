@@ -14,7 +14,6 @@ class SimpleMovement2D: # Component (mixin class)
     
     def _simple_movement_2d_update_wrapper(self: AsciiSprite, update_function): # type: ignore
         def update(delta):
-            update_function(delta)
             if keyboard.is_pressed("D"):
                 self.position.x += 1
             if keyboard.is_pressed("A"):
@@ -23,4 +22,5 @@ class SimpleMovement2D: # Component (mixin class)
                 self.position.y -= 1
             if keyboard.is_pressed("S"):
                 self.position.y += 1
+            update_function(delta)
         return update
