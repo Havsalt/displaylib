@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 class AsciiSprite(Color, Texture, AsciiNode2D):
     """Prefabricated `AsciiSprite`
 
+    `NOTE`: class texture is shared across instances as lists unless `.make_unique()` or `.as_unique()`
+
     Components:
         - `Texture`: allows the node to be displayed
         - `Color`: applies color to the texture
