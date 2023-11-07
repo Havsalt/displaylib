@@ -178,4 +178,5 @@ def load_texture(file_path: str, /, *, fill: bool = True, filler: str = " ", fli
     Returns:
         list[list[str]]: texture loaded (a nested list)
     """
+    # TODO: remove ".." and such before truly loading
     return _load_texture(file_path, fill=fill, filler=filler, fliph=fliph, flipv=flipv, transparent=transparent, default=default)
