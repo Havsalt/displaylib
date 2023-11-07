@@ -1,9 +1,9 @@
 from __future__ import annotations as _annotations
 
-from math import sqrt as _sqrt, cos as _cos, sin as _sin, atan2 as _atan2
+from math import sqrt as _sqrt, cos as _cos, sin as _sin, atan2 as _atan2, inf as _INF
 from typing import TypeVar as _TypeVar
 
-_Number = _TypeVar("_Number", int, float)
+_Vec = _TypeVar("_Vec", bound="Vec2")
 
 __all__ = [
     "lerp",
@@ -40,16 +40,16 @@ def sign(number: int | float, /) -> int:
     return 0 if number == 0 else (1 if number > 0 else -1)
 
 
-def clamp(number: _Number, smallest: _Number, largest: _Number, /) -> _Number:
+def clamp(number: int | float, smallest: int | float, largest: int | float, /) -> int | float:
     """Returns the number clamped between smallest and largest (inclusive)
 
     Args:
-        number (_Number): number to clamp
-        smallest (_Number): lower bound
-        largest (_Number): upper bound
+        number (int | float): number to clamp
+        smallest (int | float): lower bound
+        largest (int | float): upper bound
 
     Returns:
-        _Number: clamped number
+        int | float: clamped number
     """
     return max(smallest, min(largest, number))
 
@@ -62,6 +62,41 @@ class Vec2:
     Usefull for storing position or direction
     """
     __slots__ = ("x", "y")
+
+    @classmethod
+    @property
+    def ZERO(cls: type[_Vec]) -> _Vec:
+        return cls(0, 0)
+
+    @classmethod
+    @property
+    def ONE(cls: type[_Vec]) -> _Vec:
+        return cls(1, 1)
+    
+    @classmethod
+    @property
+    def INF(cls: type[_Vec]) -> _Vec:
+        return cls(_INF, _INF)
+    
+    @classmethod
+    @property
+    def LEFT(cls: type[_Vec]) -> _Vec:
+        return cls(-1, 0)
+    
+    @classmethod
+    @property
+    def RIGHT(cls: type[_Vec]) -> _Vec:
+        return cls(1, 0)
+    
+    @classmethod
+    @property
+    def UP(cls: type[_Vec]) -> _Vec:
+        return cls(0, 1)
+
+    @classmethod
+    @property
+    def DOWN(cls: type[_Vec]) -> _Vec:
+        return cls(0, -1)
 
     def __init__(self, x: float = 0, y: float = 0, /) -> None:
         """Initializes the Vec2
@@ -103,6 +138,9 @@ class Vec2:
     def __round__(self, ndigits: int = 0) -> Vec2:
         return Vec2(round(self.x, ndigits),
                     round(self.y, ndigits))
+
+    def __neg__(self) -> Vec2:
+        return Vec2(-self.x, -self.y)
     
     def __add__(self, other: Vec2) -> Vec2:
         return Vec2(self.x + other.x,
@@ -320,7 +358,7 @@ class Vec2:
         """
         return Vec2(sign(self.x), sign(self.y))
 
-    def clamp(self, smallest: Vec2, largest: Vec2, /) -> Vec2:
+    def clamped(self, smallest: Vec2, largest: Vec2, /) -> Vec2:
         """Returns a new clamped vector
 
         Args:
@@ -384,8 +422,8 @@ class Vec2i(Vec2):
         self.x = x
         self.y = y
     
-    def __reduce__(self) -> tuple[type, tuple[int, int]]:
-        return (self.__class__, (self.x, self.y))
+    def __neg__(self) -> Vec2i:
+        return Vec2i(-self.x, -self.y)
 
     def __add__(self, other: Vec2i | Vec2) -> Vec2i | Vec2:
         if isinstance(other, Vec2i):
