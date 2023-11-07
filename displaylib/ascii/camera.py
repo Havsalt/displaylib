@@ -36,7 +36,7 @@ class AsciiCamera(AsciiNode2D):
         if follow is not None:
             instance.follow = follow
         elif not hasattr(instance, "follow"):
-            instance.follow = False
+            instance.follow = True
         # override -> class value -> default
         if mode or not hasattr(instance, "mode"):
             instance.mode = mode
@@ -61,7 +61,7 @@ class AsciiCamera(AsciiNode2D):
         Returns:
             Vec2: global position
         """
-        if not self.follow or self.parent is not None:
+        if not self.follow or self.parent is None:
             return self.position.copy()
         return super().get_global_position()
 
@@ -73,7 +73,7 @@ class AsciiCamera(AsciiNode2D):
         Returns:
             float: global rotation in radians
         """
-        if not self.follow or self.parent is not None:
+        if not self.follow or self.parent is None:
             return self.rotation
         return super().get_global_rotation()
     
