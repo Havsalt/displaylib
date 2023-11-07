@@ -1,16 +1,19 @@
 from __future__ import annotations as _annotations
 
-from typing import TYPE_CHECKING, TypeVar, TypeAlias, Protocol, Callable, Any
+from typing import TYPE_CHECKING, TypeVar, ParamSpec, TypeAlias, Protocol, Callable, Any
 
 if TYPE_CHECKING:
     from ..math import Vec2
     from .node import Node
     from .engine import Engine
 
+T = TypeVar("T")
+R = TypeVar("R")
 T_co = TypeVar("T_co", covariant=True)
 Self = TypeVar("Self")
 EngineType = TypeVar("EngineType", bound="AnyEngine", covariant=True)
 NodeType = TypeVar("NodeType", bound="AnyNode", covariant=True)
+P = ParamSpec("P")
 
 class MroNext(Protocol[T_co]):
     def __new__(cls, *args, **kwargs) -> T_co: ...
@@ -24,9 +27,11 @@ class AnyEngine(Protocol):
     def _on_start(self) -> None: ...
     def _update(self) -> None: ...
     def _on_exit(self) -> None: ...
-    def __call__(self, *args: Any, **kwds: Any) -> Any: ...
+    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
 
 EngineMixin: TypeAlias = AnyEngine
+
+class App(AnyEngine, Protocol): ...
 
 class AnyNode(Protocol):
     @property
@@ -89,3 +94,5 @@ class Transform2DMixin(Protocol):
 class ValidNode(NodeMixin, Protocol): ...
 
 class ValidTransform2DNode(Transform2DMixin, NodeMixin, Protocol): ...
+
+UpdateFunction: TypeAlias = Callable[[float], None]
