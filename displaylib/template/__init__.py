@@ -13,6 +13,7 @@ __all__ = [
     "Vec2i",            # (data structure)
     # utility
     "autorun",          # (class decorator)
+    # "extend",           # (decorator)
     # base
     "BaseNode",         # (class alias)
     # core template
@@ -30,7 +31,7 @@ __all__ = [
 # math
 from ..math import lerp, sign, Vec2, Vec2i
 # utility
-from ..util import autorun
+from ..util import autorun#, extend
 # base
 from .node import Node as BaseNode
 # core template
