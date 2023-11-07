@@ -22,16 +22,17 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
         - `Color`: applies color to the texture
     """
     text: str # type: ignore
-    delimiter: str
+    delimiter: str = "\n"
+    tab_size: int = 4
+    tab_char: str = "\t"
+    tab_fill: str = " "
 
     def __new__(cls: type[NodeType], *args, text: str = "", delimiter = None, **kwargs) -> NodeType:
         mro_next = cast(MroNext[AsciiLabel], super())
         instance = mro_next.__new__(cls, *args, **kwargs)
-        # override -> class value -> default
-        if delimiter is not None: # handle before `text`!
+        # override -> immutable class value (default)
+        if delimiter is not None: # handle before `.text`!
             instance.delimiter = delimiter
-        elif not hasattr(instance, "delimiter"):
-            instance.delimiter = "\n"
         # override -> class value -> default
         if text or not hasattr(instance, "text"):
             instance.text = text
@@ -58,7 +59,8 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
         Returns:
             str: content as string
         """
-        return self.delimiter.join("".join(line) for line in self.texture)
+        return self.delimiter.join("".join(line).replace(self.tab_fill * self.tab_size, self.tab_char)
+                                   for line in self.texture)
     
     @text.setter
     def text(self, text: str) -> None:
@@ -70,4 +72,7 @@ class AsciiLabel(Color, Texture, AsciiNode2D):
         if not text:
             self.texture = []
         else:
-            self.texture = [list(line) for line in str(text).split(self.delimiter)]
+            self.texture = [list(line)
+                            for line in str(text.replace(self.tab_char,
+                                                         self.tab_fill * self.tab_size)
+                                                         ).split(self.delimiter)]
