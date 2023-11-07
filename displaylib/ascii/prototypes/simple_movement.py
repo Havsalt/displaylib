@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from ...template.type_hints import NodeType
-from ..prefabs.sprite import AsciiSprite
 from ...math import Vec2
+from ...template.type_hints import NodeType
 from .. import keyboard
+from ..prefabs.sprite import AsciiSprite
 
 
 class SimpleMovement2D: # Component (mixin class)
