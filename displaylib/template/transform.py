@@ -59,12 +59,12 @@ class Transform2D: # Component (mixin class)
             float: global rotation in radians
         """
         self = cast(ValidTransform2DNode, self) # fixes type hinting
-        rotation = self.rotation
+        global_rotation = self.rotation
         parent = self.parent
         while parent is not None and isinstance(parent, Transform2D):
-            rotation += parent.rotation
+            global_rotation += parent.rotation
             parent = parent.parent
-        return rotation
+        return global_rotation
 
     def set_global_rotation(self, rotation: float) -> None:
         """Sets the node's global rotation (world space)
