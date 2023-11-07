@@ -8,7 +8,7 @@ from ..template.type_hints import MroNext, NodeType
 from .texture import Texture, load_texture
 
 if TYPE_CHECKING:
-    from ..template.type_hints import NodeMixin
+    from ..template.type_hints import NodeMixin, UpdateFunction
     from .type_hints import TextureMixin
     class AnyTextureNode(TextureMixin, NodeMixin, Protocol):
         def __new__(cls, *args, **kwargs) -> AnyTextureNode: ...
@@ -34,6 +34,13 @@ class AnimationFrame:
         self.texture = load_texture(fpath, fill=fill, fliph=fliph, flipv=flipv)
 
 
+class EmptyAnimationFrame(AnimationFrame):
+    """Empty `AnimationFrame`, more like a placeholder
+    """
+    def __init__(self) -> None:
+        self.texture = []
+
+
 class Animation:
     """`Animation` containing frames
 
@@ -52,7 +59,8 @@ class Animation:
             fliph (optional, bool): flips the texture horizontally. Defaults to False
             flipv (optional, bool): flips the texture vertically. Defaults to False
         """
-        fnames = os.listdir(folder_path)
+        # preserve: frame0.txt -> frame10.txt -> frame15.txt
+        fnames = sorted(os.listdir(folder_path), key=lambda fname: (len(fname), fname))
         step = 1 if not reverse else -1
         self.frames = [AnimationFrame(os.path.join(os.getcwd(), folder_path, fname), fill=fill, fliph=fliph, flipv=flipv) for fname in fnames][::step]
 
@@ -78,6 +86,7 @@ class AnimationPlayer(Node):
     Known Issues:
         - `If a file's content is changed after a texture has been loaded from that file, the change won't be reflected on next load due to the use of @functools.cache`
     """
+    _update: UpdateFunction
     animations: dict[str, Animation]
     frame: int = 0
     current_animation: str = ""
@@ -90,6 +99,7 @@ class AnimationPlayer(Node):
         mro_next = cast(MroNext[AnimationPlayer], super())
         instance = mro_next.__new__(cls, *args, force_sort=False) # because this cannot be passed as an argument, force_sort is set to False
         instance.animations = dict(animations) # make unique
+        instance._update = instance._animation_player_update_wrapper(instance._update)
         return cast(NodeType, instance)
 
     def __init__(self, parent: AnyTextureNode, **animations: Animation) -> None:
@@ -269,27 +279,30 @@ class AnimationPlayer(Node):
         self.is_playing = False
         self._has_updated = False
     
-    def _update(self, _delta: float) -> None:
+    def _animation_player_update_wrapper(self, update_function: UpdateFunction) -> UpdateFunction:
         """Handles updating the parent's texture if an animation is playing
         """
-        if self.current_animation != "" and not self.current_animation in self.animations:
-            raise ValueError(f"current animation name is invalid: '{self.current_animation}'")
-            
-        if self.parent is None or not isinstance(self.parent, Texture):
-            raise TypeError("parent requires component 'Texture'")
+        def _update(delta: float) -> None:
+            update_function(delta)
+            if self.current_animation != "" and not self.current_animation in self.animations:
+                raise ValueError(f"current animation name is invalid: '{self.current_animation}'")
+                
+            if self.parent is None or not isinstance(self.parent, Texture):
+                raise TypeError("parent requires component 'Texture'")
 
-        if self.is_playing and self._has_updated:
-            animation = self.active_animation
-            if animation is not None:
-                # check playback mode and future index
-                if self.reverse_playback and (self.frame -1) >= 0:
-                    self.frame -= 1
-                    self.parent.texture = animation.frames[self.frame].texture
-                elif not self.reverse_playback and (self.frame +1) < len(animation.frames):
-                    self.frame += 1
-                    self.parent.texture = animation.frames[self.frame].texture
-                else: # both is out of bounds, therefore, stop
-                    self.is_playing = False
+            if self.is_playing and self._has_updated:
+                animation = self.active_animation
+                if animation is not None:
+                    # check playback mode and future index
+                    if self.reverse_playback and (self.frame -1) >= 0:
+                        self.frame -= 1
+                        self.parent.texture = animation.frames[self.frame].texture
+                    elif not self.reverse_playback and (self.frame +1) < len(animation.frames):
+                        self.frame += 1
+                        self.parent.texture = animation.frames[self.frame].texture
+                    else: # both is out of bounds, therefore, stop
+                        self.is_playing = False
 
-        elif not self._has_updated:
-            self._has_updated = True
+            elif not self._has_updated:
+                self._has_updated = True
+        return _update
