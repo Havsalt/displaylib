@@ -35,6 +35,7 @@ __all__ = [ # default mode is used when using the star notation (from displaylib
     "Vec2i",             # (data structure)
     # utility
     "autorun",           # (class decorator)
+    # "extend",            # (decorator)
     "debug",             # (function)
     "Debug",             # (class)
     "load_texture",      # (function)
@@ -85,6 +86,7 @@ from .ascii import (
     Vec2i,
     # utility
     autorun,
+    # extend,
     debug,
     Debug,
     load_texture,
