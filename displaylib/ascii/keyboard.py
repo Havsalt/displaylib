@@ -12,7 +12,9 @@ def is_pressed(key: _Key, /) -> bool:
 
 try:
     import keyboard as _keyboard
+    from keyboard import * # type: ignore
 
+    # overriden interface for keyboard.is_pressed
     def is_pressed(key: _Key, /) -> bool:
         return _keyboard.is_pressed(key)
 
@@ -64,11 +66,17 @@ except ModuleNotFoundError:
                 all_pressed.append(pressed)
                 if ord(pressed) == scancode or (ord(pressed) + 32 == scancode and 65 <= ord(pressed) <= 90):
                     all_pressed.pop()
-                    for prev_pressed in all_pressed:
-                        _msvcrt.ungetch(prev_pressed)
+                    for prev_pressed in reversed(all_pressed):
+                        try:
+                            _msvcrt.ungetch(prev_pressed)
+                        except OSError:
+                            continue
                     return True
-            for prev_pressed in all_pressed:
-                _msvcrt.ungetch(prev_pressed)
+            for prev_pressed in reversed(all_pressed):
+                try:
+                    _msvcrt.ungetch(prev_pressed)
+                except OSError:
+                    continue
             return False
     
     
