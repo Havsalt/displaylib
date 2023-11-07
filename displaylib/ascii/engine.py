@@ -29,7 +29,7 @@ class AsciiEngine(Engine):
     screen_margin: Vec2i
     screen: AsciiScreen
 
-    def __new__(cls: type[EngineType], *, tps: int = 16, width: int = 16, height: int = 8, initial_clear: bool = False, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> EngineType:
+    def __new__(cls: type[EngineType], *, tps: float = 16, width: int = 16, height: int = 8, initial_clear: bool = False, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> EngineType:
         """Sets `Node.root` when an Engine instance is created. Initializes default `AsciiCamera`
 
         Args:
@@ -61,7 +61,7 @@ class AsciiEngine(Engine):
             AsciiCamera.current = camera # initialize default camera
         return cast(EngineType, instance)
 
-    def __init__(self, *, tps: int = 16, width: int = 16, height: int = 8, initial_clear: bool = False, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> None:
+    def __init__(self, *, tps: float = 16, width: int = 16, height: int = 8, initial_clear: bool = False, auto_resize_screen: bool = False, screen_margin: Vec2i = Vec2i(1, 1), **config) -> None:
         """Initializes and starts the engine (only 1 instance should exist)
 
         Args:
@@ -131,4 +131,3 @@ class AsciiEngine(Engine):
         self.screen.clear()
         self.screen.render(Texture._instances)
         self.screen.show()
-        # _on_exit() is called automatically after this
