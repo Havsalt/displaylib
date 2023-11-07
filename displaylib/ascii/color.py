@@ -3,11 +3,11 @@ from __future__ import annotations as _annotations
 import random as _random
 from typing import TypeAlias as _TypeAlias
 
+ColorValue: _TypeAlias = str
 _ColorCode: _TypeAlias = int | str
 _OptionalColorCode: _TypeAlias = int | str | None
 _HexCode: _TypeAlias = str
 _OptionalHexCode: _TypeAlias = str | None
-ColorValue: _TypeAlias = str
 
 
 def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> ColorValue:
@@ -39,7 +39,7 @@ def color(fg: _ColorCode = 7, bg: _OptionalColorCode = None, *, bold: bool = Fal
 
 
 def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> ColorValue:
-    """Creates a color from the given channels, which is red, green and blue. Can be given both a foreground color and background color.
+    """Creates a color from the given channels, which is red, green and blue. Can be given both a foreground color and background color
 
     Args:
         red (int, optional): red color channel. Defaults to 0.
@@ -65,7 +65,7 @@ def rgb_color(red: int = 0, green: int = 0, blue: int = 0, *, bold: bool = False
 
 
 def hex_color(fg: _HexCode = "#ffffff", bg: _OptionalHexCode = None, *, bold: bool = False, reverse: bool = False, underline: bool = False) -> ColorValue:
-    """Creates a color from the given hex code. Can be given both a foreground color and background color.
+    """Creates a color from the given hex code. Can be given both a foreground color and background color
     The "#" in the hex codes are optional
 
     Args:
@@ -169,6 +169,7 @@ RESET = "\x1b[0m"
 BOLD = f"\x1b[1m"
 UNDERLINE = f"\x1b[4m"
 REVERSE = f"\x1b[7m"
+STRIKETHROUGH = f"\x1b[9m"
 
 # standard colors:
 BLACK   = "\x1b[38;2;0;0;0m"
