@@ -132,11 +132,11 @@ class Node(metaclass=NodeMixinSortMeta):
             self._process_priority = value
             Node._request_process_priority_sort = True
 
-    def where(self: Self, **attributes) -> Self:
+    def where(self: Self, **attributes: ...) -> Self:
         """Sets/overrides the given attributes of the node instance
 
         Returns:
-            Node: self after modification(s)
+            Self: self after modification(s)
         """
         for key, value in attributes.items():
             setattr(self, key, value)
