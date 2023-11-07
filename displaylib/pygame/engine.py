@@ -97,7 +97,7 @@ class PygameEngine(Engine):
         ...
     
     def _main_loop(self) -> None:
-        """Overriden main loop spesific for `displaylib.ascii` mode
+        """Overriden main loop spesific for `displaylib.pygame` mode
         """
         Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
         clock = pygame.time.Clock()
@@ -125,11 +125,10 @@ class PygameEngine(Engine):
                 Node._queued_nodes.clear()
                 Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
             
-            self._render(self.screen)
             for node in Node.nodes.values(): # render nodes onto the display
                 if isinstance(node, PygameNode2D):
                     node._render(self.screen)
+            self._render(self.screen) # engine render on top
             
             pygame.display.flip()
             delta = clock.tick(self.tps) / MILLISECOND # milliseconds -> seconds
-        self._on_exit()
