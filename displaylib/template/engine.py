@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
+import atexit
 
 from .node import Node
 from .type_hints import MroNext, EngineType
@@ -58,7 +59,7 @@ class Engine(metaclass=EngineMixinSortMeta):
         instance.per_frame_tasks = []
         return cast(EngineType, instance)
 
-    def __init__(self, tps: int = 16, **config) -> None:
+    def __init__(self, tps: int = 16, **_overflow) -> None:
         """Base implementation for initializing and running the App instance
 
         Args:
@@ -116,4 +117,3 @@ class Engine(metaclass=EngineMixinSortMeta):
                     del Node.nodes[uid]
                 Node._queued_nodes.clear()
                 Node.nodes = {uid: node for uid, node in sorted(Node.nodes.items(), key=self.sort_function_for_process_priority)}
-        # _on_exit() is called automatically after this
