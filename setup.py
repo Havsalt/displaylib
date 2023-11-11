@@ -1,8 +1,8 @@
+from os.path import dirname
 from setuptools import setup
 from displaylib import __version__, __author__
 
-
-with open("README.md", "r", encoding="utf-8") as markdown_file:
+with open(dirname(__file__) + "/README.md", "r", encoding="utf-8") as markdown_file:
    markdown_content = markdown_file.read()
 
 setup(
@@ -21,6 +21,7 @@ setup(
       "displaylib.template.networking",
       "displaylib.ascii",
       "displaylib.ascii.prefabs",
+      "displaylib.ascii.prototypes",
       "displaylib.pygame",
    ]
 )
