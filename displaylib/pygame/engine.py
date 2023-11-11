@@ -8,7 +8,7 @@ from .node import PygameNode2D
 
 
 class PygameEngine(Engine):
-    """`ASCIIEngine` for creating a world in Pygame graphics
+    """`PygameEngine` for creating a world in Pygame graphics
     
     Hooks:
         - `_input(self, event: pygame.event.Event) -> None`
