@@ -135,6 +135,9 @@ class Vec2:
         """
         return bool(self.x or self.y)
 
+    def __abs__(self) -> Vec2:
+        return Vec2(abs(self.x), abs(self.y))
+
     def __round__(self, ndigits: int = 0) -> Vec2:
         return Vec2(round(self.x, ndigits),
                     round(self.y, ndigits))
@@ -421,6 +424,9 @@ class Vec2i(Vec2):
         """
         self.x = x
         self.y = y
+    
+    def __abs__(self) -> Vec2:
+        return Vec2(abs(self.x), abs(self.y))
     
     def __neg__(self) -> Vec2i:
         return Vec2i(-self.x, -self.y)
