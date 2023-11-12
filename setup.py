@@ -23,5 +23,6 @@ setup(
       "displaylib.ascii.prefabs",
       "displaylib.ascii.prototypes",
       "displaylib.pygame",
+      "displaylib.pygame.prototypes"
    ]
 )
