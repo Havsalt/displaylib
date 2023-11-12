@@ -50,7 +50,7 @@ class ControllerSupport: # Component (mixin class)
 
     def __new__(cls: type[NodeType], *args, device_index: int = 0, **kwargs) -> NodeType:
         if device_index is None:
-            return super().__new__(cls, *args, **kwargs)
+            return super().__new__(cls, *args, **kwargs) # type: ignore
         mro_next = cast(MroNext[ControllerProtocol], super())
         instance = mro_next.__new__(cls, *args, **kwargs)
         try:
