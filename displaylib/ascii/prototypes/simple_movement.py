@@ -1,26 +1,34 @@
-from __future__ import annotations
+from __future__ import annotations as _annotations
 
-from ...math import Vec2
-from ...template.type_hints import NodeType
-from .. import keyboard
-from ..prefabs.sprite import AsciiSprite
+from typing import TYPE_CHECKING as _TYPE_CHECKING
+
+from ...template.type_hints import NodeType as _NodeType
+from .. import keyboard as _keyboard
+
+if _TYPE_CHECKING:
+    from typing import Protocol as _Protocol
+    from ...template.type_hints import UpdateFunction as _UpdateFunction, ValidTransform2DNode as _ValidTransform2DNode
+    
+    class _ValidSimpleMovement2DNode(_ValidTransform2DNode, _Protocol):
+        def _simple_movement_2d_update_wrapper(self: _ValidSimpleMovement2DNode, update_function: _UpdateFunction) -> _UpdateFunction:
+            ...
 
 
 class SimpleMovement2D: # Component (mixin class)
-    def __new__(cls: type[NodeType], *args, texture: list[list[str]] = [], offset: Vec2 = Vec2(0, 0), centered = None, z_index: int = 0, force_sort: bool = True, **kwargs) -> NodeType:
-        instance = super().__new__(cls, *args, **kwargs) # type: AsciiSprite  # type: ignore
+    def __new__(cls: type[_NodeType], *args, **kwargs) -> _NodeType:
+        instance = super().__new__(cls, *args, **kwargs) # type: _ValidSimpleMovement2DNode  # type: ignore
         instance._update = instance._simple_movement_2d_update_wrapper(instance._update) # type: ignore
         return instance # type: ignore
     
-    def _simple_movement_2d_update_wrapper(self: AsciiSprite, update_function): # type: ignore
-        def update(delta):
-            if keyboard.is_pressed("D"):
+    def _simple_movement_2d_update_wrapper(self: _ValidSimpleMovement2DNode, update_function: _UpdateFunction) -> _UpdateFunction:
+        def _update(delta: float):
+            if _keyboard.is_pressed("D"):
                 self.position.x += 1
-            if keyboard.is_pressed("A"):
+            if _keyboard.is_pressed("A"):
                 self.position.x -= 1
-            if keyboard.is_pressed("W"):
+            if _keyboard.is_pressed("W"):
                 self.position.y -= 1
-            if keyboard.is_pressed("S"):
+            if _keyboard.is_pressed("S"):
                 self.position.y += 1
             update_function(delta)
-        return update
+        return _update
