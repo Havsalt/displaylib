@@ -25,7 +25,7 @@ PygameNode(x, y)
 """
 
 __version__ = "0.0.8"
-__author__ = "Floating-Int"
+__author__ = "Havsalt"
 __all__ = [ # default mode is used when using the star notation (from displaylib import *)
     # math
     "lerp",              # (function)
