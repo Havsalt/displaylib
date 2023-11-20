@@ -1,17 +1,16 @@
-from __future__ import annotations
+from __future__ import annotations as _annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING as _TYPE_CHECKING
 
-from ...math import Vec2i
-from ...template.type_hints import MroNext, NodeType, AnyNode
-from ..node import AsciiNode2D
-from ..texture import Texture
-from ..colored import Color
-from ..color import WHITE
+from ...math import Vec2i as _Vec2i
+from .. import color as _color_module
+from ..node import AsciiNode2D as _AsciiNode2D
+from ..texture import Texture as _Texture
+from ..colored import Color as _Color
 
-if TYPE_CHECKING:
-    from ...template.type_hints import AnyNode
-    from ..color import ColorValue
+if _TYPE_CHECKING:
+    from ...template.type_hints import NodeType as _NodeType, AnyNode as _AnyNode
+    from ..color import ColorValue as _ColorValue
 
 
 class PanelStyle:
@@ -29,29 +28,24 @@ class PanelStyle:
     bottom_right:  str = "+"
 
 
-class Panel(Color, Texture, AsciiNode2D):
-    default_width: int
-    default_height: int
+class Panel(_Color, _Texture, _AsciiNode2D):
+    default_width: int = 12
+    default_height: int = 12
     style: PanelStyle
     
-    def __new__(cls: type[NodeType], *args, width=None, height=None, style=None, **kwargs) -> NodeType:
-        mro_next = cast(MroNext[Panel], super())
-        instance = mro_next.__new__(cls, *args, **kwargs)
-        # set width
+    def __new__(cls: type[_NodeType], *args, width=None, height=None, style=None, **kwargs) -> _NodeType:
+        instance = super().__new__(cls, *args, **kwargs) # type: Panel  # type: ignore
+        # override -> default class value
         if width is not None:
             instance._width = width
         elif hasattr(instance, "default_width"):
             instance._width = instance.default_width
-        else:
-            instance._width = 12
-        # set height
+        # override -> default class value
         if height is not None:
             instance._height = height
         elif hasattr(instance, "default_height"):
             instance._height = instance.default_height
-        else:
-            instance._height = 12
-        # set style
+        # override -> 'class value -> default
         if style is not None:
             instance.style = style
         elif hasattr(instance, "style"):
@@ -64,9 +58,9 @@ class Panel(Color, Texture, AsciiNode2D):
             *([instance.style.middle_left, *(instance.style.middle_fill*(instance._width-2)), instance.style.middle_right] for _ in range(instance._height-2)),
             [instance.style.bottom_left, *(instance.style.bottom_middle*(instance._width-2)), instance.style.bottom_right]
         ]
-        return cast(NodeType, instance)
+        return instance # type: ignore
     
-    def __init__(self, parent: AnyNode | None = None, *, x: float = 0, y: float = 0, width: int = 12, height: int = 8, color: ColorValue = WHITE, centered: bool = False, style: PanelStyle | None = None, z_index: int = 0, force_sort: bool = True) -> None:
+    def __init__(self, parent: _AnyNode | None = None, *, x: float = 0, y: float = 0, width: int = 12, height: int = 8, color: _ColorValue = _color_module.WHITE, centered: bool = False, style: PanelStyle | None = None, z_index: int = 0, force_sort: bool = True) -> None:
         """Panel interface
 
         Args:
@@ -107,5 +101,5 @@ class Panel(Color, Texture, AsciiNode2D):
             [self.style.bottom_left, *(self.style.bottom_middle*(self._width-2)), self.style.bottom_right]
         ]
     
-    def size(self) -> Vec2i:
-        return Vec2i(self._width, self._height)
+    def size(self) -> _Vec2i:
+        return _Vec2i(self._width, self._height)
