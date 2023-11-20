@@ -13,7 +13,6 @@ from ..prefabs.label import AsciiLabel as _AsciiLabel
 
 if _TYPE_CHECKING:
     from types import TracebackType as _TracebackType
-    from typing import Optional as _Optional
 
 try:
     import keyboard as _keyboard
@@ -21,13 +20,18 @@ except ModuleNotFoundError as _error:
     raise ModuleNotFoundError("missing external module: keyboard, which is required to use this submodule") from _error
 
 
-_ADDITIONAL_SYMBOLS: str = "\"¤%&-_(|)=?`´<!>@£$€{+}\\[/]~^¨*',;#.:"
+class _InputFieldCaret(_AsciiSprite):
+    color=_color_module.GRAY
+    texture=[["_"]]
+
+
+_ADDITIONAL_SYMBOLS: str = "\"¤%&-_(|)=`?´<!>@£$€{+}\\[/]~^¨*',;#.:"
 
 
 class InputField(_AsciiLabel):
     """Prefabricated `InputField` that writes what the user types.
     Call `.begin_write()` to start accepting input, and `.end_write()` to stop.
-    Can be used with a context manager, invoking `.begin_write()` and `.end_write()`.
+    Can be used with a `context manager`, invoking `.begin_write()` and `.end_write()`.
     This state can also be changed 
     
     Components (inherited from `Label`):
@@ -48,28 +52,21 @@ class InputField(_AsciiLabel):
     def __init__(self, parent: _AnyNode | None = None, *, x: float = 0, y: float = 0, text: str = "", color: _ColorValue = _color_module.WHITE, delimiter: str = "\n", offset: _Vec2 = _Vec2.ZERO, centered: bool = False, z_index: int = 0, force_sort: bool = True) -> None:
         _keyboard.on_press(callback=self._on_key_pressed, suppress=False)
         self._caret_index = len(self.text)
-        self.caret = _AsciiSprite(
-            self,
-            color=_color_module.GRAY,
-            texture=[["_"]])
+        self.caret = _InputFieldCaret(self)
         self.caret.position = self.get_caret_position()
+        self.caret.hide()
     
     def __enter__(self) -> None:
         self.begin_write()
     
-    def __exit__(self, _exc_type: _Optional[type[BaseException]], _exc_value: _Optional[BaseException], _exc_tb: _Optional[_TracebackType]) -> _Optional[bool]:
+    def __exit__(self, _exc_type: type[BaseException] | None, _exc_value: BaseException | None, _exc_tb: _TracebackType | None) -> bool | None:
         self.begin_write()
 
     def _on_key_pressed(self, key: _keyboard.KeyboardEvent) -> None:
         if not self.is_writing:
             return
-        if key.name in self.valid_keys:
-            new_chars = list(self.text)
-            new_chars.insert(self._caret_index, key.name)
-            self._caret_index += 1
-            self.text = "".join(new_chars)
         
-        elif key.name == self.key_space:
+        if key.name == self.key_space:
             new_chars = list(self.text)
             new_chars.insert(self._caret_index, " ")
             self._caret_index += 1
@@ -90,6 +87,12 @@ class InputField(_AsciiLabel):
         elif key.name == self.key_newline: # NOTE: this check is made after `.key_confirm`
             new_chars = list(self.text)
             new_chars.insert(self._caret_index, "\n")
+            self._caret_index += 1
+            self.text = "".join(new_chars)
+        
+        elif key.name in self.valid_keys:
+            new_chars = list(self.text)
+            new_chars.insert(self._caret_index, key.name)
             self._caret_index += 1
             self.text = "".join(new_chars)
         
@@ -123,9 +126,11 @@ class InputField(_AsciiLabel):
     
     def begin_write(self) -> None:
         self.is_writing = True
+        self.caret.show()
     
     def end_write(self) -> None:
         self.is_writing = False
+        self.caret.hide()
         
     def on_confirm(self, text: str) -> None:
         """Called when the confirm button is pressed.
