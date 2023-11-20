@@ -21,6 +21,8 @@ except ModuleNotFoundError as _error:
 
 
 class _InputFieldCaret(_AsciiSprite):
+    """A caret for the `InputField`
+    """
     color=_color_module.GRAY
     texture=[["_"]]
 
