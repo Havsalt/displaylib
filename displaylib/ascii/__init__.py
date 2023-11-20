@@ -1,6 +1,6 @@
 """## Ascii submodule of DisplayLib
 
-Provides a framework for creating infinite 2D worlds in Ascii
+Provides a framework for creating an infinite 2D world in `Ascii`
 """
 
 __all__ = [
